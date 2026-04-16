@@ -1,0 +1,1 @@
+Quand je donne à un truc à faire apres avoir mis les trucs tu me dis toujours ce que je fais etape par etape 
