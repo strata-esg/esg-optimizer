@@ -9,15 +9,18 @@ import logging
 from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from backend.config import settings
 from backend.database import get_db, SessionLocal
 from backend.models import Analysis, Company, User
 from backend.routers.auth import get_current_user
-from backend.schemas import AnalysisCreatedResponse, AnalysisResponse
+from backend.schemas import AnalysisCreatedResponse, AnalysisResponse, DeltaFullResponse
 from backend.services.analyzer import run_analysis_pipeline
+from backend.services.delta_service import find_previous_analysis, run_delta, _safe_json_loads
 from backend.services.extractor import ALLOWED_EXTENSIONS
+from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf
 
 logger = logging.getLogger(__name__)
 
@@ -209,3 +212,106 @@ def _serialize_analysis(analysis: Analysis) -> dict:
         "error_message": analysis.error_message,
         "created_at": analysis.created_at,
     }
+
+
+# ── GET /analysis/{analysis_id}/pdf ──────────────────────────────
+@router.get("/{analysis_id}/pdf")
+def download_analysis_pdf(
+    analysis_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Télécharge le rapport PDF d'une analyse ESG."""
+    analysis = (
+        db.query(Analysis)
+        .filter(Analysis.id == analysis_id, Analysis.user_id == current_user.id)
+        .first()
+    )
+    if not analysis:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
+
+    if analysis.status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"L'analyse n'est pas terminée (status: {analysis.status}).",
+        )
+
+    company = db.query(Company).filter(Company.id == analysis.company_id).first()
+    if not company:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entreprise introuvable.")
+
+    try:
+        pdf_bytes = generate_analysis_pdf(analysis, company)
+    except Exception as exc:
+        logger.error("Erreur génération PDF [%d] : %s", analysis_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la génération du PDF : {exc}",
+        )
+
+    filename = f"ESG_Report_{company.name}_{analysis.report_year or 'NA'}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+# ── GET /analysis/{analysis_id}/delta-pdf ────────────────────────
+@router.get("/{analysis_id}/delta-pdf")
+def download_delta_pdf(
+    analysis_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Télécharge le rapport PDF delta (comparaison N vs N-1)."""
+    analysis = (
+        db.query(Analysis)
+        .filter(Analysis.id == analysis_id, Analysis.user_id == current_user.id)
+        .first()
+    )
+    if not analysis:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
+
+    if analysis.status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"L'analyse n'est pas terminée (status: {analysis.status}).",
+        )
+
+    # Vérifier qu'un delta existe
+    if analysis.delta_narrative is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aucun delta disponible pour cette analyse. "
+                   "Un delta nécessite au moins deux analyses de la même entreprise.",
+        )
+
+    company = db.query(Company).filter(Company.id == analysis.company_id).first()
+    if not company:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entreprise introuvable.")
+
+    previous = find_previous_analysis(db, analysis)
+    if not previous:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Analyse précédente introuvable pour générer le delta PDF.",
+        )
+
+    delta_narrative = _safe_json_loads(analysis.delta_narrative) or {}
+
+    try:
+        pdf_bytes = generate_delta_pdf(analysis, previous, company, delta_narrative)
+    except Exception as exc:
+        logger.error("Erreur génération delta PDF [%d] : %s", analysis_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la génération du delta PDF : {exc}",
+        )
+
+    filename = f"ESG_Delta_{company.name}_{previous.report_year or 'NA'}_vs_{analysis.report_year or 'NA'}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

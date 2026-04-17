@@ -196,6 +196,76 @@ class StatsResponse(BaseModel):
 
 
 # ══════════════════════════════════════════════
+# DELTA
+# ══════════════════════════════════════════════
+
+class ScoreEvolutionItem(BaseModel):
+    previous: Optional[int] = None
+    current: Optional[int] = None
+    delta: Optional[int] = None
+    trend: Optional[str] = None  # forte_amelioration|amelioration|stable|degradation|forte_degradation
+
+
+class ScoreEvolution(BaseModel):
+    environment: Optional[ScoreEvolutionItem] = None
+    social: Optional[ScoreEvolutionItem] = None
+    governance: Optional[ScoreEvolutionItem] = None
+    global_: Optional[ScoreEvolutionItem] = Field(None, alias="global")
+
+
+class ESRSEvolution(BaseModel):
+    gained: list[str] = []
+    lost: list[str] = []
+    coverage_previous: Optional[float] = None
+    coverage_current: Optional[float] = None
+
+
+class KPIComparison(BaseModel):
+    name: str
+    previous_value: Optional[str] = None
+    current_value: Optional[str] = None
+    unit: Optional[str] = None
+    evolution: Optional[str] = None
+    status: Optional[str] = None  # improved|stable|degraded|new|removed
+
+
+class DeltaImprovement(BaseModel):
+    pillar: str
+    description: str
+
+
+class DeltaPriorityAction(BaseModel):
+    priority: int = Field(ge=1, le=5)
+    pillar: str
+    action: str
+    rationale: Optional[str] = None
+
+
+class DeltaFullResponse(BaseModel):
+    """Réponse complète du delta report (narration GPT-4o + scores)."""
+    analysis_id: int
+    previous_analysis_id: int
+    company_name: str
+    year_current: Optional[int] = None
+    year_previous: Optional[int] = None
+
+    # Scores bruts
+    delta_env: Optional[float] = None
+    delta_social: Optional[float] = None
+    delta_gov: Optional[float] = None
+    delta_global: Optional[float] = None
+
+    # Narration GPT-4o
+    delta_summary: Optional[str] = None
+    score_evolution: Optional[ScoreEvolution] = None
+    esrs_evolution: Optional[ESRSEvolution] = None
+    kpi_comparison: Optional[list[KPIComparison]] = None
+    key_improvements: Optional[list[DeltaImprovement]] = None
+    key_regressions: Optional[list[DeltaImprovement]] = None
+    priority_actions: Optional[list[DeltaPriorityAction]] = None
+
+
+# ══════════════════════════════════════════════
 # GENERIC
 # ══════════════════════════════════════════════
 

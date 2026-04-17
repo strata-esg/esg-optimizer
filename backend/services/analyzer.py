@@ -15,6 +15,7 @@ from backend.config import settings
 from backend.models import Analysis, Company
 from backend.prompts.system_analysis import SYSTEM_ANALYSIS_PROMPT
 from backend.services.extractor import extract_text
+from backend.services.delta_service import run_delta
 
 logger = logging.getLogger(__name__)
 
@@ -123,11 +124,21 @@ def run_analysis_pipeline(analysis_id: int, file_path: str, db: Session) -> None
         _save_results(analysis, result, raw_json)
         analysis.status = "success"
         analysis.processing_time_s = round(time.time() - start, 2)
+        db.commit()
 
         logger.info(
             "Pipeline [%d] — Succès en %.1fs (score global: %s)",
             analysis_id, analysis.processing_time_s, analysis.score_global,
         )
+
+        # 4. Delta Report (si analyse précédente existe)
+        try:
+            delta_result = run_delta(analysis, db)
+            if delta_result:
+                logger.info("Pipeline [%d] — Delta calculé avec succès", analysis_id)
+        except Exception as delta_exc:
+            # Le delta est optionnel — on ne fait pas échouer l'analyse principale
+            logger.warning("Pipeline [%d] — Delta échoué (non bloquant) : %s", analysis_id, delta_exc)
 
     except Exception as exc:
         analysis.status = "failed"
