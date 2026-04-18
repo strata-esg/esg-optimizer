@@ -35,23 +35,28 @@ class Settings(BaseSettings):
     # discovery = 1 analyse total (pas par mois), essential = paiement à l'unité,
     # pro = illimité, enterprise = illimité
     discovery_total_limit: int = 1
-    essential_analysis_price_eur: int = 39
-    pro_monthly_price_eur: int = 129
-    pro_annual_price_eur: int = 990
+    # Rétro-compat : si FREE_TIER_MONTHLY_LIMIT existe dans .env, on l'ignore (extra="ignore")
 
-    # --- Analytics (Umami) ---
-    umami_url: str = ""
-    umami_website_id: str = ""
+    # --- Analytics (Plausible) ---
+    plausible_domain: str = ""  # ex: esg-optimizer.fr
 
-    # --- Email (Resend) — sprint 6E ---
+    # --- Email (Resend) ---
     resend_api_key: str = ""
 
-    # --- Stripe — sprint 6D ---
+    # --- Stripe ---
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
-    stripe_essential_payment_link: str = ""
-    stripe_pro_monthly_payment_link: str = ""
-    stripe_pro_annual_payment_link: str = ""
+    stripe_link_essentiel: str = ""   # Payment Link Stripe pour le plan Essentiel (39€)
+    stripe_link_pro: str = ""         # Payment Link Stripe pour le plan Pro (129€/mois)
+
+    # --- Sentry (monitoring erreurs) ---
+    sentry_dsn: str = ""
+
+    # --- Quick-check public (sprint 6B) ---
+    public_upload_max_mb: int = 10
+    public_rate_limit_daily: int = 3
+    public_rate_limit_weekly: int = 10
+    public_token_expiry_hours: int = 72
 
     # --- Environment ---
     environment: str = "development"

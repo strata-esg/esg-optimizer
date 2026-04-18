@@ -1,8 +1,9 @@
 """
-ESG Optimizer MVP — Modèles SQLAlchemy (3 tables : users, companies, analyses).
+ESG Optimizer MVP — Modèles SQLAlchemy (4 tables : users, companies, analyses, public_analyses).
 """
 
-from datetime import datetime, timezone
+import uuid
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import (
     Boolean,
@@ -114,3 +115,40 @@ class Analysis(Base):
     # Relations
     company = relationship("Company", back_populates="analyses")
     user = relationship("User", back_populates="analyses")
+
+
+# ──────────────────────────────────────────────
+# PUBLIC ANALYSES (quick-check sans auth)
+# ──────────────────────────────────────────────
+def _token_default() -> str:
+    return str(uuid.uuid4())
+
+
+def _expiry_default() -> datetime:
+    return datetime.now(timezone.utc) + timedelta(hours=72)
+
+
+class PublicAnalysis(Base):
+    __tablename__ = "public_analyses"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    token = Column(String(36), unique=True, nullable=False, default=_token_default, index=True)
+    ip_hash = Column(String(64), nullable=False, index=True)  # SHA-256 de l'IP
+
+    # Résultats quick-check (limités)
+    score_global = Column(Float, nullable=True)
+    csrd_ready = Column(Boolean, nullable=True)
+    teaser_strengths = Column(Text, nullable=True)   # JSON array (top 3)
+    teaser_weaknesses = Column(Text, nullable=True)  # JSON array (top 3)
+
+    # Résultats complets (stockés pour claim post-inscription)
+    full_response = Column(Text, nullable=True)      # JSON complet du LLM
+
+    # Métadonnées
+    source_filename = Column(String(255), nullable=True)
+    status = Column(String(20), default="pending")    # pending | processing | success | failed
+    error_message = Column(Text, nullable=True)
+    processing_time_s = Column(Float, nullable=True)
+    expires_at = Column(DateTime, default=_expiry_default)
+    claimed_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=_utcnow)

@@ -1,10 +1,9 @@
 """
-ESG Optimizer MVP — Composant analytics Umami.
-Injecte le script de tracking Umami et expose des fonctions de tracking d'events.
+ESG Optimizer MVP — Composant analytics Plausible.
+Injecte le script de tracking Plausible et expose des fonctions de tracking d'events.
 
 Configuration :
-    - Variable d'environnement UMAMI_WEBSITE_ID (ou laisser vide en dev)
-    - Variable d'environnement UMAMI_URL (URL de ton instance Umami self-hosted)
+    - Variable d'environnement PLAUSIBLE_DOMAIN (ex: esg-optimizer.fr)
 
 Events trackés :
     1. landing_view         — Page d'accueil affichée
@@ -21,47 +20,53 @@ import streamlit as st
 import os
 
 # ── Config ────────────────────────────────────────────────────────
-UMAMI_URL = os.getenv("UMAMI_URL", "")  # ex: https://umami.esg-optimizer.app
-UMAMI_WEBSITE_ID = os.getenv("UMAMI_WEBSITE_ID", "")  # UUID de ton site dans Umami
+PLAUSIBLE_DOMAIN = os.getenv("PLAUSIBLE_DOMAIN", "")  # ex: esg-optimizer.fr
 
 
-def inject_umami_script() -> None:
+def inject_analytics_script() -> None:
     """
-    Injecte le script Umami dans le <head> de la page Streamlit.
-    Ne fait rien si UMAMI_URL ou UMAMI_WEBSITE_ID ne sont pas configurés.
+    Injecte le script Plausible dans la page Streamlit.
+    Ne fait rien si PLAUSIBLE_DOMAIN n'est pas configuré.
     Appeler UNE SEULE FOIS par page, typiquement dans app.py.
     """
-    if not UMAMI_URL or not UMAMI_WEBSITE_ID:
+    if not PLAUSIBLE_DOMAIN:
         return  # Pas configuré — mode dev, on skip silencieusement
 
     script = f"""
-    <script defer src="{UMAMI_URL}/script.js"
-            data-website-id="{UMAMI_WEBSITE_ID}">
+    <script defer data-domain="{PLAUSIBLE_DOMAIN}"
+            src="https://plausible.io/js/script.js">
     </script>
+    <script>window.plausible = window.plausible || function() {{
+        (window.plausible.q = window.plausible.q || []).push(arguments)
+    }}</script>
     """
     st.markdown(script, unsafe_allow_html=True)
 
 
+# Alias pour rétro-compat avec le code existant
+inject_umami_script = inject_analytics_script
+
+
 def track_event(event_name: str, data: dict | None = None) -> None:
     """
-    Envoie un event custom à Umami via JavaScript.
+    Envoie un event custom à Plausible via JavaScript.
 
     Args:
         event_name: Nom de l'event (ex: 'quick_check_started')
         data: Données additionnelles (ex: {'persona': 'pme', 'score': 72})
     """
-    if not UMAMI_URL or not UMAMI_WEBSITE_ID:
+    if not PLAUSIBLE_DOMAIN:
         return
 
-    data_json = ""
+    props_json = ""
     if data:
         import json
-        data_json = f", {json.dumps(data)}"
+        props_json = f", {{props: {json.dumps(data)}}}"
 
     js = f"""
     <script>
-        if (typeof umami !== 'undefined') {{
-            umami.track('{event_name}'{data_json});
+        if (typeof plausible !== 'undefined') {{
+            plausible('{event_name}'{props_json});
         }}
     </script>
     """

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from backend.config import settings
 from backend.models import Analysis, Company
 from backend.prompts.system_delta import SYSTEM_DELTA_PROMPT
+from backend.utils import safe_json_loads
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +47,8 @@ def find_previous_analysis(db: Session, analysis: Analysis) -> Analysis | None:
     return query.first()
 
 
-def _safe_json_loads(raw: str | None) -> dict | list | None:
-    """Parse un champ JSON stocké en string. Retourne None si invalide."""
-    if raw is None:
-        return None
-    try:
-        return json.loads(raw)
-    except (json.JSONDecodeError, TypeError):
-        return None
+# _safe_json_loads migré vers backend.utils.safe_json_loads
+_safe_json_loads = safe_json_loads  # alias rétro-compat
 
 
 def compute_score_deltas(current: Analysis, previous: Analysis) -> dict:

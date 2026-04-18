@@ -207,3 +207,47 @@ def get_stats(token: str) -> dict:
         timeout=10,
     )
     return _handle_response(resp)
+
+
+# ══════════════════════════════════════════════════════════════════
+# PUBLIC — Quick-check (sans auth)
+# ══════════════════════════════════════════════════════════════════
+
+def quick_check_upload(file_bytes: bytes, filename: str) -> dict:
+    """
+    POST /public/quick-check (multipart/form-data, sans auth)
+    Retourne : {"token": str, "status": "processing", "message": str}
+    """
+    files = {"file": (filename, file_bytes)}
+    resp = requests.post(
+        f"{BACKEND_URL}/public/quick-check",
+        files=files,
+        timeout=30,
+    )
+    return _handle_response(resp)
+
+
+def quick_check_result(token: str) -> dict:
+    """
+    GET /public/quick-check/{token}
+    Retourne le résultat du quick-check (polling).
+    """
+    resp = requests.get(
+        f"{BACKEND_URL}/public/quick-check/{token}",
+        timeout=15,
+    )
+    return _handle_response(resp)
+
+
+def claim_quick_check(auth_token: str, qc_token: str) -> dict:
+    """
+    POST /auth/claim-analysis
+    Rattache un quick-check public à un compte utilisateur.
+    """
+    resp = requests.post(
+        f"{BACKEND_URL}/auth/claim-analysis",
+        headers=_headers(auth_token),
+        params={"token": qc_token},
+        timeout=10,
+    )
+    return _handle_response(resp)

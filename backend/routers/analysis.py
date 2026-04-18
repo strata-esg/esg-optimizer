@@ -18,7 +18,8 @@ from backend.models import Analysis, Company, User
 from backend.routers.auth import get_current_user
 from backend.schemas import AnalysisCreatedResponse, AnalysisResponse, DeltaFullResponse
 from backend.services.analyzer import run_analysis_pipeline
-from backend.services.delta_service import find_previous_analysis, run_delta, _safe_json_loads
+from backend.services.delta_service import find_previous_analysis, run_delta
+from backend.utils import safe_json_loads as _safe_json_loads
 from backend.services.extractor import ALLOWED_EXTENSIONS
 from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf
 
@@ -180,16 +181,6 @@ def get_analysis(
 
 def _serialize_analysis(analysis: Analysis) -> dict:
     """Convertit les champs JSON string en objets Python pour la réponse."""
-    import json
-
-    def _safe_json_loads(raw: str | None) -> list | dict | None:
-        if raw is None:
-            return None
-        try:
-            return json.loads(raw)
-        except (json.JSONDecodeError, TypeError):
-            return None
-
     return {
         "id": analysis.id,
         "company_id": analysis.company_id,

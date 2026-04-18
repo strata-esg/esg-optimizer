@@ -14,6 +14,7 @@ from backend.database import create_tables
 from backend.routers.auth import router as auth_router
 from backend.routers.analysis import router as analysis_router
 from backend.routers.history import router as history_router
+from backend.routers.public import router as public_router, claim_router
 # ──────────────────────────────────────────────
 # Lifespan : crée les tables au démarrage
 # ──────────────────────────────────────────────
@@ -52,6 +53,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(analysis_router)
 app.include_router(history_router)
+app.include_router(public_router)
+app.include_router(claim_router)
 
 # ──────────────────────────────────────────────
 # Routes

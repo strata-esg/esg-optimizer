@@ -30,6 +30,7 @@ from reportlab.platypus import (
 )
 
 from backend.models import Analysis, Company
+from backend.utils import safe_json_loads as _safe_json_loads
 
 logger = logging.getLogger(__name__)
 
@@ -49,15 +50,6 @@ PILLAR_COLORS = {
     "S": colors.HexColor("#2563EB"),  # Bleu
     "G": colors.HexColor("#7C3AED"),  # Violet
 }
-
-
-def _safe_json_loads(raw: str | None) -> dict | list | None:
-    if raw is None:
-        return None
-    try:
-        return json.loads(raw)
-    except (json.JSONDecodeError, TypeError):
-        return None
 
 
 # ──────────────────────────────────────────────

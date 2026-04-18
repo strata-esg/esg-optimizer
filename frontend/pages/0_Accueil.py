@@ -15,8 +15,9 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from frontend.components.sidebar import render_sidebar
-from frontend.components.analytics import inject_umami_script, track_landing_view, track_pricing_viewed
+from frontend.components.analytics import inject_umami_script, track_landing_view, track_pricing_viewed, track_quick_check_started, track_quick_check_completed
 from frontend.utils.session import is_logged_in
+from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError
 
 # ── Page config ───────────────────────────────────────────────────
 render_sidebar()
@@ -85,13 +86,157 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# CTA principal
-col_l, col_cta, col_r = st.columns([1, 2, 1])
-with col_cta:
-    if is_logged_in():
-        st.page_link("pages/2_Upload.py", label=content["cta"], icon="🚀", use_container_width=True)
-    else:
-        st.page_link("pages/1_Login.py", label=content["cta"], icon="🚀", use_container_width=True)
+# ══════════════════════════════════════════════════════════════════
+# QUICK-CHECK PUBLIC — Upload sans compte
+# ══════════════════════════════════════════════════════════════════
+st.markdown(
+    """<div style="text-align: center; margin: 10px 0 20px 0;">
+        <span style="font-size: 14px; color: #9CA3AF;">ou testez directement ↓</span>
+    </div>""",
+    unsafe_allow_html=True,
+)
+
+qc_col_l, qc_col_center, qc_col_r = st.columns([1, 3, 1])
+with qc_col_center:
+    uploaded_file = st.file_uploader(
+        "Uploadez votre rapport pour un aperçu gratuit",
+        type=["pdf", "docx", "xlsx"],
+        help="PDF, DOCX ou XLSX — 10 Mo max. Aucun compte requis.",
+        key="quick_check_uploader",
+    )
+
+    if uploaded_file is not None and "qc_token" not in st.session_state:
+        track_quick_check_started()
+
+        with st.spinner("Analyse en cours... (environ 30 secondes)"):
+            try:
+                file_bytes = uploaded_file.read()
+                result = quick_check_upload(file_bytes, uploaded_file.name)
+                st.session_state["qc_token"] = result["token"]
+            except APIError as e:
+                if e.status_code == 429:
+                    st.warning(e.detail)
+                else:
+                    st.error(f"Erreur : {e.detail}")
+            except Exception as e:
+                st.error(f"Erreur de connexion au serveur : {e}")
+
+    # Polling du résultat si on a un token
+    if "qc_token" in st.session_state:
+        import time as _time
+
+        token = st.session_state["qc_token"]
+        max_polls = 40  # 40 × 3s = 2 minutes max
+
+        if "qc_result" not in st.session_state:
+            progress_bar = st.progress(0, text="Extraction du texte...")
+            for i in range(max_polls):
+                try:
+                    qc = quick_check_result(token)
+                except Exception:
+                    _time.sleep(3)
+                    continue
+
+                if qc["status"] == "success":
+                    st.session_state["qc_result"] = qc
+                    progress_bar.progress(100, text="Analyse terminée !")
+                    track_quick_check_completed(qc.get("score_global"))
+                    break
+                elif qc["status"] == "failed":
+                    progress_bar.empty()
+                    st.error(f"L'analyse a échoué : {qc.get('error_message', 'Erreur inconnue')}")
+                    break
+                else:
+                    # Progression simulée
+                    pct = min(int((i / max_polls) * 95), 95)
+                    steps = ["Extraction du texte...", "Analyse IA en cours...",
+                             "Scoring ESRS...", "Finalisation..."]
+                    step = steps[min(i // 10, 3)]
+                    progress_bar.progress(pct, text=step)
+                    _time.sleep(3)
+
+        # Affichage du résultat
+        if "qc_result" in st.session_state:
+            qc = st.session_state["qc_result"]
+            score = qc.get("score_global", 0)
+            csrd = qc.get("csrd_ready", False)
+            strengths = qc.get("teaser_strengths", [])
+            weaknesses = qc.get("teaser_weaknesses", [])
+
+            # Score en grand
+            score_color = "#10B981" if score >= 60 else "#F59E0B" if score >= 40 else "#EF4444"
+            csrd_badge = (
+                '<span style="background: #D1FAE5; color: #059669; padding: 4px 12px; '
+                'border-radius: 8px; font-weight: 600;">CSRD Ready ✓</span>'
+                if csrd else
+                '<span style="background: #FEE2E2; color: #DC2626; padding: 4px 12px; '
+                'border-radius: 8px; font-weight: 600;">Non conforme ✗</span>'
+            )
+
+            st.markdown(
+                f"""<div style="text-align: center; padding: 20px; background: #F9FAFB;
+                    border-radius: 16px; border: 1px solid #E5E7EB; margin: 16px 0;">
+                    <div style="font-size: 56px; font-weight: 800; color: {score_color};">
+                        {score}<span style="font-size: 24px; color: #9CA3AF;">/100</span>
+                    </div>
+                    <div style="margin-top: 8px;">{csrd_badge}</div>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+
+            # Forces et lacunes — visibles mais partiellement floutées
+            force_col, weak_col = st.columns(2)
+            with force_col:
+                st.markdown("**✅ 3 forces détectées**")
+                for i, s in enumerate(strengths):
+                    if i == 0:
+                        st.markdown(f"- {s}")
+                    else:
+                        # Flou sur les 2 suivantes
+                        st.markdown(
+                            f'<div style="filter: blur(4px); user-select: none; color: #6B7280;">'
+                            f'- {s}</div>',
+                            unsafe_allow_html=True,
+                        )
+
+            with weak_col:
+                st.markdown("**⚠️ 3 lacunes détectées**")
+                for i, w in enumerate(weaknesses):
+                    if i == 0:
+                        st.markdown(f"- {w}")
+                    else:
+                        st.markdown(
+                            f'<div style="filter: blur(4px); user-select: none; color: #6B7280;">'
+                            f'- {w}</div>',
+                            unsafe_allow_html=True,
+                        )
+
+            # CTA massif vers inscription
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(
+                """<div style="text-align: center; background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+                    border: 2px solid #10B981; border-radius: 12px; padding: 20px;">
+                    <div style="font-weight: 700; font-size: 16px; color: #111827;">
+                        Créez un compte gratuit pour voir le détail
+                    </div>
+                    <div style="font-size: 13px; color: #6B7280; margin-top: 4px;">
+                        10 catégories ESRS • Recommandations priorisées • Rapport PDF complet
+                    </div>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+            st.page_link(
+                "pages/1_Login.py",
+                label="Voir le rapport complet — gratuit, 30 secondes",
+                icon="🚀",
+                use_container_width=True,
+            )
+
+            # Bouton reset pour relancer un quick-check
+            if st.button("Analyser un autre rapport", use_container_width=True):
+                del st.session_state["qc_token"]
+                del st.session_state["qc_result"]
+                st.rerun()
 
 st.markdown("<br>", unsafe_allow_html=True)
 
