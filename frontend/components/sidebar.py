@@ -33,12 +33,19 @@ def render_sidebar() -> None:
         if is_logged_in():
             user = get_user()
             if user:
+                # Badge adapté au plan (4 niveaux)
+                plan = user.get("plan", "discovery")
+                plan_badges = {
+                    "discovery": ("Découverte", "#E5E7EB", "#374151"),
+                    "free": ("Découverte", "#E5E7EB", "#374151"),
+                    "essential": ("Essentiel", "#DBEAFE", "#2563EB"),
+                    "pro": ("Pro", "#D1FAE5", "#059669"),
+                    "enterprise": ("Enterprise", "#EDE9FE", "#7C3AED"),
+                }
+                label, bg, color = plan_badges.get(plan, plan_badges["discovery"])
                 plan_badge = (
-                    '<span style="background: #10B981; color: white; padding: 2px 8px; '
-                    'border-radius: 10px; font-size: 11px; font-weight: 600;">PRO</span>'
-                    if user.get("plan") == "pro"
-                    else '<span style="background: #E5E7EB; color: #374151; padding: 2px 8px; '
-                    'border-radius: 10px; font-size: 11px; font-weight: 600;">FREE</span>'
+                    f'<span style="background: {bg}; color: {color}; padding: 2px 8px; '
+                    f'border-radius: 10px; font-size: 11px; font-weight: 600;">{label}</span>'
                 )
                 st.markdown(
                     f"""<div style="padding: 8px 0;">

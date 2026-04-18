@@ -23,10 +23,14 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from frontend.components.sidebar import render_sidebar
+from frontend.components.analytics import inject_umami_script
 from frontend.utils.session import is_logged_in
 
 # ── Sidebar ──────────────────────────────────────────────────────
 render_sidebar()
+
+# ── Analytics Umami ──────────────────────────────────────────────
+inject_umami_script()
 
 # ── Page d'accueil ───────────────────────────────────────────────
 st.markdown(

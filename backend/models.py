@@ -34,7 +34,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     company_name = Column(String(255), nullable=True)
-    plan = Column(String(20), default="free")  # 'free' | 'pro'
+    plan = Column(String(20), default="discovery")  # 'discovery' | 'essential' | 'pro' | 'enterprise'
     analyses_this_month = Column(Integer, default=0)
     created_at = Column(DateTime, default=_utcnow)
 

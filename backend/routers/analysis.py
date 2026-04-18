@@ -28,15 +28,23 @@ router = APIRouter(prefix="/analysis", tags=["analysis"])
 
 
 def _check_quota(user: User) -> None:
-    """Vérifie le quota freemium (1 analyse/mois si plan=free)."""
-    if user.plan == "free" and user.analyses_this_month >= settings.free_tier_monthly_limit:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=(
-                f"Quota atteint : {settings.free_tier_monthly_limit} analyse(s)/mois "
-                f"sur le plan gratuit. Passez en Pro pour des analyses illimitées."
-            ),
-        )
+    """
+    Vérifie le quota d'analyses selon le plan :
+    - discovery / free : 1 analyse au total
+    - essential : paiement à l'unité (vérifié via Stripe, pas de quota ici pour l'instant)
+    - pro / enterprise : illimité
+    """
+    if user.plan in ("discovery", "free"):
+        if user.analyses_this_month >= settings.discovery_total_limit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    f"Quota atteint : {settings.discovery_total_limit} analyse gratuite. "
+                    f"Passez au plan Essentiel (39€/analyse) ou Pro (129€/mois) "
+                    f"pour continuer vos analyses."
+                ),
+            )
+    # essential, pro, enterprise : pas de quota côté serveur (géré par Stripe/abonnement)
 
 
 def _validate_file(file: UploadFile) -> str:

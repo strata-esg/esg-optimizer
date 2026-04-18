@@ -31,8 +31,27 @@ class Settings(BaseSettings):
     max_upload_size_mb: int = 20
     max_text_length: int = 30_000
 
-    # --- Freemium ---
-    free_tier_monthly_limit: int = 1
+    # --- Plans & quotas ---
+    # discovery = 1 analyse total (pas par mois), essential = paiement à l'unité,
+    # pro = illimité, enterprise = illimité
+    discovery_total_limit: int = 1
+    essential_analysis_price_eur: int = 39
+    pro_monthly_price_eur: int = 129
+    pro_annual_price_eur: int = 990
+
+    # --- Analytics (Umami) ---
+    umami_url: str = ""
+    umami_website_id: str = ""
+
+    # --- Email (Resend) — sprint 6E ---
+    resend_api_key: str = ""
+
+    # --- Stripe — sprint 6D ---
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_essential_payment_link: str = ""
+    stripe_pro_monthly_payment_link: str = ""
+    stripe_pro_annual_payment_link: str = ""
 
     # --- Environment ---
     environment: str = "development"
