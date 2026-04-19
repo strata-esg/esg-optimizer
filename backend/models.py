@@ -25,9 +25,15 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-# ──────────────────────────────────────────────
+def _token_default() -> str:
+    return str(uuid.uuid4())
+
+
+def _expiry_default() -> datetime:
+    return datetime.now(timezone.utc) + timedelta(hours=72)
+
+
 # USERS
-# ──────────────────────────────────────────────
 class User(Base):
     __tablename__ = "users"
 
@@ -37,16 +43,16 @@ class User(Base):
     company_name = Column(String(255), nullable=True)
     plan = Column(String(20), default="discovery")  # 'discovery' | 'essential' | 'pro' | 'enterprise'
     analyses_this_month = Column(Integer, default=0)
+    email_notifications = Column(Boolean, default=True)  # Opt-in emails (digest, analyses)
     created_at = Column(DateTime, default=_utcnow)
 
     # Relations
     companies = relationship("Company", back_populates="owner", cascade="all, delete-orphan")
     analyses = relationship("Analysis", back_populates="user", cascade="all, delete-orphan")
+    subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
 
 
-# ──────────────────────────────────────────────
 # COMPANIES
-# ──────────────────────────────────────────────
 class Company(Base):
     __tablename__ = "companies"
     __table_args__ = (
@@ -64,9 +70,7 @@ class Company(Base):
     analyses = relationship("Analysis", back_populates="company", cascade="all, delete-orphan")
 
 
-# ──────────────────────────────────────────────
 # ANALYSES
-# ──────────────────────────────────────────────
 class Analysis(Base):
     __tablename__ = "analyses"
 
@@ -106,6 +110,9 @@ class Analysis(Base):
     delta_global = Column(Float, nullable=True)
     delta_narrative = Column(Text, nullable=True)
 
+    # Partage social (badge LinkedIn)
+    share_token = Column(String(36), unique=True, nullable=True, default=_token_default, index=True)
+
     # Métadonnées
     processing_time_s = Column(Float, nullable=True)
     status = Column(String(20), default="pending")  # pending | processing | success | failed
@@ -117,17 +124,7 @@ class Analysis(Base):
     user = relationship("User", back_populates="analyses")
 
 
-# ──────────────────────────────────────────────
 # PUBLIC ANALYSES (quick-check sans auth)
-# ──────────────────────────────────────────────
-def _token_default() -> str:
-    return str(uuid.uuid4())
-
-
-def _expiry_default() -> datetime:
-    return datetime.now(timezone.utc) + timedelta(hours=72)
-
-
 class PublicAnalysis(Base):
     __tablename__ = "public_analyses"
 
@@ -152,3 +149,34 @@ class PublicAnalysis(Base):
     expires_at = Column(DateTime, default=_expiry_default)
     claimed_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=_utcnow)
+
+
+# SUBSCRIPTIONS (Stripe)
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+
+    # Plan acheté : 'essential' (one-shot) ou 'pro' (récurrent)
+    plan = Column(String(20), nullable=False)
+
+    # Statut : active | canceled | expired | one_time
+    status = Column(String(20), default="active")
+
+    # Stripe references
+    stripe_session_id = Column(String(255), unique=True, nullable=True, index=True)
+    stripe_customer_id = Column(String(255), nullable=True)
+    stripe_subscription_id = Column(String(255), nullable=True)  # Null pour one-shot (essential)
+
+    # Montant payé (en centimes EUR)
+    amount_cents = Column(Integer, nullable=True)
+
+    # Dates
+    activated_at = Column(DateTime, default=_utcnow)
+    expires_at = Column(DateTime, nullable=True)  # Null pour one-shot
+    canceled_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=_utcnow)
+
+    # Relations
+    user = relationship("User", back_populates="subscriptions")

@@ -1,6 +1,6 @@
 """
 ESG Optimizer MVP — Page Paramètres.
-Profil utilisateur, plan, compteur d'analyses, placeholder upgrade.
+Profil utilisateur, abonnement, préférences email, zone avancée.
 """
 
 import streamlit as st
@@ -11,20 +11,15 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.sidebar import render_sidebar
-from frontend.utils.api_client import APIError, get_me
+from frontend.utils.api_client import APIError, get_me, get_email_preferences, update_email_preferences
 from frontend.utils.session import get_token, get_user, save_user, require_auth
-
-# ── Config page ──────────────────────────────────────────────────
-st.set_page_config(page_title="Paramètres — ESG Optimizer", page_icon="⚙️", layout="centered")
-render_sidebar()
 
 if not require_auth():
     st.stop()
 
 token = get_token()
 
-# ── Charger les infos utilisateur fraîches ───────────────────────
+# Charger les infos utilisateur fraîches
 try:
     user = get_me(token)
     save_user(user)
@@ -34,18 +29,16 @@ except APIError as e:
 except Exception:
     user = get_user() or {}
 
-# ── Header ───────────────────────────────────────────────────────
+# Header
 st.markdown(
     """<div style="padding: 10px 0 20px 0;">
-        <h2>⚙️ Paramètres</h2>
-        <p style="color: #6B7280;">Gérez votre profil et votre abonnement.</p>
+        <h2>Paramètres</h2>
+        <p style="color: #6B7280;">Gérez votre profil, abonnement et notifications.</p>
     </div>""",
     unsafe_allow_html=True,
 )
 
-# ══════════════════════════════════════════════════════════════════
 # 1. PROFIL
-# ══════════════════════════════════════════════════════════════════
 st.subheader("Profil")
 
 col1, col2 = st.columns(2)
@@ -58,93 +51,108 @@ st.caption(
     f"Compte créé le {user.get('created_at', '?')[:10] if user.get('created_at') else '?'}"
 )
 
-# ══════════════════════════════════════════════════════════════════
 # 2. ABONNEMENT
-# ══════════════════════════════════════════════════════════════════
 st.markdown("---")
 st.subheader("Abonnement")
 
-plan = user.get("plan", "free")
+plan = user.get("plan", "discovery")
 analyses_month = user.get("analyses_this_month", 0)
 
-if plan == "pro":
+plan_display = {
+    "discovery": ("Découverte", "#E5E7EB", "#374151"),
+    "free": ("Découverte", "#E5E7EB", "#374151"),
+    "essential": ("Essentiel", "#DBEAFE", "#2563EB"),
+    "pro": ("Pro", "#D4F0D8", "#1A3D22"),
+    "enterprise": ("Enterprise", "#EDE9FE", "#7C3AED"),
+}
+
+label, bg, color = plan_display.get(plan, plan_display["discovery"])
+
+if plan in ("pro", "enterprise"):
     st.markdown(
-        """<div style="background: #D1FAE5; border: 2px solid #10B981; border-radius: 12px;
+        f"""<div style="background: {bg}; border: 2px solid {color}; border-radius: 12px;
             padding: 24px;">
-            <div style="font-weight: 700; color: #065F46; font-size: 20px;">
-                Plan Pro &#10003;
+            <div style="font-weight: 700; color: {color}; font-size: 20px;">
+                Plan {label} &#10003;
             </div>
-            <div style="color: #065F46; margin-top: 8px;">
+            <div style="color: {color}; margin-top: 8px;">
                 Analyses illimitées. Merci pour votre confiance !
             </div>
         </div>""",
         unsafe_allow_html=True,
     )
     st.metric("Analyses ce mois", analyses_month)
+elif plan == "essential":
+    st.markdown(
+        f"""<div style="background: {bg}; border: 2px solid {color}; border-radius: 12px;
+            padding: 24px;">
+            <div style="font-weight: 700; color: {color}; font-size: 20px;">
+                Plan {label}
+            </div>
+            <div style="color: #6B7280; margin-top: 8px;">
+                Analyses à l'unité (39€/analyse). {analyses_month} analyse(s) réalisée(s).
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 else:
+    remaining = max(0, 1 - analyses_month)
     st.markdown(
         f"""<div style="background: #F9FAFB; border: 2px solid #E5E7EB; border-radius: 12px;
             padding: 24px;">
             <div style="font-weight: 700; color: #374151; font-size: 20px;">
-                Plan Gratuit
+                Plan Découverte
             </div>
             <div style="color: #6B7280; margin-top: 8px;">
-                {analyses_month}/1 analyse(s) utilisée(s) ce mois
+                {remaining} analyse gratuite restante sur 1
             </div>
         </div>""",
         unsafe_allow_html=True,
     )
 
+if plan in ("discovery", "free", "essential"):
     st.markdown("")
+    if st.button("Voir les tarifs et upgrader", use_container_width=True, type="primary"):
+        st.switch_page("pages/6_Tarifs.py")
 
-    # ── Comparaison plans ────────────────────────────────
-    col_free, col_pro = st.columns(2)
+# 3. PRÉFÉRENCES EMAIL
+st.markdown("---")
+st.subheader("Notifications email")
 
-    with col_free:
-        st.markdown(
-            """<div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
-                <div style="font-weight: 700; font-size: 18px;">Gratuit</div>
-                <div style="font-size: 28px; font-weight: 700; margin: 12px 0;">0€</div>
-                <div style="font-size: 13px; color: #6B7280;">
-                    &#10003; 1 analyse / mois<br>
-                    &#10003; Scores E/S/G<br>
-                    &#10003; Rapport PDF<br>
-                    &#10007; Delta Report<br>
-                    &#10007; Analyses illimitées
-                </div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
+# Charger les préférences actuelles
+try:
+    prefs = get_email_preferences(token)
+    current_notif = prefs.get("email_notifications", True)
+except Exception:
+    current_notif = True
 
-    with col_pro:
-        st.markdown(
-            """<div style="border: 2px solid #10B981; border-radius: 12px; padding: 20px;
-                background: #F0FDF4;">
-                <div style="font-weight: 700; font-size: 18px; color: #065F46;">Pro</div>
-                <div style="font-size: 28px; font-weight: 700; margin: 12px 0; color: #065F46;">
-                    49€<span style="font-size: 14px; font-weight: 400;">/mois</span>
-                </div>
-                <div style="font-size: 13px; color: #065F46;">
-                    &#10003; Analyses illimitées<br>
-                    &#10003; Scores E/S/G<br>
-                    &#10003; Rapport PDF<br>
-                    &#10003; Delta Report<br>
-                    &#10003; Support prioritaire
-                </div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
+st.markdown(
+    """<p style="color: #6B7280; font-size: 14px;">
+        Contrôlez les emails que vous recevez d'ESG Optimizer.
+    </p>""",
+    unsafe_allow_html=True,
+)
 
-    st.markdown("")
-    if st.button("Passer en Pro", use_container_width=True, type="primary"):
-        st.info(
-            "Le paiement en ligne arrive bientôt ! "
-            "Contactez-nous à contact@esgoptimizer.ai pour activer votre plan Pro."
-        )
+new_notif = st.toggle(
+    "Recevoir les notifications par email",
+    value=current_notif,
+    help="Inclut : résultats d'analyse, digest hebdomadaire, confirmations de paiement.",
+)
 
-# ══════════════════════════════════════════════════════════════════
-# 3. DANGER ZONE (placeholder)
-# ══════════════════════════════════════════════════════════════════
+if new_notif != current_notif:
+    try:
+        update_email_preferences(token, new_notif)
+        state_text = "activées" if new_notif else "désactivées"
+        st.success(f"Notifications email {state_text}.")
+    except APIError as e:
+        st.error(f"Erreur : {e.detail}")
+
+st.caption(
+    "Même avec les notifications désactivées, vous recevrez toujours "
+    "les emails de sécurité (changement de mot de passe, etc.)."
+)
+
+# 4. ZONE AVANCÉE
 st.markdown("---")
 with st.expander("Zone avancée"):
     st.caption("Ces fonctionnalités seront disponibles dans une prochaine version.")

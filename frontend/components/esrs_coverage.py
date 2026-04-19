@@ -59,12 +59,12 @@ def render_esrs_grid(esrs_coverage: dict | None) -> None:
                 if is_covered:
                     st.markdown(
                         f"""<div style="
-                            background: #D1FAE5; border: 2px solid #10B981;
+                            background: #D4F0D8; border: 2px solid #1A3D22;
                             border-radius: 10px; padding: 12px 8px; text-align: center;
                             margin-bottom: 8px;">
-                            <div style="font-weight: 700; color: #065F46; font-size: 18px;">{code}</div>
-                            <div style="font-size: 11px; color: #065F46; margin-top: 4px;">{label}</div>
-                            <div style="color: #10B981; font-size: 20px; margin-top: 4px;">&#10003;</div>
+                            <div style="font-weight: 700; color: #1A3D22; font-size: 18px;">{code}</div>
+                            <div style="font-size: 11px; color: #1A3D22; margin-top: 4px;">{label}</div>
+                            <div style="color: #1A3D22; font-size: 20px; margin-top: 4px;">&#10003;</div>
                         </div>""",
                         unsafe_allow_html=True,
                     )

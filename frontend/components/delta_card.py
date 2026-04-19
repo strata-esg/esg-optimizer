@@ -11,7 +11,7 @@ def _trend_icon(delta: float) -> tuple[str, str, str]:
     Retourne (icône, couleur, label) selon le delta.
     """
     if delta > 5:
-        return "&#9650;", "#10B981", "Forte amélioration"
+        return "&#9650;", "#1A3D22", "Forte amélioration"
     elif delta > 0:
         return "&#9650;", "#3B82F6", "Amélioration"
     elif delta == 0:

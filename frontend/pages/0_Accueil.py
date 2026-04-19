@@ -9,29 +9,22 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-# ── Path setup ────────────────────────────────────────────────────
+# Path setup
 _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.sidebar import render_sidebar
-from frontend.components.analytics import inject_umami_script, track_landing_view, track_pricing_viewed, track_quick_check_started, track_quick_check_completed
+from frontend.components.analytics import track_landing_view, track_pricing_viewed, track_quick_check_started, track_quick_check_completed
 from frontend.utils.session import is_logged_in
 from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError
 
-# ── Page config ───────────────────────────────────────────────────
-render_sidebar()
-
-# ── Analytics ─────────────────────────────────────────────────────
-inject_umami_script()
-
-# ── Query params pour persona ─────────────────────────────────────
+# Query params pour persona
 params = st.query_params
 persona = params.get("persona", None)
 
 track_landing_view(persona)
 
-# ── Contenu personnalisé par persona ──────────────────────────────
+# Contenu personnalisé par persona
 PERSONA_CONTENT = {
     "pme": {
         "titre": "PME : Votre rapport CSRD est-il conforme ?",
@@ -70,9 +63,7 @@ default_content = {
 content = PERSONA_CONTENT.get(persona, default_content) if persona else default_content
 
 
-# ══════════════════════════════════════════════════════════════════
 # 1. HERO
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     f"""<div style="text-align: center; padding: 50px 20px 30px 20px;">
         <div style="font-size: 48px;">🌿</div>
@@ -86,9 +77,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ══════════════════════════════════════════════════════════════════
 # QUICK-CHECK PUBLIC — Upload sans compte
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="text-align: center; margin: 10px 0 20px 0;">
         <span style="font-size: 14px; color: #9CA3AF;">ou testez directement ↓</span>
@@ -164,9 +153,9 @@ with qc_col_center:
             weaknesses = qc.get("teaser_weaknesses", [])
 
             # Score en grand
-            score_color = "#10B981" if score >= 60 else "#F59E0B" if score >= 40 else "#EF4444"
+            score_color = "#1A3D22" if score >= 60 else "#F59E0B" if score >= 40 else "#EF4444"
             csrd_badge = (
-                '<span style="background: #D1FAE5; color: #059669; padding: 4px 12px; '
+                '<span style="background: #D4F0D8; color: #1A3D22; padding: 4px 12px; '
                 'border-radius: 8px; font-weight: 600;">CSRD Ready ✓</span>'
                 if csrd else
                 '<span style="background: #FEE2E2; color: #DC2626; padding: 4px 12px; '
@@ -215,7 +204,7 @@ with qc_col_center:
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown(
                 """<div style="text-align: center; background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
-                    border: 2px solid #10B981; border-radius: 12px; padding: 20px;">
+                    border: 2px solid #1A3D22; border-radius: 12px; padding: 20px;">
                     <div style="font-weight: 700; font-size: 16px; color: #111827;">
                         Créez un compte gratuit pour voir le détail
                     </div>
@@ -240,9 +229,7 @@ with qc_col_center:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════
 # 2. CARDS PERSONA "Je suis..."
-# ══════════════════════════════════════════════════════════════════
 if not persona:  # N'afficher que sur la landing générique
     st.markdown(
         """<div style="text-align: center; margin-bottom: 8px;">
@@ -269,7 +256,7 @@ if not persona:  # N'afficher que sur la landing générique
                     <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
                         padding: 20px 16px; text-align: center; min-height: 140px; cursor: pointer;
                         transition: border-color 0.2s, box-shadow 0.2s;"
-                        onmouseover="this.style.borderColor='#10B981'; this.style.boxShadow='0 2px 8px rgba(16,185,129,0.15)';"
+                        onmouseover="this.style.borderColor='#1A3D22'; this.style.boxShadow='0 2px 8px rgba(26,61,34,0.15)';"
                         onmouseout="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none';">
                         <div style="font-size: 28px;">{icon}</div>
                         <div style="font-weight: 600; font-size: 14px; margin-top: 8px; color: #111827;">
@@ -278,7 +265,7 @@ if not persona:  # N'afficher que sur la landing générique
                         <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">
                             {desc}
                         </div>
-                        <div style="font-size: 12px; color: #10B981; margin-top: 8px; font-weight: 600;">
+                        <div style="font-size: 12px; color: #1A3D22; margin-top: 8px; font-weight: 600;">
                             En savoir plus →
                         </div>
                     </div>
@@ -290,26 +277,24 @@ if not persona:  # N'afficher que sur la landing générique
 
 st.divider()
 
-# ══════════════════════════════════════════════════════════════════
 # 3. PREUVE SOCIALE (placeholder — à remplir dès 5 users)
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #10B981;">—</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">—</div>
                 <div style="font-size: 13px; color: #6B7280;">Rapports analysés</div>
             </div>
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #10B981;">—</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">—</div>
                 <div style="font-size: 13px; color: #6B7280;">Score moyen</div>
             </div>
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #10B981;">3 min</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">3 min</div>
                 <div style="font-size: 13px; color: #6B7280;">Temps d'analyse</div>
             </div>
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #10B981;">10</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">10</div>
                 <div style="font-size: 13px; color: #6B7280;">Standards ESRS couverts</div>
             </div>
         </div>
@@ -322,9 +307,7 @@ st.markdown(
 
 st.divider()
 
-# ══════════════════════════════════════════════════════════════════
 # 4. COMMENT ÇA MARCHE — 3 étapes
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="text-align: center; padding: 10px 0 20px 0;">
         <h2 style="color: #111827;">Comment ça marche</h2>
@@ -349,7 +332,7 @@ for col, num, icon, title, desc in steps:
         st.markdown(
             f"""<div style="background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
                 border-radius: 12px; padding: 28px 20px; text-align: center; min-height: 220px;">
-                <div style="background: #10B981; color: white; width: 32px; height: 32px;
+                <div style="background: #1A3D22; color: white; width: 32px; height: 32px;
                     border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
                     font-weight: 700; font-size: 14px; margin-bottom: 12px;">{num}</div>
                 <div style="font-size: 32px; margin-bottom: 8px;">{icon}</div>
@@ -366,9 +349,7 @@ for col, num, icon, title, desc in steps:
 st.markdown("<br>", unsafe_allow_html=True)
 st.divider()
 
-# ══════════════════════════════════════════════════════════════════
 # 5. DÉMO VISUELLE — Aperçu des résultats
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="text-align: center; padding: 10px 0 20px 0;">
         <h2 style="color: #111827;">Ce que vous obtenez</h2>
@@ -386,8 +367,8 @@ with demo_l:
                 📊 Scores ESG détaillés
             </div>
             <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-                <div style="flex: 1; background: #D1FAE5; border-radius: 8px; padding: 12px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: 700; color: #059669;">72</div>
+                <div style="flex: 1; background: #D4F0D8; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 700; color: #1A3D22;">72</div>
                     <div style="font-size: 11px; color: #6B7280;">Environnement</div>
                 </div>
                 <div style="flex: 1; background: #DBEAFE; border-radius: 8px; padding: 12px; text-align: center;">
@@ -402,7 +383,7 @@ with demo_l:
             <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #E5E7EB;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 13px; color: #6B7280;">Score global</span>
-                    <span style="font-size: 20px; font-weight: 700; color: #10B981;">65/100</span>
+                    <span style="font-size: 20px; font-weight: 700; color: #1A3D22;">65/100</span>
                 </div>
             </div>
         </div>""",
@@ -457,9 +438,7 @@ for col, icon, title, desc in features_extra:
 
 st.divider()
 
-# ══════════════════════════════════════════════════════════════════
 # 6. PRICING — 4 plans
-# ══════════════════════════════════════════════════════════════════
 track_pricing_viewed(persona)
 
 st.markdown(
@@ -478,7 +457,7 @@ with pr1:
         """<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
             padding: 24px 16px; text-align: center; min-height: 380px;">
             <div style="font-weight: 700; font-size: 16px; color: #111827;">Découverte</div>
-            <div style="font-size: 32px; font-weight: 800; color: #10B981; margin: 12px 0 4px 0;">0 €</div>
+            <div style="font-size: 32px; font-weight: 800; color: #1A3D22; margin: 12px 0 4px 0;">0 €</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">1 analyse gratuite</div>
             <div style="text-align: left; font-size: 12px; color: #6B7280; line-height: 2;">
                 ✅ 1 analyse complète<br>
@@ -517,14 +496,14 @@ with pr2:
 # Plan Pro (RECOMMANDÉ)
 with pr3:
     st.markdown(
-        """<div style="background: #F0FDF4; border: 2px solid #10B981; border-radius: 12px;
+        """<div style="background: #F0FDF4; border: 2px solid #1A3D22; border-radius: 12px;
             padding: 24px 16px; text-align: center; min-height: 380px; position: relative;">
             <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-                background: #10B981; color: white; padding: 2px 14px; border-radius: 10px;
+                background: #1A3D22; color: white; padding: 2px 14px; border-radius: 10px;
                 font-size: 11px; font-weight: 700;">RECOMMANDÉ</div>
             <div style="font-weight: 700; font-size: 16px; color: #111827; margin-top: 4px;">Pro</div>
-            <div style="font-size: 32px; font-weight: 800; color: #10B981; margin: 12px 0 4px 0;">129 €</div>
-            <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">/ mois <span style="color:#10B981;">(ou 990 €/an)</span></div>
+            <div style="font-size: 32px; font-weight: 800; color: #1A3D22; margin: 12px 0 4px 0;">129 €</div>
+            <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">/ mois <span style="color:#1A3D22;">(ou 990 €/an)</span></div>
             <div style="text-align: left; font-size: 12px; color: #6B7280; line-height: 2;">
                 ✅ Analyses illimitées<br>
                 ✅ Dashboard complet<br>
@@ -558,13 +537,11 @@ with pr4:
         unsafe_allow_html=True,
     )
     # Bouton "Nous contacter" — ouvre un mailto ou Calendly (à configurer sprint 6D)
-    st.link_button("Nous contacter", "mailto:diadamflow@gmail.com?subject=ESG%20Optimizer%20Enterprise", icon="📧", use_container_width=True)
+    st.link_button("Nous contacter", "mailto:diadamflow@gmail.com?subject=ESG%20Optimizer%20Enterprise", use_container_width=True)
 
 st.divider()
 
-# ══════════════════════════════════════════════════════════════════
 # 7. FAQ
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="text-align: center; padding: 10px 0 20px 0;">
         <h2 style="color: #111827;">Questions fréquentes</h2>
@@ -636,9 +613,7 @@ with st.expander("🏷️ Le rapport white-label fonctionne comment ?"):
 
 st.divider()
 
-# ══════════════════════════════════════════════════════════════════
 # 8. CTA FINAL
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="text-align: center; padding: 30px 20px;">
         <h2 style="color: #111827;">Prêt à analyser votre rapport ESG ?</h2>
@@ -658,15 +633,13 @@ with col_cta2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════
 # 9. FOOTER
-# ══════════════════════════════════════════════════════════════════
 st.markdown(
     """<div style="border-top: 1px solid #E5E7EB; padding: 30px 20px; margin-top: 20px;">
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
             max-width: 800px; margin: 0 auto;">
             <div>
-                <div style="font-weight: 700; color: #10B981; font-size: 16px;">ESG Optimizer AI</div>
+                <div style="font-weight: 700; color: #1A3D22; font-size: 16px;">ESG Optimizer AI</div>
                 <div style="font-size: 12px; color: #9CA3AF; margin-top: 4px;">
                     Analyse ESG automatisée par IA
                 </div>

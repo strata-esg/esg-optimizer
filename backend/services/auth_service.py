@@ -33,7 +33,7 @@ def decode_access_token(token: str) -> dict | None:
         return None
 
 
-# ── Feature gating par plan ───────────────────────────────────────
+# Feature gating par plan
 # Hiérarchie : discovery < essential < pro < enterprise
 PLAN_HIERARCHY = {
     "discovery": 0,

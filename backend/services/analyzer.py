@@ -12,10 +12,11 @@ from openai import OpenAI
 from sqlalchemy.orm import Session
 
 from backend.config import settings
-from backend.models import Analysis, Company
+from backend.models import Analysis, Company, User
 from backend.prompts.system_analysis import SYSTEM_ANALYSIS_PROMPT
 from backend.services.extractor import extract_text
 from backend.services.delta_service import run_delta
+from backend.services.email_service import send_analysis_complete_email, send_analysis_failed_email
 
 logger = logging.getLogger(__name__)
 
@@ -140,11 +141,39 @@ def run_analysis_pipeline(analysis_id: int, file_path: str, db: Session) -> None
             # Le delta est optionnel — on ne fait pas échouer l'analyse principale
             logger.warning("Pipeline [%d] — Delta échoué (non bloquant) : %s", analysis_id, delta_exc)
 
+        # 5. Email de notification (succès — si opt-in)
+        try:
+            user = db.query(User).filter(User.id == analysis.user_id).first()
+            if user and user.email_notifications:
+                send_analysis_complete_email(
+                    email=user.email,
+                    analysis_id=analysis.id,
+                    company_name=company_name,
+                    score_global=analysis.score_global or 0,
+                    csrd_ready=analysis.csrd_ready or False,
+                    report_year=analysis.report_year,
+                )
+        except Exception as email_exc:
+            logger.warning("Pipeline [%d] — Email succès non envoyé : %s", analysis_id, email_exc)
+
     except Exception as exc:
         analysis.status = "failed"
         analysis.error_message = str(exc)[:500]
         analysis.processing_time_s = round(time.time() - start, 2)
         logger.error("Pipeline [%d] — Échec : %s", analysis_id, exc)
+
+        # Email de notification (échec)
+        try:
+            user = db.query(User).filter(User.id == analysis.user_id).first()
+            if user:
+                send_analysis_failed_email(
+                    email=user.email,
+                    analysis_id=analysis.id,
+                    company_name=company_name,
+                    error_message=str(exc)[:200],
+                )
+        except Exception as email_exc:
+            logger.warning("Pipeline [%d] — Email échec non envoyé : %s", analysis_id, email_exc)
 
     finally:
         db.commit()

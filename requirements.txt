@@ -25,6 +25,13 @@ openpyxl==3.*
 # --- Report generation ---
 reportlab==4.*
 matplotlib==3.*
+Pillow==10.*
+
+# --- Payments (Stripe) ---
+stripe==8.*
+
+# --- Email (Resend) ---
+resend==2.*
 
 # --- Frontend ---
 streamlit==1.37.*

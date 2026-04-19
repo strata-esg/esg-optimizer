@@ -8,9 +8,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
-# ══════════════════════════════════════════════
 # AUTH
-# ══════════════════════════════════════════════
 
 class UserRegisterRequest(BaseModel):
     email: EmailStr
@@ -29,6 +27,7 @@ class UserResponse(BaseModel):
     company_name: Optional[str]
     plan: str
     analyses_this_month: int
+    email_notifications: bool = True
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -48,9 +47,7 @@ class RegisterResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-# ══════════════════════════════════════════════
 # COMPANY
-# ══════════════════════════════════════════════
 
 class CompanyResponse(BaseModel):
     id: int
@@ -61,9 +58,7 @@ class CompanyResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ══════════════════════════════════════════════
 # ANALYSIS — Upload request
-# ══════════════════════════════════════════════
 
 class AnalysisUploadMeta(BaseModel):
     """Métadonnées envoyées avec le fichier (form fields)."""
@@ -72,9 +67,7 @@ class AnalysisUploadMeta(BaseModel):
     sector: Optional[str] = None
 
 
-# ══════════════════════════════════════════════
 # ANALYSIS — Scores & résultats (sous-schémas)
-# ══════════════════════════════════════════════
 
 class ESRSCoverage(BaseModel):
     E1_climate_change: bool = False
@@ -110,9 +103,7 @@ class Recommendation(BaseModel):
     esrs_reference: Optional[str] = None
 
 
-# ══════════════════════════════════════════════
 # ANALYSIS — Réponse complète
-# ══════════════════════════════════════════════
 
 class AnalysisResponse(BaseModel):
     id: int
@@ -164,9 +155,7 @@ class AnalysisCreatedResponse(BaseModel):
     status: str = "processing"
 
 
-# ══════════════════════════════════════════════
 # HISTORY
-# ══════════════════════════════════════════════
 
 class AnalysisSummary(BaseModel):
     """Version allégée pour les listes d'historique."""
@@ -195,9 +184,7 @@ class StatsResponse(BaseModel):
     csrd_ready_pct: Optional[float]
 
 
-# ══════════════════════════════════════════════
 # DELTA
-# ══════════════════════════════════════════════
 
 class ScoreEvolutionItem(BaseModel):
     previous: Optional[int] = None
@@ -265,9 +252,7 @@ class DeltaFullResponse(BaseModel):
     priority_actions: Optional[list[DeltaPriorityAction]] = None
 
 
-# ══════════════════════════════════════════════
 # GENERIC
-# ══════════════════════════════════════════════
 
 class ErrorResponse(BaseModel):
     detail: str

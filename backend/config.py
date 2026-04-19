@@ -3,8 +3,59 @@ ESG Optimizer MVP — Configuration centralisée.
 Charge les variables d'environnement via pydantic-settings.
 """
 
+import os
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# Identité brand
+APP_NAME         = "ESG Optimizer"
+APP_TAGLINE      = "Êtes-vous prêt pour la CSRD ?"
+APP_DESCRIPTION  = "Analysez votre conformité CSRD en 3 minutes avec l'IA"
+APP_URL          = os.getenv("APP_URL", "https://esg-optimizer.app")
+APP_VERSION      = "1.0.0"
+SUPPORT_EMAIL    = os.getenv("SUPPORT_EMAIL", "hello@esg-optimizer.app")
+NOREPLY_EMAIL    = os.getenv("NOREPLY_EMAIL", "no-reply@esg-optimizer.app")
+
+# Tokens couleurs (référence unique pour tout le codebase)
+BRAND = {
+    "forest":      "#1A3D22",
+    "forest_mid":  "#2A5C34",
+    "leaf":        "#7FC686",
+    "mint":        "#D4F0D8",
+    "parchment":   "#F5F2EC",
+    "amber":       "#C17B2A",
+    "alert":       "#B53030",
+}
+
+# Plans & pricing (source de vérité pour le frontend et le backend)
+PLANS = {
+    "discovery": {
+        "name": "Découverte", "price": 0, "price_label": "Gratuit",
+        "analyses": 1, "watermark": True, "pdf_pages": 3, "delta": False,
+        "badge_bg": "#E5E7EB", "badge_color": "#374151",
+        "features": ["1 analyse", "Score global", "Rapport partiel (3 pages)"],
+    },
+    "essential": {
+        "name": "Essentiel", "price": 39, "price_label": "39 € / analyse",
+        "analyses": 1, "watermark": False, "pdf_pages": 8, "delta": True,
+        "badge_bg": "#DBEAFE", "badge_color": "#2563EB",
+        "features": ["Rapport complet", "Delta Report", "Conservation 12 mois"],
+    },
+    "pro": {
+        "name": "Pro", "price": 129, "price_label": "129 € / mois",
+        "price_annual": 990, "analyses": -1, "watermark": False,
+        "pdf_pages": 8, "delta": True,
+        "badge_bg": BRAND["mint"], "badge_color": BRAND["forest"],
+        "features": ["Illimité", "Benchmark sectoriel", "Export Excel", "White-label"],
+    },
+    "enterprise": {
+        "name": "Enterprise", "price": -1, "price_label": "Sur devis",
+        "analyses": -1, "watermark": False, "pdf_pages": 8, "delta": True,
+        "badge_bg": "#EDE9FE", "badge_color": "#7C3AED",
+        "features": ["SSO", "Multi-users", "API REST", "SLA garanti"],
+    },
+}
 
 
 class Settings(BaseSettings):

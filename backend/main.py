@@ -15,18 +15,17 @@ from backend.routers.auth import router as auth_router
 from backend.routers.analysis import router as analysis_router
 from backend.routers.history import router as history_router
 from backend.routers.public import router as public_router, claim_router
-# ──────────────────────────────────────────────
+from backend.routers.stripe import router as stripe_router
+from backend.routers.email import router as email_router
+
 # Lifespan : crée les tables au démarrage
-# ──────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_tables()
     yield
 
 
-# ──────────────────────────────────────────────
 # App FastAPI
-# ──────────────────────────────────────────────
 app = FastAPI(
     title="ESG Optimizer API",
     description="Agent autonome de reporting ESG — Analyse CSRD/ESRS automatisée",
@@ -34,9 +33,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ──────────────────────────────────────────────
 # CORS
-# ──────────────────────────────────────────────
 _allowed_origins = ["http://localhost:8501"]  # Streamlit dev
 if not settings.is_dev:
     # En production, ajouter l'URL réelle du frontend
@@ -55,10 +52,10 @@ app.include_router(analysis_router)
 app.include_router(history_router)
 app.include_router(public_router)
 app.include_router(claim_router)
+app.include_router(stripe_router)
+app.include_router(email_router)
 
-# ──────────────────────────────────────────────
 # Routes
-# ──────────────────────────────────────────────
 @app.get("/")
 async def root():
     return {

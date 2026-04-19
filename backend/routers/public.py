@@ -31,9 +31,7 @@ router = APIRouter(prefix="/public", tags=["public"])
 _client = OpenAI(api_key=settings.openai_api_key)
 
 
-# ══════════════════════════════════════════════════════════════════
 # RATE LIMITING par IP (simple, basé sur la table public_analyses)
-# ══════════════════════════════════════════════════════════════════
 
 def _hash_ip(ip: str) -> str:
     """Hash SHA-256 de l'IP pour ne pas stocker l'IP en clair (RGPD)."""
@@ -77,9 +75,7 @@ def _check_rate_limit(db: Session, ip_hash: str) -> None:
         )
 
 
-# ══════════════════════════════════════════════════════════════════
 # QUICK-CHECK GPT-4o (version allégée)
-# ══════════════════════════════════════════════════════════════════
 
 def _call_gpt4o_quick(text: str) -> dict:
     """Appelle GPT-4o avec le prompt quick-check raccourci."""
@@ -162,9 +158,7 @@ def _run_quick_check_pipeline(public_analysis_id: int, file_path: str) -> None:
             pass
 
 
-# ══════════════════════════════════════════════════════════════════
 # ENDPOINTS
-# ══════════════════════════════════════════════════════════════════
 
 @router.post("/quick-check", status_code=status.HTTP_202_ACCEPTED)
 async def quick_check(
@@ -258,9 +252,7 @@ def get_quick_check_result(token: str, db: Session = Depends(get_db)):
     return result
 
 
-# ══════════════════════════════════════════════════════════════════
 # CLAIM — Rattacher un quick-check à un compte (dans auth router)
-# ══════════════════════════════════════════════════════════════════
 # Ce endpoint est ajouté au router auth pour la cohérence, mais
 # la logique est ici pour garder le contexte.
 

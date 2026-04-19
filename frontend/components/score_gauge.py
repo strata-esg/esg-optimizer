@@ -10,7 +10,7 @@ import streamlit as st
 def _score_color(score: float) -> str:
     """Retourne une couleur selon le niveau du score."""
     if score >= 80:
-        return "#10B981"   # vert — mature
+        return "#1A3D22"   # vert — mature
     elif score >= 60:
         return "#3B82F6"   # bleu — correct
     elif score >= 40:
@@ -51,7 +51,7 @@ def render_gauge(
                     {"range": [0, 40], "color": "#FEE2E2"},
                     {"range": [40, 60], "color": "#FEF3C7"},
                     {"range": [60, 80], "color": "#DBEAFE"},
-                    {"range": [80, 100], "color": "#D1FAE5"},
+                    {"range": [80, 100], "color": "#D4F0D8"},
                 ],
                 "threshold": {
                     "line": {"color": color, "width": 3},

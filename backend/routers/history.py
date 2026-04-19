@@ -22,7 +22,7 @@ from backend.schemas import (
 router = APIRouter(prefix="/history", tags=["history"])
 
 
-# ── GET /history ───────────────────────────────────────────────────
+# GET /history
 @router.get("", response_model=HistoryResponse)
 def list_analyses(
     page: int = Query(1, ge=1),
@@ -62,7 +62,7 @@ def list_analyses(
     )
 
 
-# ── GET /history/companies ─────────────────────────────────────────
+# GET /history/companies
 @router.get("/companies", response_model=list[CompanyResponse])
 def list_companies(
     current_user: User = Depends(get_current_user),
@@ -78,7 +78,7 @@ def list_companies(
     return [CompanyResponse.model_validate(c) for c in companies]
 
 
-# ── GET /history/stats ─────────────────────────────────────────────
+# GET /history/stats
 @router.get("/stats", response_model=StatsResponse)
 def get_stats(
     current_user: User = Depends(get_current_user),

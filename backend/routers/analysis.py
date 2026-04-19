@@ -22,6 +22,7 @@ from backend.services.delta_service import find_previous_analysis, run_delta
 from backend.utils import safe_json_loads as _safe_json_loads
 from backend.services.extractor import ALLOWED_EXTENSIONS
 from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf
+from backend.services.badge_generator import generate_badge
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ def _run_pipeline_with_own_session(analysis_id: int, file_path: str) -> None:
         db.close()
 
 
-# ── POST /analysis/upload ──────────────────────────────────────
+# POST /analysis/upload
 @router.post("/upload", response_model=AnalysisCreatedResponse, status_code=status.HTTP_202_ACCEPTED)
 async def upload_analysis(
     background_tasks: BackgroundTasks,
@@ -160,7 +161,7 @@ async def upload_analysis(
     return AnalysisCreatedResponse(analysis_id=analysis.id, status="processing")
 
 
-# ── GET /analysis/{analysis_id} ─────────────────────────────────
+# GET /analysis/{analysis_id}
 @router.get("/{analysis_id}", response_model=AnalysisResponse)
 def get_analysis(
     analysis_id: int,
@@ -213,7 +214,7 @@ def _serialize_analysis(analysis: Analysis) -> dict:
     }
 
 
-# ── GET /analysis/{analysis_id}/pdf ──────────────────────────────
+# GET /analysis/{analysis_id}/pdf
 @router.get("/{analysis_id}/pdf")
 def download_analysis_pdf(
     analysis_id: int,
@@ -256,7 +257,7 @@ def download_analysis_pdf(
     )
 
 
-# ── GET /analysis/{analysis_id}/delta-pdf ────────────────────────
+# GET /analysis/{analysis_id}/delta-pdf
 @router.get("/{analysis_id}/delta-pdf")
 def download_delta_pdf(
     analysis_id: int,
@@ -314,3 +315,75 @@ def download_delta_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+# GET /analysis/badge/{share_token}
+# PUBLIC — pas d'auth, sécurisé par share_token UUID non-devinable
+@router.get("/badge/{share_token}")
+def get_badge(share_token: str, db: Session = Depends(get_db)):
+    """
+    Génère et retourne le badge PNG pour le partage social.
+    Endpoint public — pas besoin d'auth, le share_token est un UUID unique.
+    """
+    analysis = (
+        db.query(Analysis)
+        .filter(Analysis.share_token == share_token, Analysis.status == "success")
+        .first()
+    )
+    if not analysis:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
+
+    company = db.query(Company).filter(Company.id == analysis.company_id).first()
+    if not company:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entreprise introuvable.")
+
+    try:
+        png_bytes = generate_badge(
+            company_name=company.name,
+            score_global=analysis.score_global or 0,
+            csrd_ready=analysis.csrd_ready or False,
+            report_year=analysis.report_year,
+            analysis_date=analysis.created_at,
+        )
+    except Exception as exc:
+        logger.error("Erreur génération badge [%s] : %s", share_token, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur lors de la génération du badge.",
+        )
+
+    return Response(
+        content=png_bytes,
+        media_type="image/png",
+        headers={
+            "Cache-Control": "public, max-age=86400",  # Cache 24h
+            "Content-Disposition": f'inline; filename="esg_badge_{company.name}.png"',
+        },
+    )
+
+
+# GET /analysis/{id}/share-info
+@router.get("/{analysis_id}/share-info")
+def get_share_info(
+    analysis_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Retourne les infos nécessaires pour construire le lien de partage."""
+    analysis = (
+        db.query(Analysis)
+        .filter(Analysis.id == analysis_id, Analysis.user_id == current_user.id)
+        .first()
+    )
+    if not analysis:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
+
+    company = db.query(Company).filter(Company.id == analysis.company_id).first()
+
+    return {
+        "share_token": analysis.share_token,
+        "company_name": company.name if company else "Entreprise",
+        "score_global": analysis.score_global,
+        "csrd_ready": analysis.csrd_ready,
+        "report_year": analysis.report_year,
+    }

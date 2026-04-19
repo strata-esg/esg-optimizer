@@ -6,13 +6,13 @@ Stocke/lit/supprime le token JWT et les infos utilisateur dans st.session_state.
 import streamlit as st
 
 
-# ── Clés session_state ─────────────────────────────────────────────
+# Clés session_state
 _TOKEN_KEY = "jwt_token"
 _USER_KEY = "current_user"
 _ANALYSIS_KEY = "last_analysis_id"
 
 
-# ── Token JWT ──────────────────────────────────────────────────────
+# Token JWT
 
 def save_token(token: str) -> None:
     """Sauvegarde le token JWT dans la session."""
@@ -29,7 +29,7 @@ def clear_token() -> None:
     st.session_state.pop(_TOKEN_KEY, None)
 
 
-# ── Infos utilisateur ─────────────────────────────────────────────
+# Infos utilisateur
 
 def save_user(user: dict) -> None:
     """Sauvegarde les infos utilisateur dans la session."""
@@ -46,7 +46,7 @@ def clear_user() -> None:
     st.session_state.pop(_USER_KEY, None)
 
 
-# ── Dernière analyse ──────────────────────────────────────────────
+# Dernière analyse
 
 def save_last_analysis_id(analysis_id: int) -> None:
     """Mémorise l'ID de la dernière analyse lancée (pour rediriger vers Résultats)."""
@@ -58,7 +58,7 @@ def get_last_analysis_id() -> int | None:
     return st.session_state.get(_ANALYSIS_KEY)
 
 
-# ── Quick-check token (pour claim après inscription) ─────────────
+# Quick-check token (pour claim après inscription)
 
 _QC_TOKEN_KEY = "quick_check_token"
 
@@ -78,7 +78,7 @@ def clear_qc_token() -> None:
     st.session_state.pop(_QC_TOKEN_KEY, None)
 
 
-# ── Helpers ────────────────────────────────────────────────────────
+# Helpers
 
 def is_logged_in() -> bool:
     """True si un token JWT est présent en session."""

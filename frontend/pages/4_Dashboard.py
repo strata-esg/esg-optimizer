@@ -14,20 +14,36 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.sidebar import render_sidebar
 from frontend.utils.api_client import APIError, get_history, get_stats, get_companies
-from frontend.utils.session import get_token, require_auth, save_last_analysis_id
-
-# ── Config page ──────────────────────────────────────────────────
-st.set_page_config(page_title="Dashboard — ESG Optimizer", page_icon="📈", layout="wide")
-render_sidebar()
+from frontend.utils.session import get_token, get_user, require_auth, save_last_analysis_id
 
 if not require_auth():
     st.stop()
 
 token = get_token()
+_user_info = get_user()
+_user_plan = _user_info.get("plan", "discovery") if _user_info else "discovery"
 
-# ── Header ───────────────────────────────────────────────────────
+# Bandeau upgrade (plan gratuit)
+if _user_plan in ("discovery", "free"):
+    st.markdown(
+        """<div style="background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+            border: 1px solid #1A3D22; border-radius: 12px; padding: 16px; text-align: center;
+            margin-bottom: 16px;">
+            <span style="font-weight: 600; color: #111827;">
+                Plan Découverte — </span>
+            <span style="color: #6B7280;">
+                Passez au Pro pour des analyses illimitées, l'export Excel et le benchmark sectoriel.
+            </span>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+    col_d1, col_d2, col_d3 = st.columns([2, 1, 2])
+    with col_d2:
+        if st.button("Voir les tarifs", key="dash_upgrade", use_container_width=True, type="primary"):
+            st.switch_page("pages/6_Tarifs.py")
+
+# Header
 st.markdown(
     """<div style="padding: 10px 0 20px 0;">
         <h2>📈 Dashboard ESG</h2>
@@ -36,9 +52,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ══════════════════════════════════════════════════════════════════
 # 1. STATS AGRÉGÉES (header KPIs)
-# ══════════════════════════════════════════════════════════════════
 try:
     stats = get_stats(token)
 except APIError as e:
@@ -62,9 +76,7 @@ with col4:
 
 st.markdown("---")
 
-# ══════════════════════════════════════════════════════════════════
 # 2. HISTORIQUE DES ANALYSES (tableau paginé)
-# ══════════════════════════════════════════════════════════════════
 st.subheader("Historique des analyses")
 
 # Pagination
@@ -134,9 +146,7 @@ else:
     st.info("Aucune analyse pour le moment. Lancez votre première analyse depuis la page Upload !")
     st.page_link("pages/2_Upload.py", label="Lancer une analyse", icon="📤")
 
-# ══════════════════════════════════════════════════════════════════
 # 3. GRAPHIQUES (si données suffisantes)
-# ══════════════════════════════════════════════════════════════════
 if analyses_list and len(analyses_list) >= 2:
     st.markdown("---")
 
@@ -156,7 +166,7 @@ if analyses_list and len(analyses_list) >= 2:
 
         col_bar, col_line = st.columns(2)
 
-        # ── Graphique barres : scores par entreprise ─────────
+        # Graphique barres : scores par entreprise
         with col_bar:
             st.subheader("Scores par entreprise")
             latest_per_company = (
@@ -171,7 +181,7 @@ if analyses_list and len(analyses_list) >= 2:
                     x="company_name",
                     y="score_global",
                     color="score_global",
-                    color_continuous_scale=["#EF4444", "#F59E0B", "#3B82F6", "#10B981"],
+                    color_continuous_scale=["#EF4444", "#F59E0B", "#3B82F6", "#1A3D22"],
                     range_color=[0, 100],
                     labels={"company_name": "Entreprise", "score_global": "Score Global"},
                 )
@@ -182,7 +192,7 @@ if analyses_list and len(analyses_list) >= 2:
                 )
                 st.plotly_chart(fig_bar, use_container_width=True)
 
-        # ── Courbe temporelle : évolution des scores ─────────
+        # Courbe temporelle : évolution des scores
         with col_line:
             st.subheader("Évolution temporelle")
             if len(chart_df) >= 2:

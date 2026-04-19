@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none">
+  <!-- Logomark: jauge circulaire avec aiguille -->
+  <g transform="translate(4, 4)">
+    <!-- Arc de fond (cercle partiel 270°) -->
+    <path
+      d="M 8,20 A 16,16 0 1,1 32,20"
+      stroke="#D4F0D8"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <!-- Arc actif (score ~72%) -->
+    <path
+      d="M 8,20 A 16,16 0 0,1 25.5,7.5"
+      stroke="#1A3D22"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <!-- Point central -->
+    <circle cx="20" cy="20" r="2.5" fill="#1A3D22"/>
+    <!-- Aiguille -->
+    <line x1="20" y1="20" x2="28" y2="9" stroke="#1A3D22" stroke-width="2" stroke-linecap="round"/>
+    <!-- Tip aiguille -->
+    <circle cx="28" cy="9" r="1.5" fill="#7FC686"/>
+  </g>
+  <!-- Logotype -->
+  <text x="52" y="22" font-family="'DM Serif Display', Georgia, serif" font-size="15" font-weight="400" fill="#1A3D22">ESG</text>
+  <text x="52" y="37" font-family="'DM Sans', system-ui, sans-serif" font-size="11" font-weight="500" letter-spacing="2" fill="#2A5C34">OPTIMIZER</text>
+</svg>

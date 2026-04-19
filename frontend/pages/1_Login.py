@@ -11,21 +11,16 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.sidebar import render_sidebar
 from frontend.utils.api_client import APIError, login, register, get_me
 from frontend.utils.session import is_logged_in, save_token, save_user
 
-# ── Config page ──────────────────────────────────────────────────
-st.set_page_config(page_title="Connexion — ESG Optimizer", page_icon="🔐", layout="centered")
-render_sidebar()
-
-# ── Si déjà connecté, rediriger ─────────────────────────────────
+# Si déjà connecté, rediriger
 if is_logged_in():
     st.success("Vous êtes déjà connecté !")
     st.page_link("pages/2_Upload.py", label="Aller à l'upload", icon="📤")
     st.stop()
 
-# ── Header ───────────────────────────────────────────────────────
+# Header
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <h2>🔐 Connexion</h2>
@@ -34,7 +29,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Toggle inscription / connexion ───────────────────────────────
+# Toggle inscription / connexion
 mode = st.radio(
     "Mode",
     ["Se connecter", "Créer un compte"],
@@ -44,7 +39,7 @@ mode = st.radio(
 
 is_register = mode == "Créer un compte"
 
-# ── Formulaire ───────────────────────────────────────────────────
+# Formulaire
 with st.form("auth_form"):
     email = st.text_input("Email", placeholder="vous@entreprise.com")
     password = st.text_input("Mot de passe", type="password", placeholder="8 caractères minimum")
@@ -62,7 +57,7 @@ with st.form("auth_form"):
         type="primary",
     )
 
-# ── Traitement du formulaire ─────────────────────────────────────
+# Traitement du formulaire
 if submitted:
     if not email or not password:
         st.error("Veuillez remplir l'email et le mot de passe.")

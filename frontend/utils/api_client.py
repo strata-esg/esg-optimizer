@@ -20,9 +20,7 @@ class APIError(Exception):
         super().__init__(f"[{status_code}] {detail}")
 
 
-# ══════════════════════════════════════════════════════════════════
 # HELPERS
-# ══════════════════════════════════════════════════════════════════
 
 def _headers(token: str | None = None) -> dict:
     """Construit les headers avec le JWT si fourni."""
@@ -54,9 +52,7 @@ def _handle_binary_response(resp: requests.Response) -> bytes:
     return resp.content
 
 
-# ══════════════════════════════════════════════════════════════════
 # AUTH
-# ══════════════════════════════════════════════════════════════════
 
 def register(email: str, password: str, company_name: str | None = None) -> dict:
     """
@@ -92,9 +88,7 @@ def get_me(token: str) -> dict:
     return _handle_response(resp)
 
 
-# ══════════════════════════════════════════════════════════════════
 # ANALYSIS
-# ══════════════════════════════════════════════════════════════════
 
 def upload_analysis(
     token: str,
@@ -165,9 +159,7 @@ def download_delta_pdf(token: str, analysis_id: int) -> bytes:
     return _handle_binary_response(resp)
 
 
-# ══════════════════════════════════════════════════════════════════
 # HISTORY & DASHBOARD
-# ══════════════════════════════════════════════════════════════════
 
 def get_history(token: str, page: int = 1, per_page: int = 20) -> dict:
     """
@@ -209,9 +201,7 @@ def get_stats(token: str) -> dict:
     return _handle_response(resp)
 
 
-# ══════════════════════════════════════════════════════════════════
 # PUBLIC — Quick-check (sans auth)
-# ══════════════════════════════════════════════════════════════════
 
 def quick_check_upload(file_bytes: bytes, filename: str) -> dict:
     """
@@ -248,6 +238,73 @@ def claim_quick_check(auth_token: str, qc_token: str) -> dict:
         f"{BACKEND_URL}/auth/claim-analysis",
         headers=_headers(auth_token),
         params={"token": qc_token},
+        timeout=10,
+    )
+    return _handle_response(resp)
+
+
+# SOCIAL SHARING
+
+def get_share_info(token: str, analysis_id: int) -> dict:
+    """
+    GET /analysis/{id}/share-info
+    Retourne share_token, company_name, score_global, csrd_ready, report_year.
+    """
+    resp = requests.get(
+        f"{BACKEND_URL}/analysis/{analysis_id}/share-info",
+        headers=_headers(token),
+        timeout=10,
+    )
+    return _handle_response(resp)
+
+
+# STRIPE — Upgrade & Subscription
+
+def get_upgrade_url(token: str, plan: str) -> dict:
+    """
+    GET /stripe/upgrade-url?plan=essential|pro
+    Retourne : {"url": "https://buy.stripe.com/...?prefilled_email=...", "plan": "..."}
+    """
+    resp = requests.get(
+        f"{BACKEND_URL}/stripe/upgrade-url",
+        headers=_headers(token),
+        params={"plan": plan},
+        timeout=10,
+    )
+    return _handle_response(resp)
+
+
+def get_my_subscription(token: str) -> dict:
+    """
+    GET /stripe/my-subscription
+    Retourne l'abonnement actif de l'utilisateur.
+    """
+    resp = requests.get(
+        f"{BACKEND_URL}/stripe/my-subscription",
+        headers=_headers(token),
+        timeout=10,
+    )
+    return _handle_response(resp)
+
+
+# EMAIL — Préférences
+
+def get_email_preferences(token: str) -> dict:
+    """GET /email/preferences"""
+    resp = requests.get(
+        f"{BACKEND_URL}/email/preferences",
+        headers=_headers(token),
+        timeout=10,
+    )
+    return _handle_response(resp)
+
+
+def update_email_preferences(token: str, email_notifications: bool) -> dict:
+    """PUT /email/preferences"""
+    resp = requests.put(
+        f"{BACKEND_URL}/email/preferences",
+        headers=_headers(token),
+        json={"email_notifications": email_notifications},
         timeout=10,
     )
     return _handle_response(resp)

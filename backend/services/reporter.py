@@ -34,9 +34,7 @@ from backend.utils import safe_json_loads as _safe_json_loads
 
 logger = logging.getLogger(__name__)
 
-# ──────────────────────────────────────────────
 # Couleurs ESG Optimizer
-# ──────────────────────────────────────────────
 BRAND_GREEN = colors.HexColor("#16A34A")
 BRAND_DARK = colors.HexColor("#1E293B")
 BRAND_LIGHT = colors.HexColor("#F1F5F9")
@@ -52,9 +50,7 @@ PILLAR_COLORS = {
 }
 
 
-# ──────────────────────────────────────────────
 # Styles
-# ──────────────────────────────────────────────
 def _get_styles() -> dict:
     """Retourne un dict de styles personnalisés."""
     base = getSampleStyleSheet()
@@ -157,9 +153,7 @@ def _footer(canvas, doc):
     canvas.restoreState()
 
 
-# ══════════════════════════════════════════════
 # RAPPORT D'ANALYSE ESG
-# ══════════════════════════════════════════════
 
 def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
     """
@@ -179,7 +173,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
     styles = _get_styles()
     story = []
 
-    # ── PAGE DE TITRE ──
+    # PAGE DE TITRE
     story.append(Spacer(1, 3 * cm))
     story.append(Paragraph("ESG Optimizer AI", styles["title"]))
     story.append(Paragraph("Rapport d'Analyse ESG", styles["subtitle"]))
@@ -198,14 +192,14 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
     ))
     story.append(PageBreak())
 
-    # ── RÉSUMÉ EXÉCUTIF ──
+    # RÉSUMÉ EXÉCUTIF
     story.append(Paragraph("1. Résumé exécutif", styles["h1"]))
     if analysis.executive_summary:
         story.append(Paragraph(analysis.executive_summary, styles["body"]))
     else:
         story.append(Paragraph("<i>Aucun résumé disponible.</i>", styles["body"]))
 
-    # ── SCORES ESG ──
+    # SCORES ESG
     story.append(Paragraph("2. Scores ESG", styles["h1"]))
 
     scores_data = [
@@ -248,7 +242,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
     ]))
     story.append(scores_table)
 
-    # ── CONFORMITÉ CSRD ──
+    # CONFORMITÉ CSRD
     story.append(Paragraph("3. Conformité CSRD", styles["h1"]))
     csrd_status = "Prêt" if analysis.csrd_ready else "Non prêt"
     csrd_color = "green" if analysis.csrd_ready else "red"
@@ -264,7 +258,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
         for item in missing[:10]:
             story.append(Paragraph(f"  - {item}", styles["body"]))
 
-    # ── COUVERTURE ESRS ──
+    # COUVERTURE ESRS
     story.append(Paragraph("4. Couverture ESRS", styles["h1"]))
     esrs = _safe_json_loads(analysis.esrs_coverage) or {}
     if esrs:
@@ -300,7 +294,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
         ]))
         story.append(esrs_table)
 
-    # ── KPIs ──
+    # KPIs
     kpis = _safe_json_loads(analysis.kpis_detected) or []
     if kpis:
         story.append(Paragraph("5. KPIs détectés", styles["h1"]))
@@ -326,7 +320,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
         ]))
         story.append(kpi_table)
 
-    # ── FORCES / FAIBLESSES ──
+    # FORCES / FAIBLESSES
     strengths = _safe_json_loads(analysis.strengths) or []
     weaknesses = _safe_json_loads(analysis.weaknesses) or []
 
@@ -349,7 +343,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
                     styles["body"],
                 ))
 
-    # ── RECOMMANDATIONS ──
+    # RECOMMANDATIONS
     recommendations = _safe_json_loads(analysis.recommendations) or []
     if recommendations:
         story.append(Paragraph("7. Recommandations", styles["h1"]))
@@ -376,7 +370,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
         ]))
         story.append(rec_table)
 
-    # ── DELTAS (si disponibles) ──
+    # DELTAS (si disponibles)
     if analysis.delta_global is not None:
         story.append(PageBreak())
         story.append(Paragraph("8. Évolution vs année précédente", styles["h1"]))
@@ -421,9 +415,7 @@ def _score_level(score: float | None) -> str:
     return "Quasi absent"
 
 
-# ══════════════════════════════════════════════
 # RAPPORT DELTA PDF
-# ══════════════════════════════════════════════
 
 def generate_delta_pdf(
     current: Analysis,
@@ -448,7 +440,7 @@ def generate_delta_pdf(
     styles = _get_styles()
     story = []
 
-    # ── PAGE DE TITRE ──
+    # PAGE DE TITRE
     story.append(Spacer(1, 3 * cm))
     story.append(Paragraph("ESG Optimizer AI", styles["title"]))
     story.append(Paragraph("Rapport d'Évolution ESG (Delta)", styles["subtitle"]))
@@ -462,12 +454,12 @@ def generate_delta_pdf(
     story.append(Paragraph(f"Période : {year_label}", styles["subtitle"]))
     story.append(PageBreak())
 
-    # ── RÉSUMÉ D'ÉVOLUTION ──
+    # RÉSUMÉ D'ÉVOLUTION
     story.append(Paragraph("1. Synthèse de l'évolution", styles["h1"]))
     summary = delta_narrative.get("delta_summary", "Aucune synthèse disponible.")
     story.append(Paragraph(summary, styles["body"]))
 
-    # ── ÉVOLUTION DES SCORES ──
+    # ÉVOLUTION DES SCORES
     story.append(Paragraph("2. Évolution des scores", styles["h1"]))
     score_evo = delta_narrative.get("score_evolution", {})
 
@@ -509,7 +501,7 @@ def generate_delta_pdf(
     ]))
     story.append(evo_table)
 
-    # ── ÉVOLUTION ESRS ──
+    # ÉVOLUTION ESRS
     esrs_evo = delta_narrative.get("esrs_evolution", {})
     if esrs_evo:
         story.append(Paragraph("3. Évolution de la couverture ESRS", styles["h1"]))
@@ -530,7 +522,7 @@ def generate_delta_pdf(
             for l in lost:
                 story.append(Paragraph(f"  <font color='red'>-</font> {l}", styles["body"]))
 
-    # ── COMPARAISON KPIs ──
+    # COMPARAISON KPIs
     kpi_comp = delta_narrative.get("kpi_comparison", [])
     if kpi_comp:
         story.append(Paragraph("4. Comparaison des KPIs", styles["h1"]))
@@ -566,7 +558,7 @@ def generate_delta_pdf(
         ]))
         story.append(kpi_table)
 
-    # ── AMÉLIORATIONS / RÉGRESSIONS ──
+    # AMÉLIORATIONS / RÉGRESSIONS
     improvements = delta_narrative.get("key_improvements", [])
     regressions = delta_narrative.get("key_regressions", [])
 
@@ -587,7 +579,7 @@ def generate_delta_pdf(
                     styles["body"],
                 ))
 
-    # ── ACTIONS PRIORITAIRES ──
+    # ACTIONS PRIORITAIRES
     actions = delta_narrative.get("priority_actions", [])
     if actions:
         story.append(Paragraph("6. Actions prioritaires", styles["h1"]))

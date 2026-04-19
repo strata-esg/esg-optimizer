@@ -12,18 +12,13 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.sidebar import render_sidebar
 from frontend.utils.api_client import APIError, upload_analysis, get_analysis
-from frontend.utils.session import get_token, require_auth, save_last_analysis_id
-
-# ── Config page ──────────────────────────────────────────────────
-st.set_page_config(page_title="Upload — ESG Optimizer", page_icon="📤", layout="centered")
-render_sidebar()
+from frontend.utils.session import get_token, get_user, require_auth, save_last_analysis_id
 
 if not require_auth():
     st.stop()
 
-# ── Header ───────────────────────────────────────────────────────
+# Header
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <h2>📤 Nouvelle Analyse ESG</h2>
@@ -32,7 +27,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Formulaire d'upload ──────────────────────────────────────────
+# Formulaire d'upload
 uploaded_file = st.file_uploader(
     "Rapport de durabilité",
     type=["pdf", "docx", "xlsx"],
@@ -74,7 +69,7 @@ sector = st.selectbox(
     format_func=lambda x: "— Sélectionner un secteur —" if x is None else x,
 )
 
-# ── Bouton Analyser ──────────────────────────────────────────────
+# Bouton Analyser
 can_submit = uploaded_file is not None and company_name.strip() != ""
 
 if st.button(
@@ -153,11 +148,42 @@ if st.button(
             )
 
     except APIError as e:
-        st.error(f"Erreur : {e.detail}")
+        # Si quota atteint → proposer upgrade
+        if e.status_code == 403 and "Quota" in e.detail:
+            st.warning(e.detail)
+            st.markdown("---")
+            st.markdown(
+                """<div style="background: #FFF7ED; border: 1px solid #FB923C; border-radius: 12px;
+                    padding: 16px; text-align: center;">
+                    <div style="font-weight: 600; color: #9A3412;">
+                        Votre analyse gratuite a été utilisée
+                    </div>
+                    <div style="font-size: 13px; color: #6B7280; margin-top: 4px;">
+                        Passez au plan Essentiel (39€/analyse) ou Pro (129€/mois illimité) pour continuer.
+                    </div>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+            if st.button("Voir les tarifs", type="primary", use_container_width=True, key="upload_upgrade"):
+                st.switch_page("pages/6_Tarifs.py")
+        else:
+            st.error(f"Erreur : {e.detail}")
     except Exception as e:
         st.error(f"Erreur inattendue : {e}")
 
-# ── Aide ─────────────────────────────────────────────────────────
+# Bandeau quota restant (plan discovery)
+_upload_user = get_user()
+if _upload_user:
+    _upload_plan = _upload_user.get("plan", "discovery")
+    _analyses_count = _upload_user.get("analyses_this_month", 0)
+    if _upload_plan in ("discovery", "free"):
+        remaining = max(0, 1 - _analyses_count)
+        if remaining == 0:
+            st.info("Vous avez utilisé votre analyse gratuite. Passez à un plan payant pour continuer.")
+        else:
+            st.caption(f"Plan Découverte — {remaining} analyse gratuite restante.")
+
+# Aide
 if not can_submit:
     st.caption("Uploadez un fichier et renseignez le nom de l'entreprise pour lancer l'analyse.")
 

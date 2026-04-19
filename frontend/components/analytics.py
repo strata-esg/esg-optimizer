@@ -19,7 +19,7 @@ Events trackés :
 import streamlit as st
 import os
 
-# ── Config ────────────────────────────────────────────────────────
+# Config
 PLAUSIBLE_DOMAIN = os.getenv("PLAUSIBLE_DOMAIN", "")  # ex: esg-optimizer.fr
 
 
@@ -73,7 +73,7 @@ def track_event(event_name: str, data: dict | None = None) -> None:
     st.markdown(js, unsafe_allow_html=True)
 
 
-# ── Helpers pour les 8 events principaux ──────────────────────────
+# Helpers pour les 8 events principaux
 
 def track_landing_view(persona: str | None = None) -> None:
     """Track : page d'accueil affichée."""
