@@ -66,7 +66,9 @@ content = PERSONA_CONTENT.get(persona, default_content) if persona else default_
 # 1. HERO
 st.markdown(
     f"""<div style="text-align: center; padding: 50px 20px 30px 20px;">
-        <div style="font-size: 48px;">🌿</div>
+        <div style="width:48px; height:48px; margin:0 auto;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1A3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8c.7-1 1-2.2 1-3.5C18 2.5 16.6 1 12 1c-4.6 0-6 1.5-6 3.5C6 5.8 6.3 7 7 8"/><path d="M12 1v16"/><path d="M4.22 12c.65-.37 1.39-.55 2.14-.5 1.1.1 2.1.6 2.8 1.4.7.7 1.2 1.7 1.3 2.8.05.75-.13 1.5-.5 2.14"/><path d="M19.78 12c-.65-.37-1.39-.55-2.14-.5-1.1.1-2.1.6-2.8 1.4-.7.7-1.2 1.7-1.3 2.8-.05.75.13 1.5.5 2.14"/><path d="M12 17c0 3 2 5 2 5H10s2-2 2-5z"/></svg>
+        </div>
         <h1 style="margin-top: 10px; color: #111827; font-size: 2.4rem; line-height: 1.2;">
             {content['titre']}
         </h1>
@@ -176,7 +178,7 @@ with qc_col_center:
             # Forces et lacunes — visibles mais partiellement floutées
             force_col, weak_col = st.columns(2)
             with force_col:
-                st.markdown("**✅ 3 forces détectées**")
+                st.markdown("**3 forces détectées**")
                 for i, s in enumerate(strengths):
                     if i == 0:
                         st.markdown(f"- {s}")
@@ -189,7 +191,7 @@ with qc_col_center:
                         )
 
             with weak_col:
-                st.markdown("**⚠️ 3 lacunes détectées**")
+                st.markdown("**3 lacunes détectées**")
                 for i, w in enumerate(weaknesses):
                     if i == 0:
                         st.markdown(f"- {w}")
@@ -217,7 +219,6 @@ with qc_col_center:
             st.page_link(
                 "pages/1_Login.py",
                 label="Voir le rapport complet — gratuit, 30 secondes",
-                icon="🚀",
                 use_container_width=True,
             )
 
@@ -242,11 +243,18 @@ if not persona:  # N'afficher que sur la landing générique
 
     p1, p2, p3, p4 = st.columns(4)
 
+    # SVG icons inline (Lucide-style, 28px, brand color)
+    _ico = lambda d: f'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1A3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{d}</svg>'
+    _ico_building = _ico('<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/>')
+    _ico_clipboard = _ico('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/>')
+    _ico_target = _ico('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>')
+    _ico_landmark = _ico('<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>')
+
     persona_cards = [
-        (p1, "🏢", "PME / ETI", "Préparer ma conformité CSRD", "pme"),
-        (p2, "📋", "Consultant ESG", "Gagner du temps sur mes livrables", "consultant"),
-        (p3, "🎯", "Directeur RSE", "Piloter ma performance ESG", "drse"),
-        (p4, "🏛️", "Entreprise", "Déployer à grande échelle", "enterprise"),
+        (p1, _ico_building, "PME / ETI", "Préparer ma conformité CSRD", "pme"),
+        (p2, _ico_clipboard, "Consultant ESG", "Gagner du temps sur mes livrables", "consultant"),
+        (p3, _ico_target, "Directeur RSE", "Piloter ma performance ESG", "drse"),
+        (p4, _ico_landmark, "Entreprise", "Déployer à grande échelle", "enterprise"),
     ]
 
     for col, icon, title, desc, key in persona_cards:
@@ -258,7 +266,7 @@ if not persona:  # N'afficher que sur la landing générique
                         transition: border-color 0.2s, box-shadow 0.2s;"
                         onmouseover="this.style.borderColor='#1A3D22'; this.style.boxShadow='0 2px 8px rgba(26,61,34,0.15)';"
                         onmouseout="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none';">
-                        <div style="font-size: 28px;">{icon}</div>
+                        <div>{icon}</div>
                         <div style="font-weight: 600; font-size: 14px; margin-top: 8px; color: #111827;">
                             {title}
                         </div>
@@ -318,12 +326,17 @@ st.markdown(
 
 s1, s2, s3 = st.columns(3)
 
+_s = lambda d: f'<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{d}</svg>'
+_step_upload = _s('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>')
+_step_cpu = _s('<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>')
+_step_chart = _s('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>')
+
 steps = [
-    (s1, "1", "📤", "Uploadez votre rapport",
+    (s1, "1", _step_upload, "Uploadez votre rapport",
      "Glissez votre rapport de durabilité (PDF, DOCX ou XLSX). DPEF, rapport RSE, bilan carbone — tout fonctionne."),
-    (s2, "2", "🤖", "L'IA analyse en 3 minutes",
+    (s2, "2", _step_cpu, "L'IA analyse en 3 minutes",
      "GPT-4o parcourt votre document, identifie les KPIs, évalue la couverture ESRS et calcule vos scores E/S/G."),
-    (s3, "3", "📊", "Recevez votre diagnostic",
+    (s3, "3", _step_chart, "Recevez votre diagnostic",
      "Score global, conformité CSRD, forces/lacunes, recommandations priorisées et rapport PDF téléchargeable."),
 ]
 
@@ -335,7 +348,7 @@ for col, num, icon, title, desc in steps:
                 <div style="background: #1A3D22; color: white; width: 32px; height: 32px;
                     border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
                     font-weight: 700; font-size: 14px; margin-bottom: 12px;">{num}</div>
-                <div style="font-size: 32px; margin-bottom: 8px;">{icon}</div>
+                <div style="margin-bottom: 8px;">{icon}</div>
                 <div style="font-weight: 600; font-size: 15px; color: #111827; margin-bottom: 6px;">
                     {title}
                 </div>
@@ -364,7 +377,7 @@ with demo_l:
     st.markdown(
         """<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px;">
             <div style="font-weight: 600; font-size: 15px; color: #111827; margin-bottom: 12px;">
-                📊 Scores ESG détaillés
+                Scores ESG détaillés
             </div>
             <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                 <div style="flex: 1; background: #D4F0D8; border-radius: 8px; padding: 12px; text-align: center;">
@@ -394,22 +407,22 @@ with demo_r:
     st.markdown(
         """<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px;">
             <div style="font-weight: 600; font-size: 15px; color: #111827; margin-bottom: 12px;">
-                📋 Conformité CSRD
+                Conformité CSRD
             </div>
             <div style="background: #FEF3C7; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
                 <div style="font-size: 13px; color: #92400E;">
-                    ⚠️ <strong>Partiellement conforme</strong> — Couverture ESRS : 68%
+                    <strong>Partiellement conforme</strong> — Couverture ESRS : 68%
                 </div>
             </div>
             <div style="font-size: 13px; color: #374151; margin-bottom: 8px; font-weight: 600;">
                 Standards à renforcer :
             </div>
             <div style="font-size: 12px; color: #6B7280; line-height: 1.8;">
-                ❌ E1 — Changement climatique<br>
-                ❌ S2 — Travailleurs de la chaîne de valeur<br>
-                ⚠️ G1 — Gouvernance (partiel)<br>
-                ✅ E3 — Eau et ressources marines<br>
-                ✅ S1 — Effectifs de l'entreprise
+                <span style="color:#EF4444;">&#10007;</span> E1 — Changement climatique<br>
+                <span style="color:#EF4444;">&#10007;</span> S2 — Travailleurs de la chaîne de valeur<br>
+                <span style="color:#F59E0B;">&#9679;</span> G1 — Gouvernance (partiel)<br>
+                <span style="color:#1A3D22;">&#10003;</span> E3 — Eau et ressources marines<br>
+                <span style="color:#1A3D22;">&#10003;</span> S1 — Effectifs de l'entreprise
             </div>
         </div>""",
         unsafe_allow_html=True,
@@ -419,17 +432,18 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Ligne de features complémentaires
 f1, f2, f3, f4 = st.columns(4)
+_fi = lambda d: f'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{d}</svg>'
 features_extra = [
-    (f1, "📄", "Rapport PDF", "8 pages téléchargeables"),
-    (f2, "📈", "Delta Report", "Évolution année par année"),
-    (f3, "💡", "Recommandations", "Priorisées par impact"),
-    (f4, "🏆", "Benchmark", "Comparaison sectorielle"),
+    (f1, _fi('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'), "Rapport PDF", "8 pages téléchargeables"),
+    (f2, _fi('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'), "Delta Report", "Évolution année par année"),
+    (f3, _fi('<line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>'), "Recommandations", "Priorisées par impact"),
+    (f4, _fi('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 9 7 12 7s5-3 7.5-3a2.5 2.5 0 0 1 0 5H18"/><path d="M18 22H6"/><path d="M6 13v-2"/><path d="M18 13v-2"/><path d="M6 17v-2"/><path d="M18 17v-2"/>'), "Benchmark", "Comparaison sectorielle"),
 ]
 for col, icon, title, desc in features_extra:
     with col:
         st.markdown(
             f"""<div style="text-align: center; padding: 16px 8px;">
-                <div style="font-size: 24px;">{icon}</div>
+                <div>{icon}</div>
                 <div style="font-weight: 600; font-size: 13px; color: #111827; margin-top: 4px;">{title}</div>
                 <div style="font-size: 11px; color: #9CA3AF;">{desc}</div>
             </div>""",
@@ -460,17 +474,17 @@ with pr1:
             <div style="font-size: 32px; font-weight: 800; color: #1A3D22; margin: 12px 0 4px 0;">0 €</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">1 analyse gratuite</div>
             <div style="text-align: left; font-size: 12px; color: #6B7280; line-height: 2;">
-                ✅ 1 analyse complète<br>
-                ✅ Score global E/S/G<br>
-                📄 Rapport PDF (3 pages, watermark)<br>
-                ❌ Pas de Delta Report<br>
-                ❌ Pas de scores détaillés<br>
-                ❌ Historique limité à 1 analyse
+                <span style="color:#1A3D22;">&#10003;</span> 1 analyse complète<br>
+                <span style="color:#1A3D22;">&#10003;</span> Score global E/S/G<br>
+                <span style="color:#6B7280;">&#9679;</span> Rapport PDF (3 pages, watermark)<br>
+                <span style="color:#B53030;">&#10007;</span> Pas de Delta Report<br>
+                <span style="color:#B53030;">&#10007;</span> Pas de scores détaillés<br>
+                <span style="color:#B53030;">&#10007;</span> Historique limité à 1 analyse
             </div>
         </div>""",
         unsafe_allow_html=True,
     )
-    st.page_link("pages/1_Login.py", label="Commencer gratuitement", icon="🚀", use_container_width=True)
+    st.page_link("pages/1_Login.py", label="Commencer gratuitement", use_container_width=True)
 
 # Plan Essentiel
 with pr2:
@@ -481,17 +495,17 @@ with pr2:
             <div style="font-size: 32px; font-weight: 800; color: #2563EB; margin: 12px 0 4px 0;">39 €</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">par analyse</div>
             <div style="text-align: left; font-size: 12px; color: #6B7280; line-height: 2;">
-                ✅ Rapport complet sans watermark<br>
-                ✅ Scores E/S/G détaillés<br>
-                ✅ Delta Report inclus<br>
-                ✅ Conservation 12 mois<br>
-                ❌ Pas de benchmark sectoriel<br>
-                ❌ Pas de white-label
+                <span style="color:#1A3D22;">&#10003;</span> Rapport complet sans watermark<br>
+                <span style="color:#1A3D22;">&#10003;</span> Scores E/S/G détaillés<br>
+                <span style="color:#1A3D22;">&#10003;</span> Delta Report inclus<br>
+                <span style="color:#1A3D22;">&#10003;</span> Conservation 12 mois<br>
+                <span style="color:#B53030;">&#10007;</span> Pas de benchmark sectoriel<br>
+                <span style="color:#B53030;">&#10007;</span> Pas de white-label
             </div>
         </div>""",
         unsafe_allow_html=True,
     )
-    st.page_link("pages/1_Login.py", label="Acheter une analyse", icon="💳", use_container_width=True)
+    st.page_link("pages/1_Login.py", label="Acheter une analyse", use_container_width=True)
 
 # Plan Pro (RECOMMANDÉ)
 with pr3:
@@ -505,17 +519,17 @@ with pr3:
             <div style="font-size: 32px; font-weight: 800; color: #1A3D22; margin: 12px 0 4px 0;">129 €</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">/ mois <span style="color:#1A3D22;">(ou 990 €/an)</span></div>
             <div style="text-align: left; font-size: 12px; color: #6B7280; line-height: 2;">
-                ✅ Analyses illimitées<br>
-                ✅ Dashboard complet<br>
-                ✅ Benchmark sectoriel<br>
-                ✅ Export Excel des KPIs<br>
-                ✅ Rapport white-label (votre logo)<br>
-                ✅ Historique illimité
+                <span style="color:#1A3D22;">&#10003;</span> Analyses illimitées<br>
+                <span style="color:#1A3D22;">&#10003;</span> Dashboard complet<br>
+                <span style="color:#1A3D22;">&#10003;</span> Benchmark sectoriel<br>
+                <span style="color:#1A3D22;">&#10003;</span> Export Excel des KPIs<br>
+                <span style="color:#1A3D22;">&#10003;</span> Rapport white-label (votre logo)<br>
+                <span style="color:#1A3D22;">&#10003;</span> Historique illimité
             </div>
         </div>""",
         unsafe_allow_html=True,
     )
-    st.page_link("pages/1_Login.py", label="Démarrer l'essai Pro", icon="⭐", use_container_width=True)
+    st.page_link("pages/1_Login.py", label="Démarrer l'essai Pro", use_container_width=True)
 
 # Plan Enterprise
 with pr4:
@@ -526,12 +540,12 @@ with pr4:
             <div style="font-size: 32px; font-weight: 800; color: #7C3AED; margin: 12px 0 4px 0;">Sur devis</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">adapté à votre organisation</div>
             <div style="text-align: left; font-size: 12px; color: #6B7280; line-height: 2;">
-                ✅ Tout le plan Pro<br>
-                ✅ SSO / SAML<br>
-                ✅ Multi-utilisateurs<br>
-                ✅ Accès API<br>
-                ✅ SLA garanti<br>
-                ✅ Formation & onboarding
+                <span style="color:#1A3D22;">&#10003;</span> Tout le plan Pro<br>
+                <span style="color:#1A3D22;">&#10003;</span> SSO / SAML<br>
+                <span style="color:#1A3D22;">&#10003;</span> Multi-utilisateurs<br>
+                <span style="color:#1A3D22;">&#10003;</span> Accès API<br>
+                <span style="color:#1A3D22;">&#10003;</span> SLA garanti<br>
+                <span style="color:#1A3D22;">&#10003;</span> Formation & onboarding
             </div>
         </div>""",
         unsafe_allow_html=True,
@@ -549,7 +563,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-with st.expander("🔒 Mes données sont-elles en sécurité ?"):
+with st.expander("Mes données sont-elles en sécurité ?"):
     st.write(
         "Oui. Vos rapports sont traités via des serveurs européens. Les données sont chiffrées "
         "en transit (HTTPS) et au repos. Nous ne partageons jamais vos documents avec des tiers. "
@@ -557,7 +571,7 @@ with st.expander("🔒 Mes données sont-elles en sécurité ?"):
         "(header `x-openai-skip-training`)."
     )
 
-with st.expander("📋 Qu'est-ce que la CSRD et suis-je concerné ?"):
+with st.expander("Qu'est-ce que la CSRD et suis-je concerné ?"):
     st.write(
         "La Corporate Sustainability Reporting Directive (CSRD) est la directive européenne qui "
         "oblige les entreprises à publier un rapport de durabilité conforme aux standards ESRS. "
@@ -566,7 +580,7 @@ with st.expander("📋 Qu'est-ce que la CSRD et suis-je concerné ?"):
         "est conforme."
     )
 
-with st.expander("🤖 Quelle IA est utilisée ? Est-elle fiable ?"):
+with st.expander("Quelle IA est utilisée ? Est-elle fiable ?"):
     st.write(
         "Nous utilisons GPT-4o d'OpenAI, le modèle le plus performant pour l'analyse de texte. "
         "Notre système prompt est calibré sur les 10 standards ESRS (E1-E5, S1-S4, G1) et produit "
@@ -575,21 +589,21 @@ with st.expander("🤖 Quelle IA est utilisée ? Est-elle fiable ?"):
         "à la décision."
     )
 
-with st.expander("📄 Quels formats de rapport acceptez-vous ?"):
+with st.expander("Quels formats de rapport acceptez-vous ?"):
     st.write(
         "PDF, DOCX et XLSX. Tous les types de rapports de durabilité fonctionnent : DPEF, rapport "
         "RSE, rapport annuel avec section ESG, bilan carbone, rapport intégré. La taille maximale "
         "est de 20 Mo."
     )
 
-with st.expander("💰 Le plan Découverte est-il vraiment gratuit ?"):
+with st.expander("Le plan Découverte est-il vraiment gratuit ?"):
     st.write(
         "Oui, 100% gratuit, sans carte bancaire. Vous obtenez 1 analyse complète avec un score "
         "global et un aperçu du rapport PDF (3 pages sur 8). Pour accéder au rapport complet, "
         "aux scores détaillés et au Delta Report, passez au plan Essentiel (39 €/analyse) ou Pro."
     )
 
-with st.expander("📊 Qu'est-ce que le Delta Report ?"):
+with st.expander("Qu'est-ce que le Delta Report ?"):
     st.write(
         "Le Delta Report compare votre rapport actuel avec celui de l'année précédente (même "
         "entreprise). Il montre l'évolution de chaque score, les KPIs améliorés/dégradés, "
@@ -597,14 +611,14 @@ with st.expander("📊 Qu'est-ce que le Delta Report ?"):
         "doivent justifier leur progression devant le COMEX."
     )
 
-with st.expander("🗑️ Puis-je supprimer mes données ?"):
+with st.expander("Puis-je supprimer mes données ?"):
     st.write(
         "Oui. Conformément au RGPD, vous pouvez demander la suppression complète de votre compte "
         "et de toutes vos données (rapports, analyses, résultats) à tout moment. Un endpoint "
         "dédié (`DELETE /users/me`) sera disponible, ou contactez-nous par email."
     )
 
-with st.expander("🏷️ Le rapport white-label fonctionne comment ?"):
+with st.expander("Le rapport white-label fonctionne comment ?"):
     st.write(
         "Avec le plan Pro, vous pouvez remplacer le logo ESG Optimizer par le logo de votre "
         "cabinet ou de votre entreprise sur le rapport PDF. Idéal pour les consultants qui "
@@ -627,9 +641,9 @@ st.markdown(
 col_l2, col_cta2, col_r2 = st.columns([1, 2, 1])
 with col_cta2:
     if is_logged_in():
-        st.page_link("pages/2_Upload.py", label="Lancer mon analyse gratuite", icon="🚀", use_container_width=True)
+        st.page_link("pages/2_Upload.py", label="Lancer mon analyse gratuite", use_container_width=True)
     else:
-        st.page_link("pages/1_Login.py", label="Créer mon compte gratuitement", icon="🚀", use_container_width=True)
+        st.page_link("pages/1_Login.py", label="Créer mon compte gratuitement", use_container_width=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -652,7 +666,7 @@ st.markdown(
             <div style="font-size: 12px; color: #9CA3AF; line-height: 2;">
                 <a href="mailto:diadamflow@gmail.com" style="color: #6B7280; text-decoration: none;">Contact</a><br>
                 Conforme ESRS E1-E5, S1-S4, G1<br>
-                Hébergement UE 🇪🇺
+                Hébergement UE
             </div>
         </div>
         <div style="text-align: center; font-size: 11px; color: #D1D5DB; margin-top: 20px;">

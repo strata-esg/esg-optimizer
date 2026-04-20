@@ -103,6 +103,6 @@ def require_auth() -> bool:
     """
     if not is_logged_in():
         st.warning("Veuillez vous connecter pour accéder à cette page.")
-        st.page_link("pages/1_Login.py", label="Aller à la page de connexion", icon="🔐")
+        st.page_link("pages/1_Login.py", label="Aller à la page de connexion")
         return False
     return True

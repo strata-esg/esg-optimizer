@@ -19,8 +19,8 @@ st.markdown(
     <div style="padding: 2rem 0 1rem 0;">
         <h1 style="margin-bottom: 0.25rem;">Documents légaux & Méthodologie</h1>
         <p style="color: #6B7280; font-size: 0.95rem; margin-top: 0;">
-            ESG Optimizer · <a href="mailto:hello@esg-optimizer.app"
-            style="color:#1A3D22;">hello@esg-optimizer.app</a>
+            ESG Optimizer · <a href="mailto:hello@esg-optimizer.fr"
+            style="color:#1A3D22;">hello@esg-optimizer.fr</a>
         </p>
     </div>
     """,
@@ -28,10 +28,10 @@ st.markdown(
 )
 
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📄 Mentions légales",
-    "📜 CGU",
-    "🔒 Confidentialité",
-    "🔬 Méthodologie",
+    "Mentions légales",
+    "CGU",
+    "Confidentialité",
+    "Méthodologie",
 ])
 
 
@@ -44,7 +44,7 @@ with tab1:
 
 ESG Optimizer — Entreprise individuelle
 Représentant légal : Diadam
-Email : [hello@esg-optimizer.app](mailto:hello@esg-optimizer.app)
+Email : [hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 
 **Hébergement**
 
@@ -66,7 +66,7 @@ L'utilisateur reste seul responsable des décisions prises sur la base de ces an
 
 **Contact**
 
-Pour toute question relative au service : [hello@esg-optimizer.app](mailto:hello@esg-optimizer.app)
+Pour toute question relative au service : [hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 """)
 
 
@@ -81,7 +81,7 @@ with tab2:
 
 Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et
 l'utilisation de la plateforme ESG Optimizer, accessible à l'adresse
-[esg-optimizer.app](https://esg-optimizer.app).
+[esg-optimizer.fr](https://esg-optimizer.fr).
 
 ### 2. Accès au service
 
@@ -133,7 +133,7 @@ with tab3:
 
 ### Responsable de traitement
 
-ESG Optimizer · Email : [hello@esg-optimizer.app](mailto:hello@esg-optimizer.app)
+ESG Optimizer · Email : [hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 
 ### Données collectées
 
@@ -160,7 +160,7 @@ Conformément au RGPD, vous disposez des droits suivants :
 - **Effacement** : supprimer votre compte et vos données
 - **Portabilité** : exporter vos analyses au format JSON
 
-Pour exercer ces droits : [hello@esg-optimizer.app](mailto:hello@esg-optimizer.app)
+Pour exercer ces droits : [hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 
 Vous pouvez également introduire une réclamation auprès de la **CNIL**
 (Commission Nationale de l'Informatique et des Libertés) : [cnil.fr](https://www.cnil.fr)
@@ -263,7 +263,7 @@ Organisme Tiers Indépendant (OTI) accrédité par le COFRAC.
 
 ### Questions sur la méthodologie ?
 
-[hello@esg-optimizer.app](mailto:hello@esg-optimizer.app)
+[hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 """)
 
     # Badge méthodologie

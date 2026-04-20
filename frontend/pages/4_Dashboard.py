@@ -46,7 +46,7 @@ if _user_plan in ("discovery", "free"):
 # Header
 st.markdown(
     """<div style="padding: 10px 0 20px 0;">
-        <h2>📈 Dashboard ESG</h2>
+        <h2>Dashboard ESG</h2>
         <p style="color: #6B7280;">Vue d'ensemble de vos analyses et tendances ESG.</p>
     </div>""",
     unsafe_allow_html=True,
@@ -136,7 +136,7 @@ if analyses_list:
         selected_idx = event.selection.rows[0]
         selected_id = analyses_list[selected_idx]["id"]
         save_last_analysis_id(selected_id)
-        st.page_link("pages/3_Resultats.py", label=f"Voir l'analyse #{selected_id}", icon="📊")
+        st.page_link("pages/3_Resultats.py", label=f"Voir l'analyse #{selected_id}")
 
     total = history.get("total", 0)
     per_page = history.get("per_page", 20)
@@ -144,7 +144,7 @@ if analyses_list:
 
 else:
     st.info("Aucune analyse pour le moment. Lancez votre première analyse depuis la page Upload !")
-    st.page_link("pages/2_Upload.py", label="Lancer une analyse", icon="📤")
+    st.page_link("pages/2_Upload.py", label="Lancer une analyse")
 
 # 3. GRAPHIQUES (si données suffisantes)
 if analyses_list and len(analyses_list) >= 2:

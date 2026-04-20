@@ -75,7 +75,7 @@ if status == "failed":
 
 st.markdown(
     f"""<div style="text-align: center; padding: 10px 0 20px 0;">
-        <h2>📊 Résultats de l'analyse #{analysis['id']}</h2>
+        <h2>Résultats de l'analyse #{analysis['id']}</h2>
         <p style="color: #6B7280;">
             Fichier : {analysis.get('source_filename', '?')} ·
             Année : {analysis.get('report_year', '?')} ·

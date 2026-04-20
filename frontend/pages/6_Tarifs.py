@@ -154,9 +154,9 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
     # Features (une par ligne, simple markdown)
     for feat_name, included in plan["features"]:
         if included:
-            st.markdown(f"✅ {feat_name}")
+            st.markdown(f'<span style="color:#1A3D22;">&#10003;</span> {feat_name}', unsafe_allow_html=True)
         else:
-            st.markdown(f"⬜ ~~{feat_name}~~")
+            st.markdown(f'<span style="color:#9CA3AF;">&#10007;</span> ~~{feat_name}~~', unsafe_allow_html=True)
 
 
 # Affichage des 4 plans
@@ -285,7 +285,7 @@ header_row = (
     '<th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB;">Feature</th>'
     '<th style="padding: 12px 16px; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB;">Découverte</th>'
     '<th style="padding: 12px 16px; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB;">Essentiel</th>'
-    '<th style="padding: 12px 16px; text-align: center; font-weight: 700; color: #1A3D22; border-bottom: 2px solid #1A3D22;">Pro ⭐</th>'
+    '<th style="padding: 12px 16px; text-align: center; font-weight: 700; color: #1A3D22; border-bottom: 2px solid #1A3D22;">Pro</th>'
     '<th style="padding: 12px 16px; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB;">Enterprise</th>'
     '</tr>'
 )

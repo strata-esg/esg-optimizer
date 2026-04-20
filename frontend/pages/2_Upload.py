@@ -21,11 +21,19 @@ if not require_auth():
 # Header
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
-        <h2>📤 Nouvelle Analyse ESG</h2>
+        <h2>Nouvelle Analyse ESG</h2>
         <p style="color: #6B7280;">Uploadez un rapport de durabilité pour obtenir votre analyse en quelques minutes.</p>
     </div>""",
     unsafe_allow_html=True,
 )
+
+# Rapport échantillon (si venu de l'onboarding)
+if st.session_state.get("use_sample_report"):
+    st.info(
+        "Mode démonstration : un rapport d'exemple sera utilisé. "
+        "Vous pouvez aussi uploader votre propre rapport ci-dessous."
+    )
+    st.session_state.pop("use_sample_report", None)
 
 # Formulaire d'upload
 uploaded_file = st.file_uploader(
@@ -100,12 +108,43 @@ if st.button(
 
         st.success(f"Analyse #{analysis_id} lancée !")
 
-        # 2. Polling — attendre la fin de l'analyse
+        # 2. Polling avec indicateur de progression 4 étapes
         status_container = st.empty()
-        progress_bar = st.progress(0, text="Extraction du texte...")
+        progress_bar = st.progress(0)
+
+        # Étapes visuelles de l'analyse
+        ANALYSIS_STEPS = [
+            (0, 15, "Extraction du texte du document..."),
+            (15, 40, "Identification des indicateurs ESG..."),
+            (40, 75, "Évaluation de la couverture ESRS..."),
+            (75, 95, "Calcul des scores et recommandations..."),
+        ]
+
+        # Indicateur visuel des étapes
+        step_display = st.empty()
+
+        def _render_steps(current_step_idx: int):
+            """Affiche les 4 étapes avec indicateur visuel."""
+            html_parts = []
+            labels = ["Extraction", "Identification", "Évaluation ESRS", "Scoring"]
+            for i, label in enumerate(labels):
+                if i < current_step_idx:
+                    color, icon = "#1A3D22", "&#10003;"
+                elif i == current_step_idx:
+                    color, icon = "#1A3D22", "&#9679;"
+                else:
+                    color, icon = "#D1D5DB", "&#9675;"
+                html_parts.append(
+                    f'<div style="display:flex; align-items:center; gap:8px; margin:4px 0;">'
+                    f'<span style="color:{color}; font-size:14px;">{icon}</span>'
+                    f'<span style="color:{"#1A3D22" if i <= current_step_idx else "#9CA3AF"}; '
+                    f'font-size:13px; {"font-weight:600;" if i == current_step_idx else ""}">{label}</span>'
+                    f'</div>'
+                )
+            step_display.markdown("".join(html_parts), unsafe_allow_html=True)
 
         poll_count = 0
-        max_polls = 60  # 60 x 3s = 3 minutes max
+        max_polls = 60
 
         while poll_count < max_polls:
             time.sleep(3)
@@ -119,29 +158,38 @@ if st.button(
             current_status = analysis.get("status", "pending")
 
             if current_status == "pending":
-                progress_bar.progress(10, text="En attente de traitement...")
+                progress_bar.progress(5, text="En attente de traitement...")
+                _render_steps(0)
             elif current_status == "processing":
-                pct = min(20 + (poll_count * 3), 90)
-                progress_bar.progress(pct, text="Analyse GPT-4o en cours...")
+                # Simuler la progression à travers les 4 étapes
+                step_idx = min(poll_count // 5, 3)
+                lo, hi, label = ANALYSIS_STEPS[step_idx]
+                frac = (poll_count % 5) / 5
+                pct = int(lo + (hi - lo) * frac)
+                pct = min(pct, 95)
+                progress_bar.progress(pct, text=label)
+                _render_steps(step_idx)
             elif current_status == "success":
                 progress_bar.progress(100, text="Analyse terminée !")
+                _render_steps(4)
                 status_container.success("Analyse terminée avec succès !")
                 time.sleep(1)
                 st.page_link(
                     "pages/3_Resultats.py",
                     label="Voir les résultats",
-                    icon="📊",
                     use_container_width=True,
                 )
                 st.rerun()
             elif current_status == "failed":
                 progress_bar.empty()
+                step_display.empty()
                 error_msg = analysis.get("error_message", "Erreur inconnue")
                 status_container.error(f"L'analyse a échoué : {error_msg}")
                 break
 
         else:
             progress_bar.empty()
+            step_display.empty()
             status_container.warning(
                 "L'analyse prend plus de temps que prévu. "
                 "Vérifiez les résultats dans quelques minutes via le Dashboard."

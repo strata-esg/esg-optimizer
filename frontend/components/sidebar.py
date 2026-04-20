@@ -46,14 +46,14 @@ def render_sidebar() -> None:
         st.divider()
 
         # Navigation
-        st.page_link("pages/0_Accueil.py", label="Accueil", icon="🌿")
+        st.page_link("pages/0_Accueil.py", label="Accueil")
         if is_logged_in():
-            st.page_link("pages/2_Upload.py", label="Upload", icon="📤")
-            st.page_link("pages/3_Resultats.py", label="Résultats", icon="📊")
-            st.page_link("pages/4_Dashboard.py", label="Dashboard", icon="📈")
-            st.page_link("pages/5_Parametres.py", label="Paramètres", icon="⚙️")
-        st.page_link("pages/6_Tarifs.py", label="Tarifs", icon="💳")
-        st.page_link("pages/7_Mentions.py", label="Mentions", icon="📋")
+            st.page_link("pages/2_Upload.py", label="Upload")
+            st.page_link("pages/3_Resultats.py", label="Résultats")
+            st.page_link("pages/4_Dashboard.py", label="Dashboard")
+            st.page_link("pages/5_Parametres.py", label="Paramètres")
+        st.page_link("pages/6_Tarifs.py", label="Tarifs")
+        st.page_link("pages/7_Mentions.py", label="Mentions")
 
         st.divider()
 

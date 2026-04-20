@@ -12,10 +12,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 APP_NAME         = "ESG Optimizer"
 APP_TAGLINE      = "Êtes-vous prêt pour la CSRD ?"
 APP_DESCRIPTION  = "Analysez votre conformité CSRD en 3 minutes avec l'IA"
-APP_URL          = os.getenv("APP_URL", "https://esg-optimizer.app")
+APP_URL          = os.getenv("APP_URL", "https://esg-optimizer.fr")
 APP_VERSION      = "1.0.0"
-SUPPORT_EMAIL    = os.getenv("SUPPORT_EMAIL", "hello@esg-optimizer.app")
-NOREPLY_EMAIL    = os.getenv("NOREPLY_EMAIL", "no-reply@esg-optimizer.app")
+SUPPORT_EMAIL    = os.getenv("SUPPORT_EMAIL", "hello@esg-optimizer.fr")
+NOREPLY_EMAIL    = os.getenv("NOREPLY_EMAIL", "no-reply@esg-optimizer.fr")
 
 # Tokens couleurs (référence unique pour tout le codebase)
 BRAND = {

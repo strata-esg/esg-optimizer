@@ -11,7 +11,7 @@ import streamlit as st
 # Config page (doit etre le premier appel Streamlit)
 st.set_page_config(
     page_title="ESG Optimizer",
-    page_icon="🌿",
+    page_icon="leaf",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -30,14 +30,14 @@ inject_global_styles()
 
 # Pages
 pages = [
-    st.Page("pages/0_Accueil.py",    title="Accueil",           icon="🌿", default=True),
-    st.Page("pages/1_Login.py",      title="Connexion",         icon="🔐"),
-    st.Page("pages/2_Upload.py",     title="Upload",            icon="📤"),
-    st.Page("pages/3_Resultats.py",  title="Résultats",         icon="📊"),
-    st.Page("pages/4_Dashboard.py",  title="Dashboard",         icon="📈"),
-    st.Page("pages/5_Parametres.py", title="Paramètres",        icon="⚙️"),
-    st.Page("pages/6_Tarifs.py",     title="Tarifs",            icon="💳"),
-    st.Page("pages/7_Mentions.py",   title="Mentions & Méthodo", icon="📋"),
+    st.Page("pages/0_Accueil.py",    title="Accueil",            default=True),
+    st.Page("pages/1_Login.py",      title="Connexion"),
+    st.Page("pages/2_Upload.py",     title="Upload"),
+    st.Page("pages/3_Resultats.py",  title="Résultats"),
+    st.Page("pages/4_Dashboard.py",  title="Dashboard"),
+    st.Page("pages/5_Parametres.py", title="Paramètres"),
+    st.Page("pages/6_Tarifs.py",     title="Tarifs"),
+    st.Page("pages/7_Mentions.py",   title="Mentions & Méthodo"),
 ]
 
 pg = st.navigation(pages, position="hidden")
