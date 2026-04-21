@@ -9,10 +9,14 @@ from backend.config import settings
 url = settings.database_url
 
 # --- Gestion de l'URL pour PostgreSQL (Railway) ---
-if url.startswith("postgresql://"):
+# Railway peut fournir "postgres://" (sans "ql") ou "postgresql://"
+if url.startswith("postgres://"):
+    url = url.replace("postgres://", "postgresql+pg8000://", 1)
+    connect_args = {}
+elif url.startswith("postgresql://"):
     # On remplace par pg8000 pour éviter les erreurs de compilation psycopg2
     url = url.replace("postgresql://", "postgresql+pg8000://", 1)
-    connect_args = {} 
+    connect_args = {}
 else:
     # --- Gestion SQLite (Local) ---
     _db_path = url.replace("sqlite:///", "")

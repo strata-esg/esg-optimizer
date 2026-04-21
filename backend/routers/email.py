@@ -65,7 +65,9 @@ def trigger_weekly_digest(
     Sécurisé par une clé API (à appeler via cron ou manuellement).
     Utilise JWT_SECRET comme clé pour simplifier — en prod, ajouter une clé dédiée.
     """
-    if api_key != settings.jwt_secret:
+    # Utiliser CRON_API_KEY dédiée (et non JWT_SECRET qui est un secret critique)
+    valid_key = settings.cron_api_key or settings.jwt_secret  # fallback pour rétro-compat
+    if not valid_key or api_key != valid_key:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Clé API invalide.",

@@ -103,6 +103,10 @@ class Settings(BaseSettings):
     # --- Sentry (monitoring erreurs) ---
     sentry_dsn: str = ""
 
+    # --- Cron API key (séparer du JWT_SECRET pour la sécurité) ---
+    # Générer via : python -c "import secrets;print(secrets.token_urlsafe(32))"
+    cron_api_key: str = ""  # Si vide, le digest hebdomadaire est désactivé
+
     # --- Quick-check public (sprint 6B) ---
     public_upload_max_mb: int = 10
     public_rate_limit_daily: int = 3

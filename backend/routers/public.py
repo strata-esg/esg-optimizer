@@ -14,13 +14,17 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, UploadFile, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from backend.config import settings
 from backend.database import get_db, SessionLocal
-from backend.models import PublicAnalysis, User
+from backend.models import Analysis, Company, PublicAnalysis, User
 from backend.prompts.system_quick_check import SYSTEM_QUICK_CHECK_PROMPT
 from backend.services.extractor import extract_text, ALLOWED_EXTENSIONS
+# Import différé de get_current_user dans la fonction claim pour éviter
+# tout risque d'import circulaire au chargement des modules (auth → public).
+# Il n'y a pas de vraie circularité, mais on garde l'import tardif par précaution.
 
 from openai import OpenAI
 
@@ -104,6 +108,7 @@ def _run_quick_check_pipeline(public_analysis_id: int, file_path: str) -> None:
     """
     db = SessionLocal()
     start = time.time()
+    pa = None  # Initialisé à None pour éviter NameError dans le except block
 
     try:
         pa = db.query(PublicAnalysis).filter(PublicAnalysis.id == public_analysis_id).first()
@@ -142,13 +147,19 @@ def _run_quick_check_pipeline(public_analysis_id: int, file_path: str) -> None:
         )
 
     except Exception as exc:
-        pa.status = "failed"
-        pa.error_message = str(exc)[:500]
-        pa.processing_time_s = round(time.time() - start, 2)
         logger.error("Quick-check [%d] — Échec : %s", public_analysis_id, exc)
+        if pa is not None:
+            # pa a été trouvé en DB — on peut marquer l'échec
+            pa.status = "failed"
+            pa.error_message = str(exc)[:500]
+            pa.processing_time_s = round(time.time() - start, 2)
+        # Si pa est None (DB query elle-même a échoué), on ne peut rien persister
 
     finally:
-        db.commit()
+        try:
+            db.commit()
+        except Exception as commit_exc:
+            logger.error("Quick-check [%d] — Commit final échoué : %s", public_analysis_id, commit_exc)
         db.close()
 
         # Nettoyage fichier temporaire
@@ -259,21 +270,36 @@ def get_quick_check_result(token: str, db: Session = Depends(get_db)):
 claim_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+_claim_oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
+def _get_current_user_for_claim(
+    token: str = Depends(_claim_oauth2),
+    db: Session = Depends(get_db),
+) -> User:
+    """Dépendance JWT autonome pour le claim router (évite l'import circulaire au niveau module)."""
+    from backend.services.auth_service import decode_access_token
+    payload = decode_access_token(token)
+    if payload is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide ou expiré")
+    user = db.query(User).filter(User.id == int(payload["sub"])).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Utilisateur introuvable")
+    return user
+
+
 @claim_router.post("/claim-analysis")
 def claim_analysis(
-    token: str,
+    qc_token: str,
+    current_user: User = Depends(_get_current_user_for_claim),
     db: Session = Depends(get_db),
-    # On importe get_current_user ici pour éviter un import circulaire
 ):
     """
     Rattache un quick-check public à un compte utilisateur après inscription.
-    Le user passe le token reçu lors du quick-check.
+    Le user passe le qc_token reçu lors du quick-check.
+    Protégé par JWT — authentification requise.
     """
-    # Import tardif pour éviter la circularité
-    from backend.routers.auth import get_current_user, oauth2_scheme
-    # Note : cet endpoint est protégé par le JWT via le frontend
-
-    pa = db.query(PublicAnalysis).filter(PublicAnalysis.token == token).first()
+    pa = db.query(PublicAnalysis).filter(PublicAnalysis.token == qc_token).first()
 
     if not pa:
         raise HTTPException(status_code=404, detail="Token de quick-check introuvable ou expiré.")
@@ -286,8 +312,21 @@ def claim_analysis(
 
     # Vérifier expiration
     now = datetime.now(timezone.utc)
-    if pa.expires_at and pa.expires_at.replace(tzinfo=timezone.utc) < now:
-        raise HTTPException(status_code=410, detail="Ce résultat a expiré.")
+    expires = pa.expires_at
+    if expires:
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        if expires < now:
+            raise HTTPException(status_code=410, detail="Ce résultat a expiré.")
+
+    # Rattacher l'analyse au user courant
+    pa.claimed_by_user_id = current_user.id
+    db.commit()
+
+    logger.info(
+        "Quick-check [token=%s] rattaché à user=%d",
+        qc_token[:8], current_user.id,
+    )
 
     return {
         "message": "Quick-check rattaché avec succès.",

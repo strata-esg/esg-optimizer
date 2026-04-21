@@ -115,19 +115,18 @@ async def upload_analysis(
     # 2. Valider le fichier
     file_format = _validate_file(file)
 
-    # 3. Sauvegarder le fichier en temporaire
+    # 3. Lire le contenu et vérifier la taille AVANT de créer le fichier temporaire
+    content = await file.read()
+    size_mb = len(content) / (1024 * 1024)
+    if size_mb > settings.max_upload_size_mb:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Fichier trop volumineux : {size_mb:.1f} MB (max {settings.max_upload_size_mb} MB).",
+        )
+
+    # Sauvegarder le fichier en temporaire (après validation de la taille)
     suffix = f".{file_format}"
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, prefix="esg_") as tmp:
-        content = await file.read()
-
-        # Vérifier la taille
-        size_mb = len(content) / (1024 * 1024)
-        if size_mb > settings.max_upload_size_mb:
-            raise HTTPException(
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                detail=f"Fichier trop volumineux : {size_mb:.1f} MB (max {settings.max_upload_size_mb} MB).",
-            )
-
         tmp.write(content)
         tmp_path = tmp.name
 

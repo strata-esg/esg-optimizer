@@ -6,12 +6,17 @@ from backend.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+def _truncate(plain: str) -> str:
+    """bcrypt est limité à 72 bytes — on tronque pour éviter le ValueError."""
+    return plain.encode("utf-8")[:72].decode("utf-8", errors="ignore")
+
+
 def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
+    return pwd_context.hash(_truncate(plain))
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    return pwd_context.verify(_truncate(plain), hashed)
 
 
 def create_access_token(user_id: int, email: str) -> str:

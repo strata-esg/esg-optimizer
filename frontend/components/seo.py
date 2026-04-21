@@ -120,42 +120,44 @@ def inject_seo(
 SEO_PRESETS = {
     "landing": {
         "page_title": "ESG Optimizer — Analyse CSRD automatique en 3 minutes",
-        "description": (
-            "Analyse de conformité CSRD/ESRS par IA. Score ESG, rapport audit-ready, "
-            "delta annuel. De 0€ à 129€/mois. Démarrez gratuitement."
-        ),
+        "description": "Analyse de conformité CSRD/ESRS par IA. Score ESG, rapport audit-ready, delta annuel. De 0€ à 129€/mois. Démarrez gratuitement.",
         "path": "/",
     },
     "quick_check": {
         "page_title": "Quick-check ESG gratuit — Score CSRD en 60 secondes",
-        "description": (
-            "Testez gratuitement la conformité CSRD de votre rapport. Score instantané "
-            "sur les 12 ESRS. Aucune inscription requise."
-        ),
+        "description": "Testez gratuitement la conformité CSRD de votre rapport. Score instantané sur les 12 ESRS. Aucune inscription requise.",
         "path": "/quick-check",
     },
+    # --- AJOUTS POUR LES PAGES D'APPLICATION ---
+    "upload": {
+        "page_title": "Nouvelle Analyse — ESG Optimizer",
+        "description": "Uploadez votre rapport de durabilité pour lancer une analyse complète assistée par IA.",
+        "path": "/upload",
+    },
+    "results": {
+        "page_title": "Résultats de l'analyse — ESG Optimizer",
+        "description": "Détails de votre score ESG, couverture ESRS et recommandations stratégiques.",
+        "path": "/resultats",
+    },
+    "dashboard": {
+        "page_title": "Tableau de Bord — ESG Optimizer",
+        "description": "Suivez l'évolution de vos scores ESG et gérez vos rapports d'analyse.",
+        "path": "/dashboard",
+    },
+    # --------------------------------------------
     "pricing": {
         "page_title": "Tarifs ESG Optimizer — de 0€ à 129€/mois",
-        "description": (
-            "4 plans pour tous les profils : PME one-shot à 39€, consultants à 129€/mois, "
-            "Enterprise sur devis. Sans engagement."
-        ),
+        "description": "4 plans pour tous les profils : PME one-shot à 39€, consultants à 129€/mois, Enterprise sur devis. Sans engagement.",
         "path": "/pricing",
     },
     "methodologie": {
         "page_title": "Méthodologie ESG Optimizer — GHG Protocol, SBTi, EFRAG, TCFD",
-        "description": (
-            "Notre scoring ESG s'appuie sur les standards GHG Protocol, SBTi, EFRAG ESRS "
-            "et TCFD. Transparence totale sur la méthode."
-        ),
+        "description": "Notre scoring ESG s'appuie sur les standards GHG Protocol, SBTi, EFRAG ESRS et TCFD. Transparence totale sur la méthode.",
         "path": "/methodologie",
     },
     "rgpd": {
         "page_title": "RGPD & DPA — ESG Optimizer",
-        "description": (
-            "Hébergement UE, sous-traitants DPA-signés, droit à l'effacement, export "
-            "des données. 100% conforme RGPD."
-        ),
+        "description": "Hébergement UE, sous-traitants DPA-signés, droit à l'effacement, export des données. 100% conforme RGPD.",
         "path": "/rgpd",
         "robots": "index,follow",
     },

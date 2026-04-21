@@ -15,9 +15,10 @@ logger = logging.getLogger(__name__)
 # Configure Resend SDK
 resend.api_key = settings.resend_api_key
 
-# Constantes
-FROM_EMAIL = "ESG Optimizer <noreply@esg-optimizer.fr>"
-APP_URL = "https://esg-optimizer.fr"
+# Constantes — on lit depuis settings pour respecter les variables d'env
+from backend.config import APP_URL as _APP_URL, NOREPLY_EMAIL as _NOREPLY_EMAIL  # noqa: E402
+FROM_EMAIL = f"ESG Optimizer <{_NOREPLY_EMAIL}>"
+APP_URL = _APP_URL
 
 # Couleurs du brand
 GREEN = "#1A3D22"
