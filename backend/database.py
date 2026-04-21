@@ -41,6 +41,16 @@ def get_db():
         db.close()
 
 def create_tables():
-    """Crée toutes les tables."""
-    Base.metadata.create_all(bind=engine, checkfirst=True)
+    """Crée toutes les tables en ignorant les erreurs de collision SQLite."""
+    try:
+        # On tente la création normale
+        Base.metadata.create_all(bind=engine, checkfirst=True)
+    except Exception as e:
+        # Si une erreur survient (ex: "table users already exists")
+        # On vérifie si c'est juste un problème de table déjà existante
+        if "already exists" in str(e).lower():
+            pass # C'est ce qu'on veut, on ignore l'erreur
+        else:
+            # Si c'est une autre erreur, on veut quand même le savoir
+            print(f"Note DB: {e}")
     
