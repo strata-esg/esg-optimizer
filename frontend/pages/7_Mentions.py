@@ -8,6 +8,13 @@ from pathlib import Path
 
 import streamlit as st
 
+try:
+    from frontend.components.seo import seo_for
+    seo_for("legal")
+except KeyError:
+    # Si 'legal' n'existe pas encore dans SEO_PRESETS, on ne fait rien ou on utilise default
+    pass 
+
 # Path setup
 _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:

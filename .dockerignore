@@ -1,0 +1,50 @@
+# --- Virtual environments ---
+venv/
+env/
+.venv/
+
+# --- Python caches ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Git ---
+.git/
+.gitignore
+
+# --- Secrets (NE JAMAIS copier dans l'image) ---
+.env
+.env.*
+!.env.example
+
+# --- Docs & tests ---
+*.md
+!README.md
+tests/
+!tests/__init__.py
+
+# --- Data uploads (réhydratés depuis volume Railway) ---
+data/*.db
+uploads/
+results/
+*.log
+
+# --- Fichiers d'exemple ---
+rapport_2023.pdf
+ARCHITECTURE_PLAN.md
+
+# --- Node (si jamais un build front s'ajoute) ---
+node_modules/

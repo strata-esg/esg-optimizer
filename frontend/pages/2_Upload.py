@@ -12,6 +12,10 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
+# --- IMPORT & INJECTION SEO ---
+from frontend.components.seo import seo_for # Utilise seo_for ou inject_seo selon ton fichier utilitaire
+seo_for("upload")
+
 from frontend.utils.api_client import APIError, upload_analysis, get_analysis
 from frontend.utils.session import get_token, get_user, require_auth, save_last_analysis_id
 

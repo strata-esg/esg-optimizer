@@ -15,6 +15,10 @@ from frontend.components.analytics import track_event
 from frontend.utils.session import get_token, get_user, is_logged_in
 from frontend.utils.api_client import APIError, get_upgrade_url
 
+# Juste après st.set_page_config(...)
+from frontend.components.seo import seo_for
+seo_for("pricing")
+
 # Header
 st.markdown(
     """<div style="text-align: center; padding: 20px 0 30px 0;">

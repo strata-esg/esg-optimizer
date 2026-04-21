@@ -18,6 +18,10 @@ from frontend.components.analytics import track_landing_view, track_pricing_view
 from frontend.utils.session import is_logged_in
 from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError
 
+# Juste après st.set_page_config(...)
+from frontend.components.seo import seo_for
+seo_for("landing")
+
 # Query params pour persona
 params = st.query_params
 persona = params.get("persona", None)

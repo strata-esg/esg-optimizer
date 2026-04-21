@@ -12,6 +12,10 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
+# --- IMPORT & INJECTION SEO ---
+from frontend.components.seo import seo_for
+seo_for("results")
+
 from frontend.components.score_gauge import render_score_row
 from frontend.components.esrs_coverage import render_esrs_grid
 from frontend.components.delta_card import render_delta_row

@@ -14,6 +14,10 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
+# --- IMPORT & INJECTION SEO ---
+from frontend.components.seo import seo_for
+seo_for("dashboard")
+
 from frontend.utils.api_client import APIError, get_history, get_stats, get_companies
 from frontend.utils.session import get_token, get_user, require_auth, save_last_analysis_id
 
