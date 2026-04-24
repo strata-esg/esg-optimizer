@@ -8,3 +8,12 @@ font = "sans serif"
 
 [server]
 headless = true
+# CORS désactivé côté Streamlit (géré par le reverse proxy)
+# Les deux doivent être cohérents : CORS=false + XSRF=true évite le warning au démarrage
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+# Masque l'adresse réelle du serveur dans les logs
+serverAddress = "localhost"
+gatherUsageStats = false

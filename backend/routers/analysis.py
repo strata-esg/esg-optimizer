@@ -21,7 +21,7 @@ from backend.services.analyzer import run_analysis_pipeline
 from backend.services.delta_service import find_previous_analysis, run_delta
 from backend.utils import safe_json_loads as _safe_json_loads
 from backend.services.extractor import ALLOWED_EXTENSIONS
-from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf
+from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf, generate_preview
 from backend.services.badge_generator import generate_badge
 
 logger = logging.getLogger(__name__)
@@ -249,6 +249,52 @@ def download_analysis_pdf(
         )
 
     filename = f"ESG_Report_{company.name}_{analysis.report_year or 'NA'}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+# GET /analysis/{analysis_id}/preview-pdf  — disponible tous plans (watermark PRÉVISUALISATION)
+@router.get("/{analysis_id}/preview-pdf")
+def download_preview_pdf(
+    analysis_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Télécharge l'aperçu PDF 3 pages avec watermark PRÉVISUALISATION.
+    Disponible pour tous les plans, y compris Découverte.
+    """
+    analysis = (
+        db.query(Analysis)
+        .filter(Analysis.id == analysis_id, Analysis.user_id == current_user.id)
+        .first()
+    )
+    if not analysis:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
+
+    if analysis.status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"L'analyse n'est pas terminée (status: {analysis.status}).",
+        )
+
+    company = db.query(Company).filter(Company.id == analysis.company_id).first()
+    if not company:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entreprise introuvable.")
+
+    try:
+        pdf_bytes = generate_preview(analysis, company)
+    except Exception as exc:
+        logger.error("Erreur génération preview PDF [%d] : %s", analysis_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la génération de l'aperçu PDF : {exc}",
+        )
+
+    filename = f"ESG_Preview_{company.name}_{analysis.report_year or 'NA'}.pdf"
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",

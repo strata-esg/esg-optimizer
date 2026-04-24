@@ -7,6 +7,7 @@ pricing 4 plans, FAQ, footer.
 
 import streamlit as st
 import sys
+import base64
 from pathlib import Path
 
 # Path setup
@@ -17,10 +18,12 @@ if str(_root) not in sys.path:
 from frontend.components.analytics import track_landing_view, track_pricing_viewed, track_quick_check_started, track_quick_check_completed
 from frontend.utils.session import is_logged_in
 from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError
+from frontend.utils.styles import inject_global_styles
 
 # Juste après st.set_page_config(...)
 from frontend.components.seo import seo_for
 seo_for("landing")
+inject_global_styles()
 
 # Query params pour persona
 params = st.query_params
@@ -67,13 +70,25 @@ default_content = {
 content = PERSONA_CONTENT.get(persona, default_content) if persona else default_content
 
 
-# 1. HERO
+# 1. HERO — Logo via data URI base64 (évite les conflits CSS Streamlit)
+_logo_path = _root / "frontend" / "static" / "brand" / "logo-full.svg"
+if _logo_path.exists():
+    _logo_b64 = base64.b64encode(_logo_path.read_bytes()).decode()
+    _logo_html = (
+        f'<img src="data:image/svg+xml;base64,{_logo_b64}" '
+        f'alt="ESG Optimizer AI" '
+        f'style="width:200px; height:auto; display:block; margin:0 auto 16px auto;" />'
+    )
+else:
+    _logo_html = (
+        '<div style="font-family:\'DM Serif Display\',Georgia,serif; font-size:24px; '
+        'color:#1B3D20; font-weight:400; margin-bottom:16px;">ESG Optimizer AI</div>'
+    )
+
 st.markdown(
     f"""<div style="text-align: center; padding: 50px 20px 30px 20px;">
-        <div style="width:48px; height:48px; margin:0 auto;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1A3D22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8c.7-1 1-2.2 1-3.5C18 2.5 16.6 1 12 1c-4.6 0-6 1.5-6 3.5C6 5.8 6.3 7 7 8"/><path d="M12 1v16"/><path d="M4.22 12c.65-.37 1.39-.55 2.14-.5 1.1.1 2.1.6 2.8 1.4.7.7 1.2 1.7 1.3 2.8.05.75-.13 1.5-.5 2.14"/><path d="M19.78 12c-.65-.37-1.39-.55-2.14-.5-1.1.1-2.1.6-2.8 1.4-.7.7-1.2 1.7-1.3 2.8-.05.75.13 1.5.5 2.14"/><path d="M12 17c0 3 2 5 2 5H10s2-2 2-5z"/></svg>
-        </div>
-        <h1 style="margin-top: 10px; color: #111827; font-size: 2.4rem; line-height: 1.2;">
+        {_logo_html}
+        <h1 style="margin-top: 8px; color: #111827; font-size: 2.4rem; line-height: 1.2;">
             {content['titre']}
         </h1>
         <p style="font-size: 18px; color: #6B7280; max-width: 700px; margin: 16px auto 0 auto; line-height: 1.6;">
@@ -83,27 +98,73 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# QUICK-CHECK PUBLIC — Upload sans compte
+# ── QUICK-CHECK PUBLIC — Redesign avec design tokens ────────────────────────
 st.markdown(
-    """<div style="text-align: center; margin: 10px 0 20px 0;">
-        <span style="font-size: 14px; color: #9CA3AF;">ou testez directement ↓</span>
-    </div>""",
+    """
+    <style>
+    /* File uploader zone — dashed green */
+    [data-testid="stFileUploaderDropzone"] {
+        background: #FFFFFF !important;
+        border: 2px dashed #4DB862 !important;
+        border-radius: 14px !important;
+        padding: 28px 20px !important;
+        transition: border-color 0.2s ease, background 0.2s ease !important;
+    }
+    [data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #1B3D20 !important;
+        background: #F0FAF0 !important;
+    }
+    [data-testid="stFileUploaderDropzone"] p,
+    [data-testid="stFileUploaderDropzone"] span,
+    [data-testid="stFileUploaderDropzone"] small {
+        font-family: 'DM Sans', sans-serif !important;
+        color: #6B7280 !important;
+    }
+    /* Score DM Serif */
+    .qc-score-num {
+        font-family: 'DM Serif Display', Georgia, serif !important;
+        font-weight: 400 !important;
+        letter-spacing: -0.04em !important;
+        line-height: 1 !important;
+    }
+    </style>
+    """,
     unsafe_allow_html=True,
 )
 
+# Header de la section
+_, _qh, _ = st.columns([1, 4, 1])
+with _qh:
+    st.markdown(
+        """
+        <div style="background:#F7F2E8; border:1.5px solid #1B3D20; border-radius:18px;
+            padding:32px 36px 20px; margin:4px 0 0 0; text-align:center;">
+            <div style="font-family:'DM Serif Display',Georgia,serif; font-size:1.7rem;
+                color:#1B3D20; letter-spacing:-0.02em; margin-bottom:6px;">
+                Analysez votre rapport ESG — gratuit
+            </div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:13.5px; color:#6B7280;">
+                Aucun compte requis &nbsp;·&nbsp; PDF, DOCX ou XLSX &nbsp;·&nbsp; Résultat en ~3 minutes
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# Upload widget centré
 qc_col_l, qc_col_center, qc_col_r = st.columns([1, 3, 1])
 with qc_col_center:
     uploaded_file = st.file_uploader(
-        "Uploadez votre rapport pour un aperçu gratuit",
+        "Glissez ou sélectionnez votre rapport de durabilité",
         type=["pdf", "docx", "xlsx"],
         help="PDF, DOCX ou XLSX — 10 Mo max. Aucun compte requis.",
         key="quick_check_uploader",
+        label_visibility="collapsed",
     )
 
     if uploaded_file is not None and "qc_token" not in st.session_state:
         track_quick_check_started()
-
-        with st.spinner("Analyse en cours... (environ 30 secondes)"):
+        with st.spinner("Analyse en cours... (~30 secondes)"):
             try:
                 file_bytes = uploaded_file.read()
                 result = quick_check_upload(file_bytes, uploaded_file.name)
@@ -116,7 +177,7 @@ with qc_col_center:
             except Exception as e:
                 st.error(f"Erreur de connexion au serveur : {e}")
 
-    # Polling du résultat si on a un token
+    # Polling du résultat
     if "qc_token" in st.session_state:
         import time as _time
 
@@ -142,7 +203,6 @@ with qc_col_center:
                     st.error(f"L'analyse a échoué : {qc.get('error_message', 'Erreur inconnue')}")
                     break
                 else:
-                    # Progression simulée
                     pct = min(int((i / max_polls) * 95), 95)
                     steps = ["Extraction du texte...", "Analyse IA en cours...",
                              "Scoring ESRS...", "Finalisation..."]
@@ -150,7 +210,7 @@ with qc_col_center:
                     progress_bar.progress(pct, text=step)
                     _time.sleep(3)
 
-        # Affichage du résultat
+        # ── Résultat ──────────────────────────────────────────────────────────
         if "qc_result" in st.session_state:
             qc = st.session_state["qc_result"]
             score = qc.get("score_global", 0)
@@ -158,76 +218,118 @@ with qc_col_center:
             strengths = qc.get("teaser_strengths", [])
             weaknesses = qc.get("teaser_weaknesses", [])
 
-            # Score en grand
-            score_color = "#1A3D22" if score >= 60 else "#F59E0B" if score >= 40 else "#EF4444"
-            csrd_badge = (
-                '<span style="background: #D4F0D8; color: #1A3D22; padding: 4px 12px; '
-                'border-radius: 8px; font-weight: 600;">CSRD Ready ✓</span>'
+            # Couleurs score
+            if score >= 70:
+                _sc, _sb = "#1B3D20", "#D4F0D8"
+            elif score >= 40:
+                _sc, _sb = "#D97706", "#FEF3C7"
+            else:
+                _sc, _sb = "#DC2626", "#FEE2E2"
+
+            csrd_badge_html = (
+                '<span style="background:#D4F0D8; color:#1B3D20; padding:5px 14px; '
+                'border-radius:20px; font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                'font-weight:600; letter-spacing:0.01em;">CSRD Ready ✓</span>'
                 if csrd else
-                '<span style="background: #FEE2E2; color: #DC2626; padding: 4px 12px; '
-                'border-radius: 8px; font-weight: 600;">Non conforme ✗</span>'
+                '<span style="background:#FEE2E2; color:#DC2626; padding:5px 14px; '
+                'border-radius:20px; font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                'font-weight:600; letter-spacing:0.01em;">Non conforme ✗</span>'
             )
 
+            # Score card principal
             st.markdown(
-                f"""<div style="text-align: center; padding: 20px; background: #F9FAFB;
-                    border-radius: 16px; border: 1px solid #E5E7EB; margin: 16px 0;">
-                    <div style="font-size: 56px; font-weight: 800; color: {score_color};">
-                        {score}<span style="font-size: 24px; color: #9CA3AF;">/100</span>
+                f"""
+                <div style="background:#FFFFFF; border:1.5px solid {_sc}; border-radius:16px;
+                    padding:28px 20px 20px; margin:18px 0 12px; text-align:center;
+                    box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                    <div style="font-family:'DM Sans',sans-serif; font-size:11px;
+                        color:#6B7280; text-transform:uppercase; letter-spacing:0.08em;
+                        margin-bottom:8px;">Score global ESG</div>
+                    <div class="qc-score-num" style="font-size:5rem; color:{_sc};">
+                        {score}
+                        <span style="font-family:'DM Sans',sans-serif; font-size:1.2rem;
+                            color:#9CA3AF; font-weight:400;">/100</span>
                     </div>
-                    <div style="margin-top: 8px;">{csrd_badge}</div>
-                </div>""",
+                    <div style="margin-top:12px;">{csrd_badge_html}</div>
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
 
-            # Forces et lacunes — visibles mais partiellement floutées
+            # Forces et lacunes avec flou partiel
             force_col, weak_col = st.columns(2)
             with force_col:
-                st.markdown("**3 forces détectées**")
+                st.markdown(
+                    '<div style="font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                    'font-weight:600; color:#1B3D20; margin-bottom:8px;">✦ Forces détectées</div>',
+                    unsafe_allow_html=True,
+                )
                 for i, s in enumerate(strengths):
                     if i == 0:
-                        st.markdown(f"- {s}")
-                    else:
-                        # Flou sur les 2 suivantes
                         st.markdown(
-                            f'<div style="filter: blur(4px); user-select: none; color: #6B7280;">'
-                            f'- {s}</div>',
+                            f'<div style="font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                            f'color:#374151; margin-bottom:6px; padding:8px 10px; '
+                            f'background:#F0FAF0; border-radius:8px;">— {s}</div>',
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            f'<div style="filter:blur(4px); user-select:none; '
+                            f'font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                            f'color:#6B7280; margin-bottom:6px; padding:8px 10px; '
+                            f'background:#F9FAFB; border-radius:8px;">— {s}</div>',
                             unsafe_allow_html=True,
                         )
 
             with weak_col:
-                st.markdown("**3 lacunes détectées**")
+                st.markdown(
+                    '<div style="font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                    'font-weight:600; color:#DC2626; margin-bottom:8px;">✦ Lacunes détectées</div>',
+                    unsafe_allow_html=True,
+                )
                 for i, w in enumerate(weaknesses):
                     if i == 0:
-                        st.markdown(f"- {w}")
+                        st.markdown(
+                            f'<div style="font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                            f'color:#374151; margin-bottom:6px; padding:8px 10px; '
+                            f'background:#FEF2F2; border-radius:8px;">— {w}</div>',
+                            unsafe_allow_html=True,
+                        )
                     else:
                         st.markdown(
-                            f'<div style="filter: blur(4px); user-select: none; color: #6B7280;">'
-                            f'- {w}</div>',
+                            f'<div style="filter:blur(4px); user-select:none; '
+                            f'font-family:\'DM Sans\',sans-serif; font-size:13px; '
+                            f'color:#6B7280; margin-bottom:6px; padding:8px 10px; '
+                            f'background:#F9FAFB; border-radius:8px;">— {w}</div>',
                             unsafe_allow_html=True,
                         )
 
-            # CTA massif vers inscription
-            st.markdown("<br>", unsafe_allow_html=True)
+            # CTA upgrade
+            st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
             st.markdown(
-                """<div style="text-align: center; background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
-                    border: 2px solid #1A3D22; border-radius: 12px; padding: 20px;">
-                    <div style="font-weight: 700; font-size: 16px; color: #111827;">
-                        Créez un compte gratuit pour voir le détail
+                """
+                <div style="background:#1B3D20; border-radius:12px; padding:20px 24px;
+                    text-align:center;">
+                    <div style="font-family:'DM Serif Display',Georgia,serif; font-size:1.1rem;
+                        color:#FFFFFF; margin-bottom:4px;">
+                        Débloquez le rapport complet
                     </div>
-                    <div style="font-size: 13px; color: #6B7280; margin-top: 4px;">
-                        10 catégories ESRS • Recommandations priorisées • Rapport PDF complet
+                    <div style="font-family:'DM Sans',sans-serif; font-size:12.5px;
+                        color:rgba(255,255,255,0.65);">
+                        10 standards ESRS · Recommandations priorisées · PDF 8 pages
                     </div>
-                </div>""",
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
             st.page_link(
                 "pages/1_Login.py",
-                label="Voir le rapport complet — gratuit, 30 secondes",
+                label="Créer un compte gratuit — 30 secondes",
                 use_container_width=True,
             )
 
-            # Bouton reset pour relancer un quick-check
-            if st.button("Analyser un autre rapport", use_container_width=True):
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+            if st.button("↩ Analyser un autre rapport", use_container_width=True):
                 del st.session_state["qc_token"]
                 del st.session_state["qc_result"]
                 st.rerun()
@@ -554,8 +656,12 @@ with pr4:
         </div>""",
         unsafe_allow_html=True,
     )
-    # Bouton "Nous contacter" — ouvre un mailto ou Calendly (à configurer sprint 6D)
-    st.link_button("Nous contacter", "mailto:diadamflow@gmail.com?subject=ESG%20Optimizer%20Enterprise", use_container_width=True)
+    # FIX #11 : email pro pour les demandes Enterprise
+    st.link_button(
+        "Nous contacter",
+        "mailto:contact@esg-optimizer.fr?subject=Demande%20Enterprise%20ESG%20Optimizer",
+        use_container_width=True,
+    )
 
 st.divider()
 
@@ -663,12 +769,12 @@ st.markdown(
                 </div>
             </div>
             <div style="font-size: 12px; color: #9CA3AF; line-height: 2;">
-                <a href="#" style="color: #6B7280; text-decoration: none;">Mentions légales</a><br>
-                <a href="#" style="color: #6B7280; text-decoration: none;">CGU</a><br>
-                <a href="#" style="color: #6B7280; text-decoration: none;">Politique de confidentialité</a>
+                <a href="/7_Mentions" style="color: #6B7280; text-decoration: none;">Mentions légales</a><br>
+                <a href="/7_Mentions#cgu" style="color: #6B7280; text-decoration: none;">CGU</a><br>
+                <a href="/7_Mentions#confidentialite" style="color: #6B7280; text-decoration: none;">Politique de confidentialité</a>
             </div>
             <div style="font-size: 12px; color: #9CA3AF; line-height: 2;">
-                <a href="mailto:diadamflow@gmail.com" style="color: #6B7280; text-decoration: none;">Contact</a><br>
+                <a href="mailto:contact@esg-optimizer.fr" style="color: #6B7280; text-decoration: none;">Contact</a><br>
                 Conforme ESRS E1-E5, S1-S4, G1<br>
                 Hébergement UE
             </div>

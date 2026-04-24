@@ -69,61 +69,85 @@ def render_onboarding() -> bool:
     return False
 
 
-def _step_role():
-    """Étape 1 : Quel est votre profil ?"""
-    st.markdown("**Quel est votre profil ?**")
-    st.caption("Cela nous permet d'adapter l'expérience à vos besoins.")
-
-    selected = st.session_state["onboarding_data"].get("role")
-
+def _on_role_change():
+    """Callback on_change : sélection du rôle → avance automatiquement à l'étape 2."""
+    val = st.session_state.get("ob_radio_role")
+    if not val:
+        return
+    # Extraire la clé depuis le label "key — label — desc"
     for key, label, desc in ROLES:
-        is_selected = selected == key
-        border = "2px solid #1A3D22" if is_selected else "1px solid #E5E7EB"
-        bg = "#F0FDF4" if is_selected else "#F9FAFB"
-
-        if st.button(
-            f"{label} — {desc}",
-            key=f"role_{key}",
-            use_container_width=True,
-        ):
+        if val.startswith(label):
             st.session_state["onboarding_data"]["role"] = key
-            st.rerun()
+            break
+    st.session_state["onboarding_step"] = 2
 
-    st.markdown("")
-    if selected:
-        if st.button("Suivant", type="primary", use_container_width=True, key="next_1"):
-            st.session_state["onboarding_step"] = 2
-            st.rerun()
+
+def _on_report_type_change():
+    """Callback on_change : sélection du type → avance automatiquement à l'étape 3."""
+    val = st.session_state.get("ob_radio_rtype")
+    if not val:
+        return
+    for key, label in REPORT_TYPES:
+        if val == label:
+            st.session_state["onboarding_data"]["report_type"] = key
+            break
+    st.session_state["onboarding_step"] = 3
+
+
+def _step_role():
+    """Étape 1 : Quel est votre profil ? (FIX #6 : on_change auto-advance)"""
+    st.markdown("**Quel est votre profil ?**")
+    st.caption("Cliquez sur votre profil pour passer directement à l'étape suivante.")
+
+    role_options = [f"{label} — {desc}" for _, label, desc in ROLES]
+
+    # Pré-sélectionner si déjà renseigné
+    current_role = st.session_state["onboarding_data"].get("role")
+    default_idx = 0
+    if current_role:
+        for i, (key, label, desc) in enumerate(ROLES):
+            if key == current_role:
+                default_idx = i
+                break
+
+    st.radio(
+        "Profil",
+        options=role_options,
+        index=default_idx,
+        key="ob_radio_role",
+        on_change=_on_role_change,
+        label_visibility="collapsed",
+    )
 
 
 def _step_report_type():
-    """Étape 2 : Quel type de rapport analysez-vous ?"""
+    """Étape 2 : Quel type de rapport ? (FIX #6 : on_change auto-advance)"""
     st.markdown("**Quel type de rapport allez-vous analyser ?**")
-    st.caption("Vous pourrez changer cela à tout moment.")
+    st.caption("Cliquez pour passer directement à l'étape suivante.")
 
-    selected = st.session_state["onboarding_data"].get("report_type")
+    report_options = [label for _, label in REPORT_TYPES]
 
-    for key, label in REPORT_TYPES:
-        if st.button(
-            label,
-            key=f"rtype_{key}",
-            use_container_width=True,
-        ):
-            st.session_state["onboarding_data"]["report_type"] = key
-            st.rerun()
+    current_rtype = st.session_state["onboarding_data"].get("report_type")
+    default_idx = 0
+    if current_rtype:
+        for i, (key, label) in enumerate(REPORT_TYPES):
+            if key == current_rtype:
+                default_idx = i
+                break
+
+    st.radio(
+        "Type de rapport",
+        options=report_options,
+        index=default_idx,
+        key="ob_radio_rtype",
+        on_change=_on_report_type_change,
+        label_visibility="collapsed",
+    )
 
     st.markdown("")
-
-    col_back, col_next = st.columns(2)
-    with col_back:
-        if st.button("Retour", use_container_width=True, key="back_2"):
-            st.session_state["onboarding_step"] = 1
-            st.rerun()
-    with col_next:
-        if selected:
-            if st.button("Suivant", type="primary", use_container_width=True, key="next_2"):
-                st.session_state["onboarding_step"] = 3
-                st.rerun()
+    if st.button("← Retour", use_container_width=True, key="back_2"):
+        st.session_state["onboarding_step"] = 1
+        st.rerun()
 
 
 def _step_first_action():

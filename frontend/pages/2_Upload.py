@@ -53,12 +53,16 @@ with col1:
         placeholder="Ex: GreenTech SAS",
     )
 with col2:
+    # FIX #3 : année par défaut = année N-1 (les rapports ESG couvrent l'exercice précédent)
+    import datetime as _dt
+    _default_year = _dt.datetime.now().year - 1  # 2025 en 2026
     report_year = st.number_input(
         "Année du rapport",
         min_value=2000,
-        max_value=2100,
-        value=2024,
+        max_value=_dt.datetime.now().year + 1,
+        value=_default_year,
         step=1,
+        help=f"Année de l'exercice couvert par le rapport (généralement {_default_year}).",
     )
 
 sector = st.selectbox(
@@ -177,13 +181,9 @@ if st.button(
                 progress_bar.progress(100, text="Analyse terminée !")
                 _render_steps(4)
                 status_container.success("Analyse terminée avec succès !")
-                time.sleep(1)
-                st.page_link(
-                    "pages/3_Resultats.py",
-                    label="Voir les résultats",
-                    use_container_width=True,
-                )
-                st.rerun()
+                time.sleep(1.5)
+                # FIX #4 : redirection directe vers Résultats sans rerun intermédiaire
+                st.switch_page("pages/3_Resultats.py")
             elif current_status == "failed":
                 progress_bar.empty()
                 step_display.empty()

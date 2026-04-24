@@ -19,7 +19,7 @@ seo_for("results")
 from frontend.components.score_gauge import render_score_row
 from frontend.components.esrs_coverage import render_esrs_grid
 from frontend.components.delta_card import render_delta_row
-from frontend.utils.api_client import APIError, get_analysis, download_pdf, download_delta_pdf, get_share_info
+from frontend.utils.api_client import APIError, get_analysis, download_pdf, download_delta_pdf, download_preview_pdf, get_share_info
 from frontend.components.analytics import track_event
 from frontend.utils.session import get_token, get_last_analysis_id, require_auth
 
@@ -43,8 +43,17 @@ with col_btn:
     st.markdown("<br>", unsafe_allow_html=True)
     load_btn = st.button("Charger", use_container_width=True, type="primary")
 
-# Charger automatiquement si on arrive de l'upload, sinon sur clic
-should_load = load_btn or (analysis_id is not None and "analysis_loaded" not in st.session_state)
+# Charger si :
+#   - l'utilisateur vient de cliquer sur "Charger"
+#   - on arrive depuis l'upload (analysis_id présent et première visite)
+#   - l'analyse était déjà chargée (rerun causé par un clic de bouton sur la page)
+#   Sans la 3e condition, tout st.button (PDF, delta…) déclenche un rerun →
+#   should_load = False → st.stop() s'exécute avant le code de téléchargement.
+should_load = (
+    load_btn
+    or (analysis_id is not None and "analysis_loaded" not in st.session_state)
+    or "analysis_loaded" in st.session_state
+)
 
 if not should_load:
     st.info("Entrez un ID d'analyse et cliquez sur Charger, ou lancez une nouvelle analyse depuis Upload.")
@@ -107,34 +116,57 @@ st.markdown("---")
 csrd_ready = analysis.get("csrd_ready")
 csrd_pct = analysis.get("csrd_coverage_pct")
 
-if csrd_ready is not None:
+if csrd_pct is not None:
     col_badge, col_pct = st.columns([1, 2])
     with col_badge:
-        if csrd_ready:
-            st.markdown(
-                """<div style="background: #D4F0D8; border: 2px solid #1A3D22; border-radius: 12px;
-                    padding: 20px; text-align: center;">
-                    <div style="font-size: 36px;">&#10003;</div>
-                    <div style="font-weight: 700; color: #1A3D22; font-size: 18px; margin-top: 8px;">
-                        CSRD Ready
-                    </div>
-                </div>""",
-                unsafe_allow_html=True,
+        # 4 niveaux CSRD basés sur csrd_coverage_pct (pas sur le booléen LLM)
+        if csrd_pct == 100:
+            badge_html = (
+                '<div style="background:#D4F0D8; border:2px solid #1B3D20; border-radius:12px;'
+                'padding:20px; text-align:center;">'
+                '<div style="font-size:34px; color:#1B3D20;">&#10003;</div>'
+                '<div style="font-weight:700; color:#1B3D20; font-size:17px; margin-top:6px;">CSRD Ready</div>'
+                '<div style="font-size:11px; color:#2A5C34; margin-top:4px; letter-spacing:.04em; text-transform:uppercase;">Couverture 100 %</div>'
+                '</div>'
+            )
+        elif csrd_pct >= 80:
+            badge_html = (
+                f'<div style="background:#DBEAFE; border:2px solid #2563EB; border-radius:12px;'
+                f'padding:20px; text-align:center;">'
+                f'<div style="font-size:34px; color:#1D4ED8;">&#9651;</div>'
+                f'<div style="font-weight:700; color:#1E40AF; font-size:15px; margin-top:6px;">Conformité Avancée</div>'
+                f'<div style="font-size:11px; color:#3B82F6; margin-top:4px; text-transform:uppercase; letter-spacing:.04em;">'
+                f'Couverture {csrd_pct:.0f} % — 100 % requis</div>'
+                f'</div>'
+            )
+        elif csrd_pct >= 50:
+            badge_html = (
+                f'<div style="background:#FFF7ED; border:2px solid #EA580C; border-radius:12px;'
+                f'padding:20px; text-align:center;">'
+                f'<div style="font-size:34px; color:#EA580C;">&#9680;</div>'
+                f'<div style="font-weight:700; color:#9A3412; font-size:14px; margin-top:6px;">En cours de structuration</div>'
+                f'<div style="font-size:11px; color:#C2410C; margin-top:4px; text-transform:uppercase; letter-spacing:.04em;">'
+                f'Couverture {csrd_pct:.0f} % — efforts requis</div>'
+                f'</div>'
             )
         else:
-            st.markdown(
-                """<div style="background: #FEE2E2; border: 2px solid #EF4444; border-radius: 12px;
-                    padding: 20px; text-align: center;">
-                    <div style="font-size: 36px;">&#10007;</div>
-                    <div style="font-weight: 700; color: #991B1B; font-size: 18px; margin-top: 8px;">
-                        Non conforme CSRD
-                    </div>
-                </div>""",
-                unsafe_allow_html=True,
+            badge_html = (
+                f'<div style="background:#FEE2E2; border:2px solid #DC2626; border-radius:12px;'
+                f'padding:20px; text-align:center;">'
+                f'<div style="font-size:34px; color:#DC2626;">&#10007;</div>'
+                f'<div style="font-weight:700; color:#991B1B; font-size:15px; margin-top:6px;">Lacunes majeures</div>'
+                f'<div style="font-size:11px; color:#991B1B; margin-top:4px; text-transform:uppercase; letter-spacing:.04em;">'
+                f'Couverture {csrd_pct:.0f} % — restructuration nécessaire</div>'
+                f'</div>'
             )
+        st.markdown(badge_html, unsafe_allow_html=True)
+
     with col_pct:
-        if csrd_pct is not None:
-            st.metric("Couverture CSRD", f"{csrd_pct:.0f}%")
+        st.metric(
+            "Couverture CSRD",
+            f"{csrd_pct:.0f}%",
+            help="100% = CSRD Ready · 80-99% = Conformité Avancée · 50-79% = En cours · <50% = Lacunes majeures",
+        )
         missing = analysis.get("missing_disclosures") or []
         if missing:
             st.markdown("**Disclosures manquantes :**")
@@ -193,6 +225,26 @@ with col_weak:
     else:
         st.caption("Aucune lacune identifiée.")
 
+    # Red flags Gouvernance si score G < 60
+    if score_gov < 60:
+        sev = "critique" if score_gov < 40 else "élevée"
+        sev_color = "#991B1B" if score_gov < 40 else "#92400E"
+        sev_bg = "#FEE2E2" if score_gov < 40 else "#FEF3C7"
+        sev_border = "#EF4444" if score_gov < 40 else "#F59E0B"
+        st.markdown(
+            f"""<div style="background:{sev_bg}; border-left:4px solid {sev_border};
+                border-radius:0 8px 8px 0; padding:12px 14px; margin-top:12px;">
+                <div style="font-weight:700; color:{sev_color}; font-size:13px; margin-bottom:6px;">
+                    ⚠ Alerte Gouvernance — Sévérité {sev} (G : {int(score_gov)}/100)
+                </div>
+                <div style="font-size:12px; color:{sev_color}; line-height:1.6;">
+                    {"→ Score G < 40 : reporting de gouvernance quasi absent. Les auditeurs CSRD exigeront a minima :<br>— Politique anti-corruption documentée (ESRS G1)<br>— Déclaration sur la conformité fiscale<br>— Dispositif de protection des lanceurs d'alerte" if score_gov < 40 else
+                     "→ Score G < 60 : plusieurs indicateurs G1 manquants.<br>— Vérifier la présence d'une charte éthique publiée<br>— Documenter les procédures de due diligence fournisseurs<br>— Préciser les objectifs chiffrés de lutte contre la corruption"}
+                </div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
 # 7. Recommandations
 st.markdown("---")
 recommendations = analysis.get("recommendations") or []
@@ -246,8 +298,8 @@ if is_free_plan:
     )
     col_upg1, col_upg2, col_upg3 = st.columns([1, 2, 1])
     with col_upg2:
-        if st.button("Voir les tarifs", use_container_width=True, type="primary", key="results_upgrade"):
-            st.switch_page("pages/6_Tarifs.py")
+        # FIX : st.page_link = ancre HTML directe, pas de rerun intermédiaire qui court-circuite la page
+        st.page_link("pages/6_Tarifs.py", label="🔓 Voir les tarifs", use_container_width=True)
 
 # 9. Boutons de téléchargement
 st.markdown("---")
@@ -257,14 +309,21 @@ col_pdf, col_delta = st.columns(2)
 
 with col_pdf:
     if is_free_plan:
-        st.button(
-            "Rapport PDF (plan Essentiel+)",
-            use_container_width=True,
-            type="primary",
-            disabled=True,
-            key="pdf_locked",
-        )
-        st.caption("Disponible à partir du plan Essentiel.")
+        # Plan Découverte : aperçu 3 pages watermarked disponible
+        if st.button("📄 Télécharger l'aperçu PDF (3 pages)", use_container_width=True, key="pdf_preview"):
+            try:
+                with st.spinner("Génération de l'aperçu PDF..."):
+                    preview_bytes = download_preview_pdf(token, analysis["id"])
+                st.download_button(
+                    label="⬇ Enregistrer l'aperçu (watermark)",
+                    data=preview_bytes,
+                    file_name=f"ESG_Preview_{analysis['id']}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True,
+                )
+            except APIError as e:
+                st.error(f"Erreur : {e.detail}")
+        st.caption("Aperçu 3 pages avec mention PRÉVISUALISATION. Le rapport complet (8+ pages) est disponible à partir du plan Essentiel.")
     else:
         if st.button("Télécharger le rapport PDF", use_container_width=True, type="primary"):
             try:
@@ -343,14 +402,19 @@ try:
     col_share, col_preview = st.columns([1, 1])
 
     with col_share:
+        # FIX #10 : copywriting orienté valorisation de marque, sans jargon technique
         st.markdown(
             f"""<div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px;
                 padding: 20px; text-align: center;">
-                <div style="font-size: 13px; color: #6B7280; margin-bottom: 12px;">
-                    Partagez votre score et boostez votre visibilité ESG
+                <div style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">
+                    Valorisez votre démarche RSE
                 </div>
-                <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">
-                    Chaque partage = un backlink + preuve sociale
+                <div style="font-size: 13px; color: #6B7280; margin-bottom: 8px;">
+                    Montrez à vos parties prenantes, clients et partenaires
+                    que votre entreprise s'engage concrètement pour la durabilité.
+                </div>
+                <div style="font-size: 12px; color: #93C5FD; font-style: italic;">
+                    Un score publié, c'est une preuve de transparence qui renforce votre crédibilité ESG.
                 </div>
             </div>""",
             unsafe_allow_html=True,

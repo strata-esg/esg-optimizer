@@ -23,28 +23,75 @@ COLORS = {
 
 
 def inject_global_styles() -> None:
-    """Charge les polices Google Fonts et applique le thème brand."""
+    """Charge les polices Google Fonts et applique le thème brand (tokens colors_and_type.css)."""
     st.markdown(
         """
         <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
 
         <style>
+        /* ── DESIGN TOKENS (colors_and_type.css) ─────────────── */
         :root {
-          --esg-forest:      #1A3D22;
+          /* Brand Greens */
+          --green-950: #0D1F0F;
+          --green-900: #1B3D20;
+          --green-800: #255228;
+          --green-700: #2F6830;
+          --green-600: #3A7D3C;
+          --green-500: #4DB862;
+          --green-400: #6FCA80;
+          --green-300: #96D9A2;
+          --green-200: #C5E8C5;
+          --green-100: #DFF2DF;
+          --green-50:  #F0FAF0;
+          /* Neutrals */
+          --neutral-900: #1A1A1A;
+          --neutral-600: #6B7280;
+          --neutral-500: #9CA3AF;
+          --neutral-400: #D1D5DB;
+          --neutral-300: #E5E7EB;
+          --neutral-200: #F3F4F6;
+          --neutral-100: #F9FAFB;
+          --neutral-50:  #FFFFFF;
+          /* Cream / Warm */
+          --cream-100: #F7F2E8;
+          --cream-50:  #FBF8F3;
+          --cream-200: #F5EFE2;
+          --cream-300: #F2EAD8;
+          /* Semantic */
+          --amber-600: #D97706;
+          --amber-500: #F59E0B;
+          --amber-100: #FEF3C7;
+          --red-600:   #DC2626;
+          --red-100:   #FEE2E2;
+          --blue-600:  #2563EB;
+          --blue-100:  #DBEAFE;
+          /* Backgrounds */
+          --bg-page:    #F7F2E8;
+          --bg-surface: #FFFFFF;
+          --bg-sidebar: #1B3D20;
+          /* Typography */
+          --font-serif: 'DM Serif Display', Georgia, serif;
+          --font-sans:  'DM Sans', system-ui, -apple-system, sans-serif;
+          --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+          /* Shadows */
+          --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+          --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+          /* Legacy aliases */
+          --esg-forest:      #1B3D20;
           --esg-forest-mid:  #2A5C34;
           --esg-leaf:        #7FC686;
           --esg-mint:        #D4F0D8;
-          --esg-parchment:   #F5F2EC;
-          --esg-amber:       #C17B2A;
-          --esg-amber-light: #FDF3E3;
-          --esg-alert:       #B53030;
-          --esg-alert-light: #FDF0F0;
-          --esg-text:        #1C1C1C;
+          --esg-parchment:   #F7F2E8;
+          --esg-amber:       #D97706;
+          --esg-amber-light: #FEF3C7;
+          --esg-alert:       #DC2626;
+          --esg-alert-light: #FEE2E2;
+          --esg-text:        #1A1A1A;
           --esg-text-muted:  #6B7280;
-          --esg-border:      #E5E0D8;
+          --esg-border:      #E5E7EB;
         }
 
         /* Typographie */

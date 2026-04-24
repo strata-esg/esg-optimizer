@@ -14,19 +14,24 @@ if str(_root) not in sys.path:
 from frontend.components.analytics import track_event
 from frontend.utils.session import get_token, get_user, is_logged_in
 from frontend.utils.api_client import APIError, get_upgrade_url
+from frontend.utils.styles import inject_global_styles
 
 # Juste après st.set_page_config(...)
 from frontend.components.seo import seo_for
 seo_for("pricing")
+inject_global_styles()
 
 # Header
 st.markdown(
-    """<div style="text-align: center; padding: 20px 0 30px 0;">
-        <h1 style="font-size: 36px; font-weight: 800; color: #111827; margin-bottom: 8px;">
-            Choisissez votre plan
-        </h1>
-        <p style="font-size: 18px; color: #6B7280; max-width: 600px; margin: 0 auto;">
-            De l'analyse ponctuelle au reporting continu — un plan adapté à chaque besoin ESG.
+    """<div style="text-align: center; padding: 20px 0 36px 0;">
+        <div style="font-family:'DM Serif Display',Georgia,serif; font-size:2.4rem;
+            font-weight:400; color:#1A3D22; letter-spacing:-0.02em; margin-bottom:10px;
+            line-height:1.15;">
+            Tarifs simples, sans engagement
+        </div>
+        <p style="font-family:'DM Sans',sans-serif; font-size:16px; color:#6B7280;
+            max-width:560px; margin:0 auto; line-height:1.6;">
+            Commencez gratuitement. Passez au supérieur quand vous êtes prêt.
         </p>
     </div>""",
     unsafe_allow_html=True,
@@ -125,42 +130,71 @@ PLANS = [
 ]
 
 
-# Helper : générer une card de plan (composants natifs)
+# Helper : générer une card de plan (HTML card identique à la homepage)
 def _render_plan_card(plan: dict, user_plan: str | None) -> None:
-    """Affiche une card de plan avec ses features et CTA — composants Streamlit natifs."""
+    """Affiche une card de plan avec ses features — HTML cards style homepage."""
     is_recommended = plan["recommended"]
     is_current = user_plan == plan["slug"]
 
-    # Badge recommandé
-    if is_recommended:
-        st.markdown(
-            '<p style="background:#1A3D22;color:white;font-size:11px;font-weight:700;'
-            'padding:3px 12px;border-radius:8px;text-align:center;letter-spacing:0.5px;'
-            'margin-bottom:4px;">RECOMMANDÉ</p>',
-            unsafe_allow_html=True,
-        )
+    # Couleurs par plan
+    _colors = {
+        "discovery":  ("#E5E7EB", "1px",  "#1A3D22", "#F9FAFB"),
+        "essential":  ("#E5E7EB", "1px",  "#2563EB", "#F9FAFB"),
+        "pro":        ("#1A3D22", "2px",  "#1A3D22", "#F0FDF4"),
+        "enterprise": ("#E5E7EB", "1px",  "#7C3AED", "#F9FAFB"),
+    }
+    border_color, border_w, price_color, bg = _colors.get(plan["slug"], _colors["discovery"])
 
-    # Nom du plan
-    st.markdown(f"### {plan['name']}")
+    # Badge "RECOMMANDÉ"
+    rec_badge = (
+        '<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);'
+        'background:#1A3D22;color:white;padding:3px 14px;border-radius:10px;'
+        'font-size:11px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">RECOMMANDÉ</div>'
+        if is_recommended else ""
+    )
 
-    # Prix
-    st.markdown(f"**{plan['price']}** {plan['period']}")
+    # Badge "Votre plan actuel"
+    current_badge = (
+        '<div style="background:#D4F0D8;color:#1A3D22;text-align:center;padding:6px 10px;'
+        'border-radius:6px;font-size:12px;font-weight:600;margin:8px 0;">Votre plan actuel ✓</div>'
+        if is_current else ""
+    )
 
-    # Description
-    st.caption(plan["description"])
-
-    # Badge plan actuel
-    if is_current:
-        st.info("Votre plan actuel")
-
-    st.markdown("---")
-
-    # Features (une par ligne, simple markdown)
+    # Liste des features
+    features_html = ""
     for feat_name, included in plan["features"]:
         if included:
-            st.markdown(f'<span style="color:#1A3D22;">&#10003;</span> {feat_name}', unsafe_allow_html=True)
+            features_html += (
+                f'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;">'
+                f'<span style="color:#1A3D22;flex-shrink:0;">&#10003;</span>'
+                f'<span>{feat_name}</span></div>'
+            )
         else:
-            st.markdown(f'<span style="color:#9CA3AF;">&#10007;</span> ~~{feat_name}~~', unsafe_allow_html=True)
+            features_html += (
+                f'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;">'
+                f'<span style="color:#B53030;flex-shrink:0;">&#10007;</span>'
+                f'<span style="color:#9CA3AF;text-decoration:line-through;">{feat_name}</span></div>'
+            )
+
+    mt = "margin-top:8px;" if is_recommended else ""
+    st.markdown(
+        f"""<div style="background:{bg};border:{border_w} solid {border_color};border-radius:12px;
+            padding:24px 16px;text-align:center;min-height:390px;position:relative;{mt}">
+            {rec_badge}
+            <div style="font-weight:700;font-size:16px;color:#111827;
+                margin-top:{'4px' if is_recommended else '0'};">{plan['name']}</div>
+            <div style="font-size:32px;font-weight:800;color:{price_color};
+                margin:12px 0 4px 0;">{plan['price']}</div>
+            <div style="font-size:12px;color:#9CA3AF;margin-bottom:6px;">{plan['period']}</div>
+            <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">{plan['description']}</div>
+            {current_badge}
+            <div style="border-top:1px solid #E5E7EB;margin:10px 0 12px;"></div>
+            <div style="text-align:left;font-size:12px;color:#374151;line-height:1.7;">
+                {features_html}
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
 
 # Affichage des 4 plans
@@ -172,7 +206,7 @@ if is_logged_in():
         user_plan = user.get("plan", "discovery")
     token = get_token()
 
-cols = st.columns(4, gap="medium")
+cols = st.columns(4, gap="small")
 
 for i, plan in enumerate(PLANS):
     with cols[i]:

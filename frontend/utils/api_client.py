@@ -146,6 +146,19 @@ def download_pdf(token: str, analysis_id: int) -> bytes:
     return _handle_binary_response(resp)
 
 
+def download_preview_pdf(token: str, analysis_id: int) -> bytes:
+    """
+    GET /analysis/{id}/preview-pdf
+    Aperçu PDF 3 pages watermarked — disponible pour tous les plans.
+    """
+    resp = requests.get(
+        f"{BACKEND_URL}/analysis/{analysis_id}/preview-pdf",
+        headers=_headers(token),
+        timeout=30,
+    )
+    return _handle_binary_response(resp)
+
+
 def download_delta_pdf(token: str, analysis_id: int) -> bytes:
     """
     GET /analysis/{id}/delta-pdf
