@@ -14,15 +14,6 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-import streamlit as st
-
-st.set_page_config(page_title="Tableau de Bord | ESG Optimizer", page_icon="🎯", layout="wide")
-
-st.components.v1.html(
-    """<script defer src="https://umami-production-c67f.up.railway.app/script.js" data-website-id="9ff84a61-6d23-48a1-be51-d0aa27f70cdd"></script>""",
-    height=0
-)
-
 # --- IMPORT & INJECTION SEO ---
 from frontend.components.seo import seo_for
 seo_for("dashboard")
