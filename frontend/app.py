@@ -11,7 +11,7 @@ import streamlit as st
 # Config page (doit etre le premier appel Streamlit)
 st.set_page_config(
    page_title="ESG Optimizer — Analyse IA & Conformité CSRD",
-    page_icon="🎯",
+    page_icon="leaf",
     layout="wide",
     initial_sidebar_state="expanded",
 )
