@@ -113,6 +113,15 @@ class Settings(BaseSettings):
     public_rate_limit_weekly: int = 10
     public_token_expiry_hours: int = 72
 
+    # --- Cloudflare R2 (stockage persistant des rapports uploadés) ---
+    # Activer en prod pour éviter de perdre les fichiers lors d'un redeploy Railway.
+    # En dev, use_r2_storage=False → fallback sur tempfile local.
+    use_r2_storage: bool = False
+    r2_account_id: str = ""           # ex: abc123def456...
+    r2_access_key_id: str = ""        # Clé d'accès R2 (depuis Cloudflare Dashboard)
+    r2_secret_access_key: str = ""    # Clé secrète R2
+    r2_bucket_name: str = "esg-reports"  # Nom du bucket R2
+
     # --- Environment ---
     environment: str = "development"
 

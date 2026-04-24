@@ -17,6 +17,7 @@ from backend.prompts.system_analysis import SYSTEM_ANALYSIS_PROMPT
 from backend.services.extractor import extract_text
 from backend.services.delta_service import run_delta
 from backend.services.email_service import send_analysis_complete_email, send_analysis_failed_email
+from backend.services.storage_service import StorageService
 
 logger = logging.getLogger(__name__)
 
@@ -81,18 +82,20 @@ def _save_results(analysis: Analysis, result: dict, raw_json: str) -> None:
     analysis.raw_llm_response = raw_json
 
 
-def run_analysis_pipeline(analysis_id: int, file_path: str, db: Session) -> None:
+def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> None:
     """
     Pipeline complet exécuté en background task :
     1. Charge l'analyse depuis la DB
-    2. Extrait le texte du document
-    3. Appelle GPT-4o
-    4. Sauvegarde les résultats
-    5. Supprime le fichier temporaire
+    2. Télécharge le fichier depuis R2 (ou chemin local en dev)
+    3. Extrait le texte du document
+    4. Appelle GPT-4o
+    5. Sauvegarde les résultats
+    6. Supprime le fichier du stockage
 
     Met à jour le status en 'success' ou 'failed' dans tous les cas.
     """
     start = time.time()
+    local_path: str | None = None  # chemin du fichier téléchargé localement
 
     analysis = db.query(Analysis).filter(Analysis.id == analysis_id).first()
     if not analysis:
@@ -109,9 +112,13 @@ def run_analysis_pipeline(analysis_id: int, file_path: str, db: Session) -> None
         analysis.status = "processing"
         db.commit()
 
-        # 1. Extraction du texte
+        # 1. Récupérer le fichier depuis le stockage (R2 → tempfile local, ou direct si local)
+        logger.info("Pipeline [%d] — Récupération fichier : %s", analysis_id, storage_key)
+        local_path = StorageService.download_to_tempfile(storage_key)
+
+        # 2. Extraction du texte
         logger.info("Pipeline [%d] — Extraction texte : %s", analysis_id, analysis.source_filename)
-        text = extract_text(file_path, analysis.source_format)
+        text = extract_text(local_path, analysis.source_format)
 
         if not text.strip():
             raise RuntimeError("Le document ne contient aucun texte exploitable.")
@@ -178,8 +185,15 @@ def run_analysis_pipeline(analysis_id: int, file_path: str, db: Session) -> None
     finally:
         db.commit()
 
-        # Nettoyage du fichier temporaire
+        # Nettoyage : supprimer le fichier du stockage R2 + le tempfile local éventuel
         try:
-            Path(file_path).unlink(missing_ok=True)
-        except OSError:
-            pass
+            StorageService.delete(storage_key)
+        except Exception as del_exc:
+            logger.warning("Pipeline [%d] — Impossible de supprimer storage_key=%s : %s", analysis_id, storage_key, del_exc)
+
+        if local_path and local_path != storage_key:
+            # local_path est un fichier téléchargé depuis R2 (distinct de storage_key)
+            try:
+                Path(local_path).unlink(missing_ok=True)
+            except OSError:
+                pass

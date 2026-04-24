@@ -34,10 +34,12 @@ def _handle_response(resp: requests.Response) -> dict:
     """Parse la réponse JSON et lève APIError si erreur HTTP."""
     if resp.status_code >= 400:
         try:
-            detail = resp.json().get("detail", resp.text)
+            body = resp.json()
+            # Le backend renvoie {"error": "..."} ou {"detail": "..."} selon le handler
+            detail = body.get("detail") or body.get("error") or resp.text
         except Exception:
             detail = resp.text
-        raise APIError(resp.status_code, detail)
+        raise APIError(resp.status_code, str(detail))
     return resp.json()
 
 
@@ -45,10 +47,11 @@ def _handle_binary_response(resp: requests.Response) -> bytes:
     """Retourne le contenu binaire (PDF) ou lève APIError."""
     if resp.status_code >= 400:
         try:
-            detail = resp.json().get("detail", resp.text)
+            body = resp.json()
+            detail = body.get("detail") or body.get("error") or resp.text
         except Exception:
             detail = resp.text
-        raise APIError(resp.status_code, detail)
+        raise APIError(resp.status_code, str(detail))
     return resp.content
 
 

@@ -8,7 +8,6 @@ POST /auth/claim-analysis → rattacher un quick-check à un compte user
 import hashlib
 import json
 import logging
-import tempfile
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -22,6 +21,7 @@ from backend.database import get_db, SessionLocal
 from backend.models import Analysis, Company, PublicAnalysis, User
 from backend.prompts.system_quick_check import SYSTEM_QUICK_CHECK_PROMPT
 from backend.services.extractor import extract_text, ALLOWED_EXTENSIONS
+from backend.services.storage_service import StorageService
 # Import différé de get_current_user dans la fonction claim pour éviter
 # tout risque d'import circulaire au chargement des modules (auth → public).
 # Il n'y a pas de vraie circularité, mais on garde l'import tardif par précaution.
@@ -101,14 +101,16 @@ def _call_gpt4o_quick(text: str) -> dict:
         raise RuntimeError(f"Erreur analyse IA : {exc}") from exc
 
 
-def _run_quick_check_pipeline(public_analysis_id: int, file_path: str) -> None:
+def _run_quick_check_pipeline(public_analysis_id: int, storage_key: str) -> None:
     """
     Background task pour le quick-check.
     Crée sa propre session DB (celle du request est fermée).
+    Télécharge le fichier depuis R2 (ou utilise le chemin local en dev).
     """
     db = SessionLocal()
     start = time.time()
     pa = None  # Initialisé à None pour éviter NameError dans le except block
+    local_path: str | None = None
 
     try:
         pa = db.query(PublicAnalysis).filter(PublicAnalysis.id == public_analysis_id).first()
@@ -119,9 +121,12 @@ def _run_quick_check_pipeline(public_analysis_id: int, file_path: str) -> None:
         pa.status = "processing"
         db.commit()
 
-        # 1. Extraction texte
-        extension = Path(file_path).suffix.lstrip(".")
-        text = extract_text(file_path, extension)
+        # 1. Récupérer le fichier depuis le stockage
+        local_path = StorageService.download_to_tempfile(storage_key)
+
+        # 2. Extraction texte
+        extension = Path(local_path).suffix.lstrip(".")
+        text = extract_text(local_path, extension)
 
         if not text.strip():
             raise RuntimeError("Le document ne contient aucun texte exploitable.")
@@ -162,11 +167,17 @@ def _run_quick_check_pipeline(public_analysis_id: int, file_path: str) -> None:
             logger.error("Quick-check [%d] — Commit final échoué : %s", public_analysis_id, commit_exc)
         db.close()
 
-        # Nettoyage fichier temporaire
+        # Nettoyage : supprimer depuis le stockage R2 + tempfile local éventuel
         try:
-            Path(file_path).unlink(missing_ok=True)
-        except OSError:
-            pass
+            StorageService.delete(storage_key)
+        except Exception as del_exc:
+            logger.warning("Quick-check [%d] — Impossible de supprimer storage_key=%s : %s", public_analysis_id, storage_key, del_exc)
+
+        if local_path and local_path != storage_key:
+            try:
+                Path(local_path).unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
 # ENDPOINTS
@@ -208,10 +219,8 @@ async def quick_check(
             detail=f"Fichier trop volumineux : {size_mb:.1f} MB (max {settings.public_upload_max_mb} MB).",
         )
 
-    # 4. Sauvegarder en temporaire
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{extension}", prefix="qc_") as tmp:
-        tmp.write(content)
-        tmp_path = tmp.name
+    # 4. Sauvegarder dans le stockage (R2 en prod, tempfile local en dev)
+    storage_key = StorageService.upload(content, file.filename)
 
     # 5. Créer l'entrée en DB
     pa = PublicAnalysis(ip_hash=ip_hash, source_filename=file.filename, status="pending")
@@ -220,8 +229,8 @@ async def quick_check(
     db.refresh(pa)
 
     # 6. Lancer le pipeline en background
-    logger.info("Quick-check [%d] créé — IP=%s, fichier=%s", pa.id, ip_hash[:12], file.filename)
-    background_tasks.add_task(_run_quick_check_pipeline, pa.id, tmp_path)
+    logger.info("Quick-check [%d] créé — IP=%s, fichier=%s, storage_key=%s", pa.id, ip_hash[:12], file.filename, storage_key)
+    background_tasks.add_task(_run_quick_check_pipeline, pa.id, storage_key)
 
     return {
         "token": pa.token,

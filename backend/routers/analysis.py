@@ -4,7 +4,6 @@ POST /analysis/upload  → lance l'analyse en background
 GET  /analysis/{id}    → récupère les résultats
 """
 
-import tempfile
 import logging
 from pathlib import Path
 
@@ -23,6 +22,7 @@ from backend.utils import safe_json_loads as _safe_json_loads
 from backend.services.extractor import ALLOWED_EXTENSIONS
 from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf, generate_preview
 from backend.services.badge_generator import generate_badge
+from backend.services.storage_service import StorageService
 
 logger = logging.getLogger(__name__)
 
@@ -124,11 +124,8 @@ async def upload_analysis(
             detail=f"Fichier trop volumineux : {size_mb:.1f} MB (max {settings.max_upload_size_mb} MB).",
         )
 
-    # Sauvegarder le fichier en temporaire (après validation de la taille)
-    suffix = f".{file_format}"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, prefix="esg_") as tmp:
-        tmp.write(content)
-        tmp_path = tmp.name
+    # Sauvegarder le fichier (R2 en prod, tempfile local en dev)
+    storage_key = StorageService.upload(content, file.filename)
 
     # 4. Créer ou récupérer l'entreprise
     company = _get_or_create_company(db, current_user, company_name, sector)
@@ -152,10 +149,10 @@ async def upload_analysis(
 
     # 7. Lancer le pipeline en background
     logger.info(
-        "Analyse [%d] créée — user=%d, company=%s, fichier=%s",
-        analysis.id, current_user.id, company_name, file.filename,
+        "Analyse [%d] créée — user=%d, company=%s, fichier=%s, storage_key=%s",
+        analysis.id, current_user.id, company_name, file.filename, storage_key,
     )
-    background_tasks.add_task(_run_pipeline_with_own_session, analysis.id, tmp_path)
+    background_tasks.add_task(_run_pipeline_with_own_session, analysis.id, storage_key)
 
     return AnalysisCreatedResponse(analysis_id=analysis.id, status="processing")
 

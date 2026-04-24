@@ -44,6 +44,9 @@ pytest==8.*
 httpx==0.27.*
 python-dotenv==1.*
 
+# --- Cloudflare R2 / S3-compatible storage ---
+boto3==1.35.*
+
 # --- Load testing (Sprint 6H) ---
 locust==2.31.*
 
