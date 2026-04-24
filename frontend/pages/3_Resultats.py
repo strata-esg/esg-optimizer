@@ -384,8 +384,25 @@ try:
     app_url = os.getenv("APP_URL", "https://esg-optimizer.fr")
     badge_url = f"{app_url}/analysis/badge/{share_token}"
 
-    # Texte pré-rempli pour LinkedIn
-    csrd_text = "CSRD Ready ✓" if csrd else "en cours de conformité CSRD"
+    # Badge CSRD 4 niveaux (basé sur csrd_pct déjà chargé, plus fiable que le booléen LLM)
+    _share_pct = csrd_pct  # déjà en scope depuis l'analyse principale
+    if _share_pct is not None:
+        if _share_pct >= 100:
+            _badge_label, _badge_style = "CSRD Ready ✓", "background:#D4F0D8;color:#1A3D22;"
+            csrd_text = "CSRD Ready ✓"
+        elif _share_pct >= 80:
+            _badge_label, _badge_style = "Conformité Avancée", "background:#DBEAFE;color:#1E40AF;"
+            csrd_text = f"Conformité Avancée ({int(_share_pct)}% CSRD)"
+        elif _share_pct >= 50:
+            _badge_label, _badge_style = "En cours de structuration", "background:#FFF7ED;color:#9A3412;"
+            csrd_text = "en cours de conformité CSRD"
+        else:
+            _badge_label, _badge_style = "Lacunes majeures", "background:#FEE2E2;color:#991B1B;"
+            csrd_text = "avec des lacunes CSRD importantes"
+    else:
+        _badge_label = "CSRD Ready ✓" if csrd else "Non conforme ✗"
+        _badge_style = "background:#D4F0D8;color:#1A3D22;" if csrd else "background:#FEE2E2;color:#DC2626;"
+        csrd_text = "CSRD Ready ✓" if csrd else "en cours de conformité CSRD"
     linkedin_text = (
         f"Je viens d'analyser le rapport ESG {year} de {company} avec ESG Optimizer AI.\n\n"
         f"Score : {int(score)}/100 — {csrd_text}\n\n"
@@ -447,7 +464,7 @@ try:
                     {company}
                 </div>
                 <div style="margin-top: 8px;">
-                    {'<span style="background:#D4F0D8; color:#1A3D22; padding:2px 10px; border-radius:8px; font-size:12px; font-weight:600;">CSRD Ready ✓</span>' if csrd else '<span style="background:#FEE2E2; color:#DC2626; padding:2px 10px; border-radius:8px; font-size:12px; font-weight:600;">Non conforme ✗</span>'}
+                    <span style="{_badge_style}padding:2px 10px;border-radius:8px;font-size:12px;font-weight:600;">{_badge_label}</span>
                 </div>
                 <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">
                     esg-optimizer.fr

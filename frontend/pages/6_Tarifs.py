@@ -188,24 +188,24 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
             )
 
     mt = "margin-top:8px;" if is_recommended else ""
-    st.markdown(
-        f"""<div style="background:{bg};border:{border_w} solid {border_color};border-radius:12px;
-            padding:24px 16px;text-align:center;min-height:390px;position:relative;{mt}">
-            {rec_badge}
-            <div style="font-weight:700;font-size:16px;color:#111827;
-                margin-top:{'4px' if is_recommended else '0'};">{plan['name']}</div>
-            <div style="font-size:32px;font-weight:800;color:{price_color};
-                margin:12px 0 4px 0;">{plan['price']}</div>
-            <div style="font-size:12px;color:#9CA3AF;margin-bottom:6px;">{plan['period']}</div>
-            <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">{plan['description']}</div>
-            {current_badge}
-            <div style="border-top:1px solid #E5E7EB;margin:10px 0 12px;"></div>
-            <div style="text-align:left;font-size:12px;color:#374151;line-height:1.7;">
-                {features_html}
-            </div>
-        </div>""",
-        unsafe_allow_html=True,
+    mt_inner = "4px" if is_recommended else "0"
+    # Générer le HTML en une seule chaîne (sans saut de ligne) pour éviter que
+    # le parser Markdown ne coupe le bloc HTML sur les lignes "vides" générées
+    # par rec_badge / current_badge vides.
+    html = (
+        f'<div style="background:{bg};border:{border_w} solid {border_color};border-radius:12px;'
+        f'padding:24px 16px;text-align:center;min-height:390px;position:relative;{mt}">'
+        f'{rec_badge}'
+        f'<div style="font-weight:700;font-size:16px;color:#111827;margin-top:{mt_inner};">{plan["name"]}</div>'
+        f'<div style="font-size:32px;font-weight:800;color:{price_color};margin:12px 0 4px 0;">{plan["price"]}</div>'
+        f'<div style="font-size:12px;color:#9CA3AF;margin-bottom:6px;">{plan["period"]}</div>'
+        f'<div style="font-size:12px;color:#6B7280;margin-bottom:10px;">{plan["description"]}</div>'
+        f'{current_badge}'
+        f'<div style="border-top:1px solid #E5E7EB;margin:10px 0 12px;"></div>'
+        f'<div style="text-align:left;font-size:12px;color:#374151;line-height:1.7;">{features_html}</div>'
+        f'</div>'
     )
+    st.markdown(html, unsafe_allow_html=True)
 
 
 # Affichage des 4 plans

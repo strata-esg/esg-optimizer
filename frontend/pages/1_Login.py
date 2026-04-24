@@ -30,9 +30,6 @@ if is_logged_in():
     st.stop()
 
 # ── CSS split-panel (injecté seulement pour le formulaire login/register) ─────
-_logo_path = _root / "frontend" / "static" / "brand" / "logo-full.svg"
-_logo_svg = _logo_path.read_text(encoding="utf-8") if _logo_path.exists() else ""
-
 st.markdown(
     f"""
     <style>
@@ -118,18 +115,6 @@ col_left, col_right = st.columns([4, 5], gap="small")
 
 # ── Panneau gauche : brand ───────────────────────────────────────────────────
 with col_left:
-    if _logo_svg:
-        st.markdown(
-            f'<div class="esg-brand-logo">{_logo_svg}</div>',
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            '<div style="font-family:\'DM Serif Display\',serif; font-size:22px; '
-            'color:white; font-weight:400; margin-bottom:32px;">ESG Optimizer AI</div>',
-            unsafe_allow_html=True,
-        )
-
     st.markdown(
         """
         <div style="font-family:'DM Serif Display',Georgia,serif; font-size:2.2rem;
@@ -162,11 +147,6 @@ with col_left:
             unsafe_allow_html=True,
         )
 
-    st.markdown(
-        '<div style="position:absolute; bottom:32px; font-family:\'DM Sans\',sans-serif; '
-        'font-size:11px; color:rgba(255,255,255,0.35);">ESG Optimizer v1.0</div>',
-        unsafe_allow_html=True,
-    )
 
 # ── Panneau droit : formulaire ───────────────────────────────────────────────
 with col_right:

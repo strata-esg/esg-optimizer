@@ -208,28 +208,40 @@ if st.button(
             )
 
     except APIError as e:
-        # Si quota atteint → proposer upgrade
-        if e.status_code == 403 and "Quota" in e.detail:
-            st.warning(e.detail)
-            st.markdown("---")
+        import json as _json
+        # Extraire le message lisible depuis une réponse JSON brute
+        try:
+            _raw = _json.loads(e.detail) if isinstance(e.detail, str) else e.detail
+            _msg = _raw.get("error", str(e.detail)) if isinstance(_raw, dict) else str(e.detail)
+        except Exception:
+            _msg = str(e.detail)
+
+        if e.status_code == 403:
+            # Plan insuffisant → proposer upgrade
             st.markdown(
-                """<div style="background: #FFF7ED; border: 1px solid #FB923C; border-radius: 12px;
-                    padding: 16px; text-align: center;">
-                    <div style="font-weight: 600; color: #9A3412;">
-                        Votre analyse gratuite a été utilisée
-                    </div>
-                    <div style="font-size: 13px; color: #6B7280; margin-top: 4px;">
-                        Passez au plan Essentiel (39€/analyse) ou Pro (129€/mois illimité) pour continuer.
-                    </div>
-                </div>""",
+                '<div style="background:#FFF7ED;border:1.5px solid #FB923C;border-radius:12px;'
+                'padding:20px;text-align:center;margin:8px 0;">'
+                '<div style="font-size:22px;margin-bottom:8px;">🔒</div>'
+                '<div style="font-weight:700;color:#9A3412;font-size:15px;">'
+                'Limite de votre plan atteinte</div>'
+                '<div style="font-size:13px;color:#6B7280;margin-top:6px;">'
+                'Vous avez utilisé votre analyse gratuite. Passez au plan '
+                '<strong>Essentiel (39€/analyse)</strong> ou '
+                '<strong>Pro (129€/mois illimité)</strong> pour continuer.'
+                '</div></div>',
                 unsafe_allow_html=True,
             )
-            if st.button("Voir les tarifs", type="primary", use_container_width=True, key="upload_upgrade"):
+            if st.button("🚀 Voir les tarifs et continuer", type="primary",
+                         use_container_width=True, key="upload_upgrade"):
                 st.switch_page("pages/6_Tarifs.py")
+        elif e.status_code == 429:
+            st.warning("Trop de requêtes — merci de patienter quelques instants avant de réessayer.")
+        elif e.status_code and e.status_code >= 500:
+            st.error("Le service est temporairement indisponible. Merci de réessayer dans quelques minutes.")
         else:
-            st.error(f"Erreur : {e.detail}")
-    except Exception as e:
-        st.error(f"Erreur inattendue : {e}")
+            st.error(f"Une erreur est survenue : {_msg}")
+    except Exception:
+        st.error("Impossible de contacter le serveur. Vérifiez votre connexion réseau et réessayez.")
 
 # Bandeau quota restant (plan discovery)
 _upload_user = get_user()

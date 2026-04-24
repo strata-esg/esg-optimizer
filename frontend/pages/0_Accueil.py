@@ -7,7 +7,6 @@ pricing 4 plans, FAQ, footer.
 
 import streamlit as st
 import sys
-import base64
 from pathlib import Path
 
 # Path setup
@@ -78,7 +77,7 @@ PERSONA_CONTENT = {
 # Contenu par défaut (générique)
 default_content = {
     "titre": "Êtes-vous prêt pour la CSRD ?",
-    "sous_titre": "Obtenez votre score ESG en 3 minutes. Notre IA analyse votre rapport de durabilité et génère un diagnostic complet : scores E/S/G, conformité ESRS, recommandations priorisées.",
+    "sous_titre": "Obtenez votre score ESG en 3 minutes. Notre agent analyse votre rapport de durabilité et génère un diagnostic complet : scores E/S/G, conformité ESRS, recommandations priorisées.",
     "cta": "Analyser mon rapport gratuitement",
     "argument": "Déjà utilisé par des PME, consultants ESG et directeurs RSE pour préparer leur conformité CSRD.",
 }
@@ -86,25 +85,10 @@ default_content = {
 content = PERSONA_CONTENT.get(persona, default_content) if persona else default_content
 
 
-# 1. HERO — Logo via data URI base64 (évite les conflits CSS Streamlit)
-_logo_path = _root / "frontend" / "static" / "brand" / "logo-full.svg"
-if _logo_path.exists():
-    _logo_b64 = base64.b64encode(_logo_path.read_bytes()).decode()
-    _logo_html = (
-        f'<img src="data:image/svg+xml;base64,{_logo_b64}" '
-        f'alt="ESG Optimizer AI" '
-        f'style="width:200px; height:auto; display:block; margin:0 auto 16px auto;" />'
-    )
-else:
-    _logo_html = (
-        '<div style="font-family:\'DM Serif Display\',Georgia,serif; font-size:24px; '
-        'color:#1B3D20; font-weight:400; margin-bottom:16px;">ESG Optimizer AI</div>'
-    )
-
+# 1. HERO — Sans logo (texte uniquement)
 st.markdown(
     f"""<div style="text-align: center; padding: 50px 20px 30px 20px;">
-        {_logo_html}
-        <h1 style="margin-top: 8px; color: #111827; font-size: 2.4rem; line-height: 1.2;">
+        <h1 style="margin-top: 0; color: #111827; font-size: 2.4rem; line-height: 1.2;">
             {content['titre']}
         </h1>
         <p style="font-size: 18px; color: #6B7280; max-width: 700px; margin: 16px auto 0 auto; line-height: 1.6;">
@@ -242,14 +226,30 @@ with qc_col_center:
             else:
                 _sc, _sb = "#DC2626", "#FEE2E2"
 
+            # Badge CSRD 4 niveaux
+            _csrd_pct = qc.get("csrd_coverage_pct")  # présent si le backend le renvoie
+            if _csrd_pct is not None:
+                if _csrd_pct >= 100:
+                    _bl, _bs = "CSRD Ready ✓", "background:#D4F0D8;color:#1B3D20;"
+                elif _csrd_pct >= 80:
+                    _bl, _bs = "Conformité Avancée", "background:#DBEAFE;color:#1E40AF;"
+                elif _csrd_pct >= 50:
+                    _bl, _bs = "En cours de structuration", "background:#FFF7ED;color:#9A3412;"
+                else:
+                    _bl, _bs = "Lacunes majeures", "background:#FEE2E2;color:#991B1B;"
+            else:
+                # Approximation : csrd_ready + score
+                if csrd:
+                    _bl, _bs = "CSRD Ready ✓", "background:#D4F0D8;color:#1B3D20;"
+                elif score >= 60:
+                    _bl, _bs = "En cours de structuration", "background:#FFF7ED;color:#9A3412;"
+                else:
+                    _bl, _bs = "Lacunes majeures", "background:#FEE2E2;color:#991B1B;"
+
             csrd_badge_html = (
-                '<span style="background:#D4F0D8; color:#1B3D20; padding:5px 14px; '
-                'border-radius:20px; font-family:\'DM Sans\',sans-serif; font-size:13px; '
-                'font-weight:600; letter-spacing:0.01em;">CSRD Ready ✓</span>'
-                if csrd else
-                '<span style="background:#FEE2E2; color:#DC2626; padding:5px 14px; '
-                'border-radius:20px; font-family:\'DM Sans\',sans-serif; font-size:13px; '
-                'font-weight:600; letter-spacing:0.01em;">Non conforme ✗</span>'
+                f'<span style="{_bs}padding:5px 14px;border-radius:20px;'
+                f'font-family:\'DM Sans\',sans-serif;font-size:13px;'
+                f'font-weight:600;letter-spacing:0.01em;">{_bl}</span>'
             )
 
             # Score card principal
