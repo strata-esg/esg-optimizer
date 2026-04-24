@@ -14,6 +14,22 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
+# 1. CONFIGURATION DE LA PAGE (TOUJOURS EN PREMIER)
+st.set_page_config(
+    page_title="ESG Optimizer — Analyse IA & Conformité CSRD",
+    page_icon="🎯",
+    layout="wide"
+)
+
+# 2. INSERTION DU SCRIPT UMAMI (JUSTE APRÈS LA CONFIG)
+st.components.v1.html(
+    f"""
+    <script defer src="https://umami-production-c67f.up.railway.app/script.js" 
+    data-website-id="9ff84a61-6d23-48a1-be51-d0aa27f70cdd"></script>
+    """,
+    height=0,
+)
+
 from frontend.components.analytics import (
     track_landing_view,
     track_pricing_viewed,
