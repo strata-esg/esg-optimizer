@@ -15,7 +15,14 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.analytics import track_landing_view, track_pricing_viewed, track_quick_check_started, track_quick_check_completed
+from frontend.components.analytics import (
+    track_landing_view,
+    track_pricing_viewed,
+    track_quick_check_submit,
+    track_quick_check_completed,
+    track_cta_landing_click,
+    track_payment_completed,
+)
 from frontend.utils.session import is_logged_in
 from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError
 from frontend.utils.styles import inject_global_styles
@@ -25,9 +32,18 @@ from frontend.components.seo import seo_for
 seo_for("landing")
 inject_global_styles()
 
-# Query params pour persona
+# Query params
 params = st.query_params
 persona = params.get("persona", None)
+
+# ── Détection paiement complété (redirect Stripe) ─────────────────────────────
+# Stripe Payment Link doit être configuré avec :
+#   success_url = https://<app-url>/?payment_success=1&plan=essential  (ou pro)
+_payment_success = params.get("payment_success", None)
+_payment_plan    = params.get("plan", None)
+if _payment_success == "1" and _payment_plan in ("essential", "pro"):
+    track_payment_completed(_payment_plan)
+    st.toast(f"🎉 Paiement confirmé — bienvenue sur le plan {_payment_plan.title()} !", icon="✅")
 
 track_landing_view(persona)
 
@@ -163,7 +179,7 @@ with qc_col_center:
     )
 
     if uploaded_file is not None and "qc_token" not in st.session_state:
-        track_quick_check_started()
+        track_quick_check_submit(uploaded_file.name)  # Event #2 funnel
         with st.spinner("Analyse en cours... (~30 secondes)"):
             try:
                 file_bytes = uploaded_file.read()
@@ -590,7 +606,9 @@ with pr1:
         </div>""",
         unsafe_allow_html=True,
     )
-    st.page_link("pages/1_Login.py", label="Commencer gratuitement", use_container_width=True)
+    if st.button("Commencer gratuitement", key="cta_discovery", use_container_width=True):
+        track_cta_landing_click("Commencer gratuitement", source="pricing_discovery")
+        st.switch_page("pages/1_Login.py")
 
 # Plan Essentiel
 with pr2:
@@ -611,7 +629,9 @@ with pr2:
         </div>""",
         unsafe_allow_html=True,
     )
-    st.page_link("pages/1_Login.py", label="Acheter une analyse", use_container_width=True)
+    if st.button("Acheter une analyse", key="cta_essential", use_container_width=True):
+        track_cta_landing_click("Acheter une analyse", source="pricing_essential")
+        st.switch_page("pages/1_Login.py")
 
 # Plan Pro (RECOMMANDÉ)
 with pr3:
@@ -635,7 +655,9 @@ with pr3:
         </div>""",
         unsafe_allow_html=True,
     )
-    st.page_link("pages/1_Login.py", label="Démarrer l'essai Pro", use_container_width=True)
+    if st.button("Démarrer l'essai Pro", key="cta_pro", use_container_width=True, type="primary"):
+        track_cta_landing_click("Démarrer l'essai Pro", source="pricing_pro")
+        st.switch_page("pages/1_Login.py")
 
 # Plan Enterprise
 with pr4:
@@ -751,9 +773,13 @@ st.markdown(
 col_l2, col_cta2, col_r2 = st.columns([1, 2, 1])
 with col_cta2:
     if is_logged_in():
-        st.page_link("pages/2_Upload.py", label="Lancer mon analyse gratuite", use_container_width=True)
+        if st.button("Lancer mon analyse gratuite", key="cta_final_logged", use_container_width=True, type="primary"):
+            track_cta_landing_click("Lancer mon analyse gratuite", source="footer_cta")
+            st.switch_page("pages/2_Upload.py")
     else:
-        st.page_link("pages/1_Login.py", label="Créer mon compte gratuitement", use_container_width=True)
+        if st.button("Créer mon compte gratuitement", key="cta_final_register", use_container_width=True, type="primary"):
+            track_cta_landing_click("Créer mon compte gratuitement", source="footer_cta")
+            st.switch_page("pages/1_Login.py")
 
 st.markdown("<br>", unsafe_allow_html=True)
 

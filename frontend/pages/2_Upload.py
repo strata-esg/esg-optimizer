@@ -18,6 +18,7 @@ seo_for("upload")
 
 from frontend.utils.api_client import APIError, upload_analysis, get_analysis
 from frontend.utils.session import get_token, get_user, require_auth, save_last_analysis_id
+from frontend.components.analytics import track_upload_started, track_analysis_completed
 
 if not require_auth():
     st.stop()
@@ -113,6 +114,7 @@ if st.button(
 
         analysis_id = result["analysis_id"]
         save_last_analysis_id(analysis_id)
+        track_upload_started(company_name.strip(), sector)  # Event #3 funnel
 
         st.success(f"Analyse #{analysis_id} lancée !")
 
@@ -181,6 +183,12 @@ if st.button(
                 progress_bar.progress(100, text="Analyse terminée !")
                 _render_steps(4)
                 status_container.success("Analyse terminée avec succès !")
+                # Event #4 funnel — score récupéré depuis la réponse API
+                _user_plan = get_user().get("plan") if get_user() else None
+                track_analysis_completed(
+                    score=analysis.get("score_global"),
+                    plan=_user_plan,
+                )
                 time.sleep(1.5)
                 # FIX #4 : redirection directe vers Résultats sans rerun intermédiaire
                 st.switch_page("pages/3_Resultats.py")

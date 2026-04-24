@@ -11,7 +11,7 @@ _root = Path(__file__).resolve().parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from frontend.components.analytics import track_event
+from frontend.components.analytics import track_event, track_pricing_plan_click, track_payment_completed
 from frontend.utils.session import get_token, get_user, is_logged_in
 from frontend.utils.api_client import APIError, get_upgrade_url
 from frontend.utils.styles import inject_global_styles
@@ -20,6 +20,17 @@ from frontend.utils.styles import inject_global_styles
 from frontend.components.seo import seo_for
 seo_for("pricing")
 inject_global_styles()
+
+# ── Détection paiement complété (redirect Stripe depuis 6_Tarifs) ─────────────
+_qp = st.query_params
+_ps = _qp.get("payment_success", None)
+_pp = _qp.get("plan", None)
+if _ps == "1" and _pp in ("essential", "pro"):
+    track_payment_completed(_pp)  # Event #6 funnel
+    st.toast(f"🎉 Paiement confirmé — bienvenue sur le plan {_pp.title()} !", icon="✅")
+
+# ── Tracking vue page ─────────────────────────────────────────────────────────
+track_event("pricing_viewed")
 
 # Header
 st.markdown(
@@ -238,6 +249,7 @@ for i, plan in enumerate(PLANS):
                     use_container_width=True,
                     type="primary",
                 ):
+                    track_pricing_plan_click("discovery", source="pricing_page")  # Event #5 funnel
                     st.switch_page("pages/1_Login.py")
 
         elif action in ("stripe_essential", "stripe_pro"):
@@ -250,6 +262,7 @@ for i, plan in enumerate(PLANS):
                 use_container_width=True,
                 type=btn_type,
             ):
+                track_pricing_plan_click(stripe_plan, source="pricing_page")  # Event #5 funnel
                 if not is_logged_in():
                     st.warning("Connectez-vous d'abord pour souscrire.")
                     st.switch_page("pages/1_Login.py")
@@ -258,7 +271,6 @@ for i, plan in enumerate(PLANS):
                         result = get_upgrade_url(token, stripe_plan)
                         url = result.get("url", "")
                         if url:
-                            track_event("click_upgrade", {"plan": stripe_plan})
                             st.markdown(
                                 f'<meta http-equiv="refresh" content="0;url={url}">',
                                 unsafe_allow_html=True,
@@ -273,7 +285,7 @@ for i, plan in enumerate(PLANS):
                 key=f"btn_{plan['slug']}",
                 use_container_width=True,
             ):
-                track_event("click_enterprise_contact", {})
+                track_pricing_plan_click("enterprise", source="pricing_page")  # Event #5 funnel
                 st.markdown(
                     """<div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px;
                         padding: 16px; margin-top: 8px; text-align: center;">
@@ -454,11 +466,11 @@ with col_cta2:
                 type="primary",
                 key="cta_final_upgrade",
             ):
+                track_pricing_plan_click("pro", source="pricing_footer_cta")  # Event #5 funnel
                 try:
                     result = get_upgrade_url(token, "pro")
                     url = result.get("url", "")
                     if url:
-                        track_event("click_upgrade", {"plan": "pro", "source": "pricing_cta"})
                         st.markdown(
                             f'<meta http-equiv="refresh" content="0;url={url}">',
                             unsafe_allow_html=True,
