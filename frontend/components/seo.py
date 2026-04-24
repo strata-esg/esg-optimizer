@@ -1,27 +1,18 @@
 """
-frontend/components/seo.py — Injection des meta tags SEO/OpenGraph (Sprint 6H).
+frontend/components/seo.py - Injection meta tags SEO/OpenGraph.
 
-Streamlit ne supporte pas nativement les meta tags dans <head> : on utilise
-`st.markdown(..., unsafe_allow_html=True)` avec un petit hack JS pour injecter
-dynamiquement dans le document HEAD au load de la page.
-
-Usage (à appeler en tout début de chaque page, juste après st.set_page_config) :
-
-    from frontend.components.seo import inject_seo
-
-    inject_seo(
-        page_title="Analyse CSRD automatique en 3 minutes — ESG Optimizer",
-        description="Conformité CSRD/ESRS évaluée par IA. Rapport audit-ready en 3 min.",
-        path="/",  # slug de la page pour l'URL canonique
-    )
+Utilise components.html + window.parent (meme technique qu'Umami) pour
+injecter les balises dans le head reel de la page. Les crawlers JS-capable
+(Google, Slack, Discord, Telegram) les voient. WhatsApp/LinkedIn lisent
+le HTML brut de Streamlit (limitation sans reverse-proxy).
 """
 
 from __future__ import annotations
-
-import streamlit as st
+import streamlit.components.v1 as components
 
 APP_URL = "https://esg-optimizer.fr"
-DEFAULT_OG_IMAGE = f"{APP_URL}/static/og-image.png"  # badge générique 1200x630
+APP_NAME = "ESG Optimizer"
+DEFAULT_OG_IMAGE = f"{APP_URL}/static/og-image.png"
 
 
 def inject_seo(
@@ -32,139 +23,116 @@ def inject_seo(
     twitter_card: str = "summary_large_image",
     robots: str = "index,follow",
 ) -> None:
-    """Injecte meta title, description, OpenGraph, Twitter Card, canonical."""
+    """Injecte title, description, OG, Twitter Card, canonical via window.parent."""
     canonical = f"{APP_URL.rstrip('/')}{path}"
     image = og_image or DEFAULT_OG_IMAGE
 
-    # Caractères spéciaux à échapper pour éviter la casse des attributs HTML
-    def _esc(s: str) -> str:
-        return (
-            s.replace("&", "&amp;")
-            .replace('"', "&quot;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-        )
+    def esc(s: str) -> str:
+        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", "")
 
-    title_esc = _esc(page_title)
-    desc_esc = _esc(description)
+    t = esc(page_title)
+    d = esc(description)
+    img = esc(image)
+    can = esc(canonical)
+    an = esc(APP_NAME)
 
-    html = f"""
-    <script>
-    (function() {{
-      const head = document.head;
-      if (!head) return;
+    schema = (
+        '{"@context":"https://schema.org","@type":"SoftwareApplication",'
+        f'"name":"{an}","applicationCategory":"BusinessApplication",'
+        '"operatingSystem":"Web",'
+        f'"description":"{d}","url":"{APP_URL}",'
+        '"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR",'
+        '"description":"Plan Decouverte gratuit, puis 39 euros/analyse ou 129 euros/mois"}'
+        "}"
+    )
 
-      // Nettoie les anciennes balises injectées (évite doublons lors des reruns)
-      document.querySelectorAll('meta[data-esg-seo], link[data-esg-seo]').forEach(el => el.remove());
-
-      function add(tag, attrs) {{
-        const el = document.createElement(tag);
-        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-        el.setAttribute('data-esg-seo', '1');
+    components.html(
+        f"""<script>
+(function(){{
+    var p=window.parent;
+    if(!p||!p.document)return;
+    var head=p.document.head;
+    if(!head)return;
+    p.document.querySelectorAll('[data-esg-seo]').forEach(function(el){{el.remove();}});
+    function meta(attrs){{
+        var el=p.document.createElement('meta');
+        Object.keys(attrs).forEach(function(k){{el.setAttribute(k,attrs[k]);}});
+        el.setAttribute('data-esg-seo','1');
         head.appendChild(el);
-      }}
-
-      // Title
-      document.title = "{title_esc}";
-
-      // Meta classiques
-      add('meta', {{ name: 'description', content: "{desc_esc}" }});
-      add('meta', {{ name: 'robots',      content: "{robots}" }});
-      add('meta', {{ name: 'viewport',    content: 'width=device-width, initial-scale=1' }});
-
-      // Canonical
-      add('link', {{ rel: 'canonical', href: "{canonical}" }});
-
-      // OpenGraph
-      add('meta', {{ property: 'og:title',       content: "{title_esc}" }});
-      add('meta', {{ property: 'og:description', content: "{desc_esc}" }});
-      add('meta', {{ property: 'og:url',         content: "{canonical}" }});
-      add('meta', {{ property: 'og:image',       content: "{image}" }});
-      add('meta', {{ property: 'og:type',        content: 'website' }});
-      add('meta', {{ property: 'og:site_name',   content: 'ESG Optimizer' }});
-      add('meta', {{ property: 'og:locale',      content: 'fr_FR' }});
-
-      // Twitter
-      add('meta', {{ name: 'twitter:card',        content: "{twitter_card}" }});
-      add('meta', {{ name: 'twitter:title',       content: "{title_esc}" }});
-      add('meta', {{ name: 'twitter:description', content: "{desc_esc}" }});
-      add('meta', {{ name: 'twitter:image',       content: "{image}" }});
-
-      // Schema.org SoftwareApplication (rich snippet Google)
-      const ld = document.createElement('script');
-      ld.setAttribute('type', 'application/ld+json');
-      ld.setAttribute('data-esg-seo', '1');
-      ld.textContent = JSON.stringify({{
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "ESG Optimizer",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web",
-        "description": "{desc_esc}",
-        "url": "{APP_URL}",
-        "offers": {{
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "EUR",
-          "description": "Plan Découverte gratuit, puis 39 €/analyse ou 129 €/mois"
-        }}
-      }});
-      head.appendChild(ld);
-    }})();
-    </script>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    }}
+    function link(attrs){{
+        var el=p.document.createElement('link');
+        Object.keys(attrs).forEach(function(k){{el.setAttribute(k,attrs[k]);}});
+        el.setAttribute('data-esg-seo','1');
+        head.appendChild(el);
+    }}
+    p.document.title='{t}';
+    meta({{name:'description',content:'{d}'}});
+    meta({{name:'robots',content:'{robots}'}});
+    link({{rel:'canonical',href:'{can}'}});
+    meta({{property:'og:title',content:'{t}'}});
+    meta({{property:'og:description',content:'{d}'}});
+    meta({{property:'og:url',content:'{can}'}});
+    meta({{property:'og:image',content:'{img}'}});
+    meta({{property:'og:type',content:'website'}});
+    meta({{property:'og:site_name',content:'{an}'}});
+    meta({{property:'og:locale',content:'fr_FR'}});
+    meta({{name:'twitter:card',content:'{twitter_card}'}});
+    meta({{name:'twitter:title',content:'{t}'}});
+    meta({{name:'twitter:description',content:'{d}'}});
+    meta({{name:'twitter:image',content:'{img}'}});
+    var ld=p.document.createElement('script');
+    ld.type='application/ld+json';
+    ld.setAttribute('data-esg-seo','1');
+    ld.textContent='{schema}';
+    head.appendChild(ld);
+}})();
+</script>""",
+        height=0,
+    )
 
 
-# --- Presets par page -------------------------------------------------
-SEO_PRESETS = {
+SEO_PRESETS: dict[str, dict] = {
     "landing": {
-        "page_title": "ESG Optimizer — Analyse CSRD automatique en 3 minutes",
-        "description": "Analyse de conformité CSRD/ESRS par IA. Score ESG, rapport audit-ready, delta annuel. De 0€ à 129€/mois. Démarrez gratuitement.",
+        "page_title": "ESG Optimizer - Analyse CSRD automatique en 3 minutes",
+        "description": "Analyse de conformite CSRD/ESRS par IA. Score ESG, rapport audit-ready, delta annuel. De 0 a 129 euros/mois. Demarrez gratuitement.",
         "path": "/",
     },
-    "quick_check": {
-        "page_title": "Quick-check ESG gratuit — Score CSRD en 60 secondes",
-        "description": "Testez gratuitement la conformité CSRD de votre rapport. Score instantané sur les 12 ESRS. Aucune inscription requise.",
-        "path": "/quick-check",
-    },
-    # --- AJOUTS POUR LES PAGES D'APPLICATION ---
     "upload": {
-        "page_title": "Nouvelle Analyse — ESG Optimizer",
-        "description": "Uploadez votre rapport de durabilité pour lancer une analyse complète assistée par IA.",
+        "page_title": "Nouvelle Analyse - ESG Optimizer",
+        "description": "Uploadez votre rapport de durabilite pour lancer une analyse complete assistee par IA.",
         "path": "/upload",
     },
     "results": {
-        "page_title": "Résultats de l'analyse — ESG Optimizer",
-        "description": "Détails de votre score ESG, couverture ESRS et recommandations stratégiques.",
+        "page_title": "Resultats de l'analyse - ESG Optimizer",
+        "description": "Details de votre score ESG, couverture ESRS et recommandations strategiques.",
         "path": "/resultats",
     },
     "dashboard": {
-        "page_title": "Tableau de Bord — ESG Optimizer",
-        "description": "Suivez l'évolution de vos scores ESG et gérez vos rapports d'analyse.",
+        "page_title": "Tableau de Bord - ESG Optimizer",
+        "description": "Suivez l'evolution de vos scores ESG et gerez vos rapports d'analyse.",
         "path": "/dashboard",
     },
-    # --------------------------------------------
     "pricing": {
-        "page_title": "Tarifs ESG Optimizer — de 0€ à 129€/mois",
-        "description": "4 plans pour tous les profils : PME one-shot à 39€, consultants à 129€/mois, Enterprise sur devis. Sans engagement.",
+        "page_title": "Tarifs ESG Optimizer - de 0 a 129 euros/mois",
+        "description": "4 plans pour tous les profils : PME one-shot a 39 euros, consultants a 129 euros/mois, Enterprise sur devis. Sans engagement.",
         "path": "/pricing",
     },
-    "methodologie": {
-        "page_title": "Méthodologie ESG Optimizer — GHG Protocol, SBTi, EFRAG, TCFD",
-        "description": "Notre scoring ESG s'appuie sur les standards GHG Protocol, SBTi, EFRAG ESRS et TCFD. Transparence totale sur la méthode.",
-        "path": "/methodologie",
+    "login": {
+        "page_title": "Connexion - ESG Optimizer",
+        "description": "Connectez-vous ou creez votre compte gratuit pour analyser vos rapports de durabilite.",
+        "path": "/login",
+        "robots": "noindex,nofollow",
     },
-    "rgpd": {
-        "page_title": "RGPD & DPA — ESG Optimizer",
-        "description": "Hébergement UE, sous-traitants DPA-signés, droit à l'effacement, export des données. 100% conforme RGPD.",
-        "path": "/rgpd",
-        "robots": "index,follow",
+    "methodologie": {
+        "page_title": "Methodologie ESG Optimizer - GHG Protocol, SBTi, EFRAG, TCFD",
+        "description": "Notre scoring s'appuie sur les standards GHG Protocol, SBTi, EFRAG ESRS et TCFD. Transparence totale.",
+        "path": "/methodologie",
     },
 }
 
 
 def seo_for(page_key: str, **overrides) -> None:
     """Raccourci : inject_seo(**SEO_PRESETS[page_key], **overrides)."""
-    cfg = {**SEO_PRESETS[page_key], **overrides}
+    cfg = {**SEO_PRESETS.get(page_key, SEO_PRESETS["landing"]), **overrides}
     inject_seo(**cfg)

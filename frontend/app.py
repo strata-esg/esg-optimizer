@@ -7,17 +7,20 @@ import sys
 from pathlib import Path
 
 import streamlit as st
+from PIL import Image
 
 # Config page (doit etre le premier appel Streamlit)
+_root = Path(__file__).resolve().parent.parent
+_favicon = Image.open(_root / "frontend" / "static" / "brand" / "favicon.png")
+
 st.set_page_config(
-   page_title="ESG Optimizer — Analyse IA & Conformité CSRD",
-    page_icon="leaf",
+    page_title="ESG Optimizer — Analyse IA & Conformité CSRD",
+    page_icon=_favicon,
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # Path setup
-_root = Path(__file__).resolve().parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
