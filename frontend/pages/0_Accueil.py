@@ -127,7 +127,7 @@ st.markdown(
                 box-shadow:0 4px 14px rgba(27,61,32,0.3);"
                 onmouseover="this.style.background='#2A5C34'"
                 onmouseout="this.style.background='#1B3D20'">
-                &#9654;&nbsp; Analyser gratuitement — 3 min
+                &#9654;&nbsp; Analyser gratuitement &#8212; 3 min
             </a>
             <a href="?persona=consultant" style="display:inline-block; background:transparent;
                 color:#1B3D20; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
@@ -137,7 +137,7 @@ st.markdown(
             </a>
         </div>
         <div style="font-size:12px; color:#9CA3AF; margin-top:8px;">
-            Aucun compte requis &nbsp;·&nbsp; PDF, DOCX ou XLSX &nbsp;·&nbsp; Résultat en ~3 minutes
+            Aucun compte requis &nbsp;&#183;&nbsp; PDF, DOCX ou XLSX &nbsp;&#183;&nbsp; Résultat en ~3 minutes
         </div>
     </div>""",
     unsafe_allow_html=True,
@@ -180,24 +180,33 @@ st.markdown(
 # Ancre HTML pour le scroll depuis le CTA hero
 st.markdown('<div id="quick-check" style="height:0;margin:0;padding:0;"></div>', unsafe_allow_html=True)
 
-# JS : traduit le texte anglais hardcodé de Streamlit dans les zones d'upload
+# JS : traduit les textes anglais de Streamlit — flag anti-boucle infinie
 st.components.v1.html(
     """<script>
+    var _busy = false;
     function _translateUploader() {
+        if (_busy) return;
+        _busy = true;
         try {
             var doc = window.parent ? window.parent.document : document;
             var zones = doc.querySelectorAll('[data-testid="stFileUploaderDropzone"]');
             zones.forEach(function(zone) {
                 zone.querySelectorAll('span, p, small, div').forEach(function(el) {
                     if (el.childElementCount === 0) {
-                        el.textContent = el.textContent
-                            .replace('Drag and drop file here', 'Glissez-déposez votre fichier ici')
-                            .replace('Limit 200MB per file', 'Taille max : 200 Mo — PDF, DOCX, XLSX')
-                            .replace('Browse files', 'Parcourir');
+                        var t = el.textContent;
+                        if (t.indexOf('Drag and drop') >= 0 ||
+                            t.indexOf('Limit 200MB') >= 0 ||
+                            t.indexOf('Browse files') >= 0) {
+                            el.textContent = t
+                                .replace('Drag and drop file here', 'Glissez-deposez votre fichier ici')
+                                .replace('Limit 200MB per file', 'Taille max : 200 Mo')
+                                .replace('Browse files', 'Parcourir');
+                        }
                     }
                 });
             });
         } catch(e) {}
+        _busy = false;
     }
     _translateUploader();
     var _obs = new MutationObserver(_translateUploader);
