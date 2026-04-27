@@ -279,16 +279,11 @@ def inject_global_styles() -> None:
           border-bottom-color: #1A3D22 !important;
         }
 
-        /* File uploader */
+        /* File uploader — pas de bordure externe (double-encadrement supprimé)
+           le dropzone interne porte sa propre bordure verte */
         [data-testid="stFileUploader"] {
-          border: 2px dashed #E5E0D8 !important;
-          border-radius: 12px !important;
-          background: white !important;
-          transition: border-color 0.15s ease !important;
-        }
-
-        [data-testid="stFileUploader"]:hover {
-          border-color: #1A3D22 !important;
+          border: none !important;
+          background: transparent !important;
         }
 
         [data-testid="stFileUploader"] * {

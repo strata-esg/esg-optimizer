@@ -22,8 +22,8 @@ from frontend.components.analytics import (
     track_cta_landing_click,
     track_payment_completed,
 )
-from frontend.utils.session import is_logged_in
-from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError
+from frontend.utils.session import is_logged_in, get_token, save_user
+from frontend.utils.api_client import quick_check_upload, quick_check_result, APIError, get_me
 from frontend.utils.styles import inject_global_styles
 
 # Juste après st.set_page_config(...)
@@ -43,6 +43,14 @@ _payment_plan    = params.get("plan", None)
 if _payment_success == "1" and _payment_plan in ("essential", "pro"):
     track_payment_completed(_payment_plan)
     st.toast(f"🎉 Paiement confirmé — bienvenue sur le plan {_payment_plan.title()} !", icon="✅")
+    # Rafraîchir les données utilisateur pour mettre à jour la sidebar
+    _tok = get_token()
+    if _tok:
+        try:
+            _fresh_user = get_me(_tok)
+            save_user(_fresh_user)
+        except Exception:
+            pass
 
 track_landing_view(persona)
 
@@ -85,15 +93,52 @@ default_content = {
 content = PERSONA_CONTENT.get(persona, default_content) if persona else default_content
 
 
-# 1. HERO — Sans logo (texte uniquement)
+# 1. HERO — Logo + CTA proéminent above the fold
 st.markdown(
-    f"""<div style="text-align: center; padding: 50px 20px 30px 20px;">
-        <h1 style="margin-top: 0; color: #111827; font-size: 2.4rem; line-height: 1.2;">
+    f"""<div style="text-align: center; padding: 40px 20px 10px 20px;">
+        <div style="margin-bottom: 18px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"
+                 fill="none" width="64" height="64" style="display:inline-block;">
+                <circle cx="28" cy="28" r="27" fill="#1B3D20" stroke="none"/>
+                <path d="M 10,34 A 18,18 0 1,1 46,34"
+                    stroke="rgba(212,240,216,0.25)" stroke-width="4"
+                    stroke-linecap="round" fill="none"/>
+                <path d="M 10,34 A 18,18 0 0,1 38,12"
+                    stroke="#7FC686" stroke-width="4"
+                    stroke-linecap="round" fill="none"/>
+                <circle cx="28" cy="31" r="3" fill="#D4F0D8"/>
+                <line x1="28" y1="31" x2="40" y2="16"
+                    stroke="#D4F0D8" stroke-width="2.2" stroke-linecap="round"/>
+                <circle cx="40" cy="16" r="2.5" fill="#7FC686"/>
+            </svg>
+        </div>
+        <h1 style="margin-top:0; color:#1B3D20; font-size:2.6rem; line-height:1.15;
+            font-family:'DM Serif Display',Georgia,serif; font-weight:400;">
             {content['titre']}
         </h1>
-        <p style="font-size: 18px; color: #6B7280; max-width: 700px; margin: 16px auto 0 auto; line-height: 1.6;">
+        <p style="font-size:17px; color:#6B7280; max-width:620px; margin:14px auto 28px auto;
+            line-height:1.65;">
             {content['sous_titre']}
         </p>
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+            <a href="#quick-check" style="display:inline-block; background:#1B3D20; color:#D4F0D8;
+                font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600;
+                padding:14px 32px; border-radius:10px; text-decoration:none;
+                box-shadow:0 4px 14px rgba(27,61,32,0.3);"
+                onmouseover="this.style.background='#2A5C34'"
+                onmouseout="this.style.background='#1B3D20'">
+                &#9654;&nbsp; Analyser gratuitement — 3 min
+            </a>
+            <a href="?persona=consultant" style="display:inline-block; background:transparent;
+                color:#1B3D20; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
+                padding:14px 24px; border-radius:10px; text-decoration:none;
+                border:1.5px solid #1B3D20;">
+                Je suis consultant &#8594;
+            </a>
+        </div>
+        <div style="font-size:12px; color:#9CA3AF; margin-top:8px;">
+            Aucun compte requis &nbsp;·&nbsp; PDF, DOCX ou XLSX &nbsp;·&nbsp; Résultat en ~3 minutes
+        </div>
     </div>""",
     unsafe_allow_html=True,
 )
@@ -132,18 +177,50 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Ancre HTML pour le scroll depuis le CTA hero
+st.markdown('<div id="quick-check" style="height:0;margin:0;padding:0;"></div>', unsafe_allow_html=True)
+
+# JS : traduit le texte anglais hardcodé de Streamlit dans les zones d'upload
+st.components.v1.html(
+    """<script>
+    function _translateUploader() {
+        try {
+            var doc = window.parent ? window.parent.document : document;
+            var zones = doc.querySelectorAll('[data-testid="stFileUploaderDropzone"]');
+            zones.forEach(function(zone) {
+                zone.querySelectorAll('span, p, small, div').forEach(function(el) {
+                    if (el.childElementCount === 0) {
+                        el.textContent = el.textContent
+                            .replace('Drag and drop file here', 'Glissez-déposez votre fichier ici')
+                            .replace('Limit 200MB per file', 'Taille max : 200 Mo — PDF, DOCX, XLSX')
+                            .replace('Browse files', 'Parcourir');
+                    }
+                });
+            });
+        } catch(e) {}
+    }
+    _translateUploader();
+    var _obs = new MutationObserver(_translateUploader);
+    try {
+        _obs.observe(window.parent ? window.parent.document.body : document.body,
+            { childList: true, subtree: true });
+    } catch(e) {}
+    </script>""",
+    height=0,
+)
+
 # Header de la section
 _, _qh, _ = st.columns([1, 4, 1])
 with _qh:
     st.markdown(
         """
         <div style="background:#F7F2E8; border:1.5px solid #1B3D20; border-radius:18px;
-            padding:32px 36px 20px; margin:4px 0 0 0; text-align:center;">
-            <div style="font-family:'DM Serif Display',Georgia,serif; font-size:1.7rem;
+            padding:28px 36px 16px; margin:4px 0 0 0; text-align:center;">
+            <div style="font-family:'DM Serif Display',Georgia,serif; font-size:1.6rem;
                 color:#1B3D20; letter-spacing:-0.02em; margin-bottom:6px;">
                 Analysez votre rapport ESG — gratuit
             </div>
-            <div style="font-family:'DM Sans',sans-serif; font-size:13.5px; color:#6B7280;">
+            <div style="font-family:'DM Sans',sans-serif; font-size:13px; color:#6B7280;">
                 Aucun compte requis &nbsp;·&nbsp; PDF, DOCX ou XLSX &nbsp;·&nbsp; Résultat en ~3 minutes
             </div>
         </div>

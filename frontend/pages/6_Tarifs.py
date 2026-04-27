@@ -12,8 +12,8 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from frontend.components.analytics import track_event, track_pricing_plan_click, track_payment_completed
-from frontend.utils.session import get_token, get_user, is_logged_in
-from frontend.utils.api_client import APIError, get_upgrade_url
+from frontend.utils.session import get_token, get_user, is_logged_in, save_user
+from frontend.utils.api_client import APIError, get_upgrade_url, get_me
 from frontend.utils.styles import inject_global_styles
 
 # Juste après st.set_page_config(...)
@@ -28,6 +28,14 @@ _pp = _qp.get("plan", None)
 if _ps == "1" and _pp in ("essential", "pro"):
     track_payment_completed(_pp)  # Event #6 funnel
     st.toast(f"🎉 Paiement confirmé — bienvenue sur le plan {_pp.title()} !", icon="✅")
+    # Rafraîchir les données user immédiatement pour mettre à jour la sidebar
+    _tok = get_token()
+    if _tok:
+        try:
+            _fresh = get_me(_tok)
+            save_user(_fresh)
+        except Exception:
+            pass
 
 # ── Tracking vue page ─────────────────────────────────────────────────────────
 track_event("pricing_viewed")
@@ -271,11 +279,31 @@ for i, plan in enumerate(PLANS):
                         result = get_upgrade_url(token, stripe_plan)
                         url = result.get("url", "")
                         if url:
-                            st.markdown(
-                                f'<meta http-equiv="refresh" content="0;url={url}">',
-                                unsafe_allow_html=True,
+                            # Ouvre Stripe dans un NOUVEL ONGLET — préserve la session Streamlit
+                            _safe_url = url.replace("'", "\\'")
+                            st.components.v1.html(
+                                f"<script>window.open('{_safe_url}', '_blank', 'noopener,noreferrer');</script>",
+                                height=0,
                             )
-                            st.info(f"Redirection vers Stripe... [Cliquez ici si rien ne se passe]({url})")
+                            st.success(
+                                "✅ Stripe s'est ouvert dans un nouvel onglet. "
+                                "Une fois le paiement effectué, revenez ici et cliquez sur "
+                                "**Actualiser mon plan** ci-dessous."
+                            )
+                            st.markdown(
+                                f"_Si l'onglet ne s'est pas ouvert : "
+                                f"[cliquez ici pour accéder au paiement]({url})_"
+                            )
+                            if st.button("🔄 Actualiser mon plan", key=f"refresh_plan_{plan['slug']}",
+                                         use_container_width=True):
+                                _tok2 = get_token()
+                                if _tok2:
+                                    try:
+                                        _fresh2 = get_me(_tok2)
+                                        save_user(_fresh2)
+                                        st.rerun()
+                                    except Exception:
+                                        st.error("Impossible de rafraîchir, réessayez.")
                     except APIError as e:
                         st.error(f"Erreur : {e.detail}")
 
@@ -471,11 +499,29 @@ with col_cta2:
                     result = get_upgrade_url(token, "pro")
                     url = result.get("url", "")
                     if url:
-                        st.markdown(
-                            f'<meta http-equiv="refresh" content="0;url={url}">',
-                            unsafe_allow_html=True,
+                        _safe_url2 = url.replace("'", "\\'")
+                        st.components.v1.html(
+                            f"<script>window.open('{_safe_url2}', '_blank', 'noopener,noreferrer');</script>",
+                            height=0,
                         )
-                        st.info(f"Redirection vers Stripe... [Cliquez ici]({url})")
+                        st.success(
+                            "✅ Stripe s'est ouvert dans un nouvel onglet. "
+                            "Une fois le paiement effectué, cliquez sur **Actualiser mon plan**."
+                        )
+                        st.markdown(
+                            f"_Si l'onglet ne s'est pas ouvert : "
+                            f"[cliquez ici pour accéder au paiement]({url})_"
+                        )
+                        if st.button("🔄 Actualiser mon plan", key="refresh_plan_footer",
+                                     use_container_width=True):
+                            _tok3 = get_token()
+                            if _tok3:
+                                try:
+                                    _fresh3 = get_me(_tok3)
+                                    save_user(_fresh3)
+                                    st.rerun()
+                                except Exception:
+                                    st.error("Impossible de rafraîchir, réessayez.")
                 except APIError as e:
                     st.error(f"Erreur : {e.detail}")
         else:
