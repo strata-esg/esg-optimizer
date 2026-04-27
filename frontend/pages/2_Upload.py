@@ -23,6 +23,73 @@ from frontend.components.analytics import track_upload_started, track_analysis_c
 if not require_auth():
     st.stop()
 
+# CSS du dropzone + JS de traduction des textes Streamlit anglais
+st.markdown(
+    """
+    <style>
+    [data-testid="stFileUploaderDropzone"] {
+        background: #FFFFFF !important;
+        border: 2px dashed #4DB862 !important;
+        border-radius: 14px !important;
+        padding: 28px 20px !important;
+        transition: border-color 0.2s ease, background 0.2s ease !important;
+    }
+    [data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #1B3D20 !important;
+        background: #F0FAF0 !important;
+    }
+    [data-testid="stFileUploaderDropzone"] p,
+    [data-testid="stFileUploaderDropzone"] span,
+    [data-testid="stFileUploaderDropzone"] small {
+        font-family: 'DM Sans', sans-serif !important;
+        color: #6B7280 !important;
+    }
+    /* Masquer "Press Enter to submit form" */
+    [data-testid="InputInstructions"] { display: none !important; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.components.v1.html(
+    """<script>
+    var _busy = false;
+    function _translateUploader() {
+        if (_busy) return;
+        _busy = true;
+        try {
+            var doc = window.parent ? window.parent.document : document;
+            var zones = doc.querySelectorAll('[data-testid="stFileUploaderDropzone"]');
+            zones.forEach(function(zone) {
+                zone.querySelectorAll('span, p, small, div, button').forEach(function(el) {
+                    if (el.childElementCount === 0) {
+                        var t = el.textContent;
+                        if (t.indexOf('Drag and drop') >= 0 ||
+                            t.indexOf('Limit') >= 0 ||
+                            t.indexOf('Browse files') >= 0) {
+                            el.textContent = t
+                                .replace('Drag and drop file here', 'Glissez-déposez votre fichier ici')
+                                .replace('Drag and drop files here', 'Glissez-déposez vos fichiers ici')
+                                .replace(/Limit \\d+MB per file/, 'Taille max : 20 Mo')
+                                .replace('Limit 200MB per file', 'Taille max : 20 Mo')
+                                .replace('Browse files', 'Parcourir');
+                        }
+                    }
+                });
+            });
+        } catch(e) {}
+        _busy = false;
+    }
+    _translateUploader();
+    var _obs = new MutationObserver(_translateUploader);
+    try {
+        _obs.observe(window.parent ? window.parent.document.body : document.body,
+            { childList: true, subtree: true });
+    } catch(e) {}
+    </script>""",
+    height=0,
+)
+
 # Header
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">

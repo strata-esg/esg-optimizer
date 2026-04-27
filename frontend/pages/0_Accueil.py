@@ -92,6 +92,25 @@ default_content = {
 
 content = PERSONA_CONTENT.get(persona, default_content) if persona else default_content
 
+# Bouton secondaire du HERO :
+#   - quand AUCUN persona : "Je suis consultant →" (lien vers ?persona=consultant)
+#   - quand un persona est déjà actif : "← Retour à la version générale"
+#   Ça évite la boucle "je clique sur Je suis consultant → ça ouvre la même page".
+if persona:
+    _hero_secondary_cta = (
+        '<a href="?" style="display:inline-block;background:transparent;'
+        'color:#1B3D20;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:500;'
+        'padding:14px 24px;border-radius:10px;text-decoration:none;'
+        'border:1.5px solid #1B3D20;">&#8592; Retour à la version générale</a>'
+    )
+else:
+    _hero_secondary_cta = (
+        '<a href="?persona=consultant" style="display:inline-block;background:transparent;'
+        'color:#1B3D20;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:500;'
+        'padding:14px 24px;border-radius:10px;text-decoration:none;'
+        'border:1.5px solid #1B3D20;">Je suis consultant &#8594;</a>'
+    )
+
 
 # 1. HERO — Logo + CTA proéminent above the fold
 st.markdown(
@@ -129,12 +148,7 @@ st.markdown(
                 onmouseout="this.style.background='#1B3D20'">
                 &#9654;&nbsp; Analyser gratuitement &#8212; 3 min
             </a>
-            <a href="?persona=consultant" style="display:inline-block; background:transparent;
-                color:#1B3D20; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
-                padding:14px 24px; border-radius:10px; text-decoration:none;
-                border:1.5px solid #1B3D20;">
-                Je suis consultant &#8594;
-            </a>
+            {_hero_secondary_cta}
         </div>
         <div style="font-size:12px; color:#9CA3AF; margin-top:8px;">
             Aucun compte requis &nbsp;&#183;&nbsp; PDF, DOCX ou XLSX &nbsp;&#183;&nbsp; Résultat en ~3 minutes

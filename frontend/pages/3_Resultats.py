@@ -454,26 +454,81 @@ try:
 
     with col_preview:
         st.markdown("**Aperçu du badge :**")
+        # Couleur d'accent selon le score
+        _score_color = "#1A3D22" if score >= 60 else "#D97706" if score >= 40 else "#DC2626"
+        _accent_bg = "#D4F0D8" if score >= 60 else "#FEF3C7" if score >= 40 else "#FEE2E2"
         st.markdown(
-            f"""<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
-                padding: 20px; text-align: center;">
-                <div style="font-size: 48px; font-weight: 800; color: {'#1A3D22' if score >= 60 else '#F59E0B' if score >= 40 else '#EF4444'};">
-                    {int(score)}<span style="font-size: 18px; color: #9CA3AF;">/100</span>
+            f"""<div style="position:relative;
+                background: linear-gradient(135deg, #FFFFFF 0%, #F7F2E8 100%);
+                border: 1.5px solid {_score_color};
+                border-radius: 18px;
+                padding: 24px 22px 22px 22px;
+                text-align: center;
+                box-shadow: 0 8px 24px rgba(26,61,34,0.08), 0 2px 4px rgba(26,61,34,0.04);
+                overflow: hidden;">
+                <!-- Filigrane décoratif -->
+                <div style="position:absolute; top:-24px; right:-24px; width:120px; height:120px;
+                    background: radial-gradient(circle, {_accent_bg} 0%, transparent 70%);
+                    border-radius: 50%; opacity: 0.55; pointer-events: none;"></div>
+                <!-- Logo ESG -->
+                <div style="display:flex; align-items:center; justify-content:center; gap:8px;
+                    margin-bottom: 14px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"
+                         width="22" height="22">
+                        <circle cx="20" cy="20" r="19" fill="#1A3D22"/>
+                        <path d="M 8,24 A 12,12 0 1,1 32,24"
+                            stroke="rgba(212,240,216,0.3)" stroke-width="2.5"
+                            stroke-linecap="round" fill="none"/>
+                        <path d="M 8,24 A 12,12 0 0,1 27,11"
+                            stroke="#7FC686" stroke-width="2.5"
+                            stroke-linecap="round" fill="none"/>
+                        <circle cx="20" cy="22" r="2" fill="#D4F0D8"/>
+                        <line x1="20" y1="22" x2="29" y2="11"
+                            stroke="#D4F0D8" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    <span style="font-family:'DM Sans',sans-serif; font-size:11px;
+                        font-weight:700; color:#1A3D22; letter-spacing:0.12em;
+                        text-transform:uppercase;">ESG Optimizer</span>
                 </div>
-                <div style="font-weight: 600; font-size: 14px; color: #111827; margin-top: 4px;">
+                <!-- Score géant typé serif -->
+                <div style="font-family:'DM Serif Display',Georgia,serif;
+                    font-size: 5rem; font-weight:400; line-height:1;
+                    color: {_score_color}; letter-spacing: -0.04em;">
+                    {int(score)}<span style="font-family:'DM Sans',sans-serif;
+                        font-size: 1.3rem; color:#9CA3AF; font-weight:400;">/100</span>
+                </div>
+                <!-- Label score -->
+                <div style="font-family:'DM Sans',sans-serif; font-size:10px;
+                    color:#6B7280; text-transform:uppercase; letter-spacing:0.1em;
+                    margin: 4px 0 14px;">
+                    Score ESG global
+                </div>
+                <!-- Entreprise -->
+                <div style="font-family:'DM Serif Display',Georgia,serif;
+                    font-weight:400; font-size: 16px; color:#111827;
+                    letter-spacing:-0.01em; margin-bottom: 4px;">
                     {company}
                 </div>
-                <div style="margin-top: 8px;">
-                    <span style="{_badge_style}padding:2px 10px;border-radius:8px;font-size:12px;font-weight:600;">{_badge_label}</span>
+                <div style="font-size: 11px; color:#9CA3AF; margin-bottom: 12px;">
+                    Rapport {year}
                 </div>
-                <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">
-                    esg-optimizer.fr
+                <!-- Badge conformité -->
+                <div style="margin: 6px 0 14px;">
+                    <span style="{_badge_style}padding:6px 14px;border-radius:20px;
+                        font-family:'DM Sans',sans-serif; font-size:12px;
+                        font-weight:600; letter-spacing:0.02em;">{_badge_label}</span>
+                </div>
+                <!-- Footer URL -->
+                <div style="border-top:1px solid #E5E7EB; padding-top:10px;
+                    font-family:'DM Sans',sans-serif; font-size:10.5px;
+                    color:#6B7280; letter-spacing:0.04em;">
+                    Vérifié par <strong style="color:#1A3D22;">esg-optimizer.fr</strong>
                 </div>
             </div>""",
             unsafe_allow_html=True,
         )
         # Lien direct vers l'image du badge
-        st.caption(f"URL du badge : `{badge_url}`")
+        st.caption(f"URL du badge partageable : `{badge_url}`")
 
 except APIError:
     st.caption("Partage non disponible pour cette analyse.")

@@ -21,6 +21,37 @@ from frontend.components.seo import seo_for
 seo_for("pricing")
 inject_global_styles()
 
+# CSS spécifique : alignement parfait des 4 cards + bouton CTA aligné en bas
+st.markdown(
+    """
+    <style>
+    /* Force toutes les cards de plan à avoir la même hauteur */
+    .esg-pricing-row [data-testid="column"] > div:first-child {
+        height: 100%;
+    }
+    /* Wrapper card flex-column pour aligner le bouton en bas */
+    .esg-plan-wrap {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 460px;
+    }
+    .esg-plan-wrap .esg-plan-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    /* Espacement homogène autour du bouton CTA */
+    .esg-pricing-row .stButton {
+        margin-top: 14px;
+    }
+    /* Masquer le hint "Press Enter to submit form" */
+    [data-testid="InputInstructions"] { display: none !important; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ── Détection paiement complété (redirect Stripe depuis 6_Tarifs) ─────────────
 _qp = st.query_params
 _ps = _qp.get("payment_success", None)
@@ -34,6 +65,17 @@ if _ps == "1" and _pp in ("essential", "pro"):
         try:
             _fresh = get_me(_tok)
             save_user(_fresh)
+        except Exception:
+            pass
+
+# ── Auto-refresh du plan utilisateur (capture les essais Pro et code promos
+#    dès que le webhook Stripe a tagué le compte côté backend) ───────────────
+if is_logged_in():
+    _tok_auto = get_token()
+    if _tok_auto:
+        try:
+            _fresh_auto = get_me(_tok_auto)
+            save_user(_fresh_auto)
         except Exception:
             pass
 
@@ -195,22 +237,22 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
                 f'<span style="color:#9CA3AF;text-decoration:line-through;">{feat_name}</span></div>'
             )
 
-    mt = "margin-top:8px;" if is_recommended else ""
-    mt_inner = "4px" if is_recommended else "0"
-    # Générer le HTML en une seule chaîne (sans saut de ligne) pour éviter que
-    # le parser Markdown ne coupe le bloc HTML sur les lignes "vides" générées
-    # par rec_badge / current_badge vides.
+    # Wrapper "esg-plan-wrap" + carte interne avec hauteur 100% pour alignement parfait
+    # Toutes les cards (y compris la recommandée) ont la MEME taille/padding/min-height.
     html = (
-        f'<div style="background:{bg};border:{border_w} solid {border_color};border-radius:12px;'
-        f'padding:24px 16px;text-align:center;min-height:390px;position:relative;{mt}">'
+        f'<div class="esg-plan-wrap">'
+        f'<div class="esg-plan-card" style="background:{bg};border:{border_w} solid {border_color};'
+        f'border-radius:14px;padding:32px 18px 22px 18px;text-align:center;'
+        f'position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.04);">'
         f'{rec_badge}'
-        f'<div style="font-weight:700;font-size:16px;color:#111827;margin-top:{mt_inner};">{plan["name"]}</div>'
-        f'<div style="font-size:32px;font-weight:800;color:{price_color};margin:12px 0 4px 0;">{plan["price"]}</div>'
-        f'<div style="font-size:12px;color:#9CA3AF;margin-bottom:6px;">{plan["period"]}</div>'
-        f'<div style="font-size:12px;color:#6B7280;margin-bottom:10px;">{plan["description"]}</div>'
+        f'<div style="font-weight:700;font-size:16px;color:#111827;">{plan["name"]}</div>'
+        f'<div style="font-size:32px;font-weight:800;color:{price_color};margin:12px 0 4px 0;line-height:1;">{plan["price"]}</div>'
+        f'<div style="font-size:12px;color:#9CA3AF;margin-bottom:6px;min-height:18px;">{plan["period"]}</div>'
+        f'<div style="font-size:12px;color:#6B7280;margin-bottom:10px;min-height:32px;">{plan["description"]}</div>'
         f'{current_badge}'
-        f'<div style="border-top:1px solid #E5E7EB;margin:10px 0 12px;"></div>'
-        f'<div style="text-align:left;font-size:12px;color:#374151;line-height:1.7;">{features_html}</div>'
+        f'<div style="border-top:1px solid #E5E7EB;margin:10px 0 14px;"></div>'
+        f'<div style="text-align:left;font-size:12.5px;color:#374151;line-height:1.85;flex:1;">{features_html}</div>'
+        f'</div>'
         f'</div>'
     )
     st.markdown(html, unsafe_allow_html=True)
@@ -225,12 +267,61 @@ if is_logged_in():
         user_plan = user.get("plan", "discovery")
     token = get_token()
 
+# Si l'utilisateur vient de cliquer pour payer, on ouvre Stripe automatiquement
+if st.session_state.get("stripe_url"):
+    _stripe_url = st.session_state.pop("stripe_url")
+    _stripe_plan_clicked = st.session_state.pop("stripe_plan_clicked", "")
+    st.components.v1.html(
+        f"""
+        <script>
+        (function() {{
+            var w = window.open("{_stripe_url}", "_blank");
+            if (!w || w.closed || typeof w.closed == 'undefined') {{
+                // Popup bloqué : on bascule l'onglet courant
+                window.top.location.href = "{_stripe_url}";
+            }}
+        }})();
+        </script>
+        """,
+        height=0,
+    )
+    st.markdown(
+        f"""
+        <div style="background:#F0FDF4;border:1.5px solid #1A3D22;border-radius:12px;
+            padding:18px 22px;margin:16px 0;text-align:center;">
+            <div style="font-weight:700;color:#1A3D22;font-size:15px;margin-bottom:6px;">
+                💳 Stripe s'ouvre dans un nouvel onglet…
+            </div>
+            <div style="font-size:13px;color:#374151;margin-bottom:10px;">
+                Si l'onglet ne s'est pas ouvert, cliquez ici :
+            </div>
+            <a href="{_stripe_url}" target="_blank" rel="noopener noreferrer"
+                style="display:inline-block;background:#1A3D22;color:#D4F0D8;
+                padding:10px 28px;border-radius:8px;font-weight:600;
+                text-decoration:none;font-size:14px;">Accéder au paiement Stripe</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if st.button("🔄 J'ai payé / activé mon essai — actualiser mon plan",
+                 key="refresh_plan_global", use_container_width=True, type="primary"):
+        _tok_r = get_token()
+        if _tok_r:
+            try:
+                _fresh_r = get_me(_tok_r)
+                save_user(_fresh_r)
+                st.success("Plan rafraîchi !")
+                st.rerun()
+            except Exception:
+                st.error("Impossible de rafraîchir. Réessayez dans quelques instants.")
+
+# Wrapper class pour cibler les cards via CSS
+st.markdown('<div class="esg-pricing-row">', unsafe_allow_html=True)
 cols = st.columns(4, gap="small")
 
 for i, plan in enumerate(PLANS):
     with cols[i]:
         _render_plan_card(plan, user_plan)
-        st.markdown("<div style='height: 12px'></div>", unsafe_allow_html=True)
 
         action = plan["cta_action"]
         is_current = user_plan == plan["slug"]
@@ -279,36 +370,10 @@ for i, plan in enumerate(PLANS):
                         result = get_upgrade_url(token, stripe_plan)
                         url = result.get("url", "")
                         if url:
-                            # Ouvre Stripe dans un NOUVEL ONGLET — préserve la session Streamlit
-                            _safe_url = url.replace("'", "\\'")
-                            st.markdown(
-                                f'<div style="text-align:center;margin:8px 0;">'
-                                f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
-                                f'style="display:inline-block;background:#1A3D22;color:#D4F0D8;'
-                                f'padding:10px 20px;border-radius:8px;font-weight:600;'
-                                f'text-decoration:none;font-size:14px;">💳 Accéder au paiement Stripe</a>'
-                                f'</div>',
-                                unsafe_allow_html=True,
-                            )
-                            st.success(
-                                "✅ Stripe s'est ouvert dans un nouvel onglet. "
-                                "Une fois le paiement effectué, revenez ici et cliquez sur "
-                                "**Actualiser mon plan** ci-dessous."
-                            )
-                            st.markdown(
-                                f"_Si l'onglet ne s'est pas ouvert : "
-                                f"[cliquez ici pour accéder au paiement]({url})_"
-                            )
-                            if st.button("🔄 Actualiser mon plan", key=f"refresh_plan_{plan['slug']}",
-                                         use_container_width=True):
-                                _tok2 = get_token()
-                                if _tok2:
-                                    try:
-                                        _fresh2 = get_me(_tok2)
-                                        save_user(_fresh2)
-                                        st.rerun()
-                                    except Exception:
-                                        st.error("Impossible de rafraîchir, réessayez.")
+                            # Stocke l'URL en session_state pour rendu hors-callback
+                            st.session_state["stripe_url"] = url
+                            st.session_state["stripe_plan_clicked"] = stripe_plan
+                            st.rerun()
                     except APIError as e:
                         st.error(f"Erreur : {e.detail}")
 
@@ -492,7 +557,7 @@ with col_cta2:
         ):
             st.switch_page("pages/1_Login.py")
     else:
-        if user_plan in ("discovery", "free"):
+        if user_plan in ("discovery", "free", None):
             if st.button(
                 "Passer au plan Pro",
                 use_container_width=True,
@@ -504,34 +569,16 @@ with col_cta2:
                     result = get_upgrade_url(token, "pro")
                     url = result.get("url", "")
                     if url:
-                        st.markdown(
-                            f'<div style="text-align:center;margin:8px 0;">'
-                            f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
-                            f'style="display:inline-block;background:#1A3D22;color:#D4F0D8;'
-                            f'padding:10px 20px;border-radius:8px;font-weight:600;'
-                            f'text-decoration:none;font-size:14px;">💳 Payer sur Stripe</a>'
-                            f'</div>',
-                            unsafe_allow_html=True,
-                        )
-                        st.success(
-                            "✅ Stripe s'est ouvert dans un nouvel onglet. "
-                            "Une fois le paiement effectué, cliquez sur **Actualiser mon plan**."
-                        )
-                        st.markdown(
-                            f"_Si l'onglet ne s'est pas ouvert : "
-                            f"[cliquez ici pour accéder au paiement]({url})_"
-                        )
-                        if st.button("🔄 Actualiser mon plan", key="refresh_plan_footer",
-                                     use_container_width=True):
-                            _tok3 = get_token()
-                            if _tok3:
-                                try:
-                                    _fresh3 = get_me(_tok3)
-                                    save_user(_fresh3)
-                                    st.rerun()
-                                except Exception:
-                                    st.error("Impossible de rafraîchir, réessayez.")
+                        st.session_state["stripe_url"] = url
+                        st.session_state["stripe_plan_clicked"] = "pro"
+                        st.rerun()
                 except APIError as e:
                     st.error(f"Erreur : {e.detail}")
         else:
-            st.success(f"Vous êtes déjà sur le plan {user_plan.title()}. Merci pour votre confiance !")
+            # Mappage label-friendly du plan (évite le crash sur None et améliore l'affichage)
+            _plan_label = {
+                "essential": "Essentiel",
+                "pro": "Pro",
+                "enterprise": "Enterprise",
+            }.get(user_plan, str(user_plan).title() if user_plan else "Découverte")
+            st.success(f"Vous êtes déjà sur le plan {_plan_label}. Merci pour votre confiance !")
