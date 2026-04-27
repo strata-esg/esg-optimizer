@@ -106,3 +106,27 @@ def require_auth() -> bool:
         st.page_link("pages/1_Login.py", label="Aller à la page de connexion")
         return False
     return True
+
+
+# ── Cookie helpers (utilisés par login + logout) ──────────────────────────────
+
+def save_jwt_cookie(token: str) -> None:
+    """Persiste le JWT dans un cookie browser 30 jours (survit aux refreshs)."""
+    try:
+        from datetime import datetime, timedelta
+        cm = st.session_state.get("_cm")
+        if cm:
+            cm.set("esg_jwt", token, expires_at=datetime.now() + timedelta(days=30))
+    except Exception:
+        pass
+
+
+def clear_jwt_cookie() -> None:
+    """Supprime le cookie JWT (appelé à la déconnexion)."""
+    try:
+        cm = st.session_state.get("_cm")
+        if cm:
+            cm.delete("esg_jwt")
+    except Exception:
+        pass
+

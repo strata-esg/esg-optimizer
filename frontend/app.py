@@ -5,6 +5,7 @@ Lancer avec : cd frontend && streamlit run app.py --server.port 8501
 
 import sys
 from pathlib import Path
+from datetime import datetime, timedelta
 
 import streamlit as st
 from PIL import Image
@@ -27,11 +28,36 @@ if str(_root) not in sys.path:
 from frontend.components.sidebar import render_sidebar
 from frontend.components.analytics import inject_umami_script
 from frontend.utils.styles import inject_global_styles
+from frontend.utils.session import get_token, save_token, save_user, clear_token, clear_user
 
 # Styles brand
 inject_global_styles()
 
-# Pages
+# ── Cookie manager — persistence de session entre les refreshs ────────────────
+try:
+    import extra_streamlit_components as stx
+    _cm = stx.CookieManager(key="esg_cm")
+    # Stocker dans session_state pour que les pages puissent l'utiliser
+    st.session_state["_cm"] = _cm
+
+    # Restaurer la session depuis le cookie si la page a été rafraîchie
+    if not get_token() and not st.session_state.get("_cookie_checked"):
+        st.session_state["_cookie_checked"] = True
+        _jwt = _cm.get("esg_jwt")
+        if _jwt:
+            try:
+                from frontend.utils.api_client import get_me
+                _user = get_me(_jwt)
+                save_token(_jwt)
+                save_user(_user)
+                st.rerun()
+            except Exception:
+                # Token expiré ou invalide — supprimer le cookie
+                _cm.delete("esg_jwt")
+except Exception:
+    pass  # Package non dispo en dev local sans pip install
+
+# ── Pages ─────────────────────────────────────────────────────────────────────
 pages = [
     st.Page("pages/0_Accueil.py",    title="Accueil",            default=True),
     st.Page("pages/1_Login.py",      title="Connexion"),

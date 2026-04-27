@@ -12,7 +12,7 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from frontend.utils.api_client import APIError, login, register, get_me
-from frontend.utils.session import is_logged_in, save_token, save_user
+from frontend.utils.session import is_logged_in, save_token, save_user, save_jwt_cookie
 from frontend.components.onboarding import render_onboarding
 
 # ── Guard : déjà connecté (AVANT le CSS split-panel pour éviter les conflits) ─
@@ -217,6 +217,7 @@ with col_right:
                     result = register(email, password, company_name or None)
                     token = result["access_token"]
                     save_token(token)
+                    save_jwt_cookie(token)
                     user_data = result.get("user") or get_me(token)
                     save_user(user_data)
                     st.session_state["show_onboarding"] = True
@@ -227,6 +228,7 @@ with col_right:
                     result = login(email, password)
                     token = result["access_token"]
                     save_token(token)
+                    save_jwt_cookie(token)
                     save_user(get_me(token))
                     st.success("Connexion réussie !")
                     st.balloons()

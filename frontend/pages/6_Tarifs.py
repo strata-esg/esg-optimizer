@@ -281,9 +281,14 @@ for i, plan in enumerate(PLANS):
                         if url:
                             # Ouvre Stripe dans un NOUVEL ONGLET — préserve la session Streamlit
                             _safe_url = url.replace("'", "\\'")
-                            st.components.v1.html(
-                                f"<script>window.open('{_safe_url}', '_blank', 'noopener,noreferrer');</script>",
-                                height=0,
+                            st.markdown(
+                                f'<div style="text-align:center;margin:8px 0;">'
+                                f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
+                                f'style="display:inline-block;background:#1A3D22;color:#D4F0D8;'
+                                f'padding:10px 20px;border-radius:8px;font-weight:600;'
+                                f'text-decoration:none;font-size:14px;">💳 Accéder au paiement Stripe</a>'
+                                f'</div>',
+                                unsafe_allow_html=True,
                             )
                             st.success(
                                 "✅ Stripe s'est ouvert dans un nouvel onglet. "
@@ -499,10 +504,14 @@ with col_cta2:
                     result = get_upgrade_url(token, "pro")
                     url = result.get("url", "")
                     if url:
-                        _safe_url2 = url.replace("'", "\\'")
-                        st.components.v1.html(
-                            f"<script>window.open('{_safe_url2}', '_blank', 'noopener,noreferrer');</script>",
-                            height=0,
+                        st.markdown(
+                            f'<div style="text-align:center;margin:8px 0;">'
+                            f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
+                            f'style="display:inline-block;background:#1A3D22;color:#D4F0D8;'
+                            f'padding:10px 20px;border-radius:8px;font-weight:600;'
+                            f'text-decoration:none;font-size:14px;">💳 Payer sur Stripe</a>'
+                            f'</div>',
+                            unsafe_allow_html=True,
                         )
                         st.success(
                             "✅ Stripe s'est ouvert dans un nouvel onglet. "

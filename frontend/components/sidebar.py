@@ -4,7 +4,7 @@ Sidebar ESG Optimizer : logo, navigation, infos utilisateur.
 
 import streamlit as st
 
-from frontend.utils.session import get_user, is_logged_in, logout
+from frontend.utils.session import get_user, is_logged_in, logout, clear_jwt_cookie
 
 
 def render_sidebar() -> None:
@@ -95,7 +95,9 @@ def render_sidebar() -> None:
                         st.switch_page("pages/6_Tarifs.py")
 
             if st.button("Se déconnecter", use_container_width=True, type="secondary"):
+                clear_jwt_cookie()
                 logout()
+                st.session_state.pop("_cookie_checked", None)
                 st.rerun()
         else:
             st.caption("Non connecté")
