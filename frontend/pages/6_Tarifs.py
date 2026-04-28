@@ -213,11 +213,12 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
         if is_recommended else ""
     )
 
-    # Badge "Votre plan actuel"
+    # Badge "Votre plan actuel" — placeholder invisible si non-courant pour garder la même hauteur
     current_badge = (
         '<div style="background:#D4F0D8;color:#1A3D22;text-align:center;padding:6px 10px;'
         'border-radius:6px;font-size:12px;font-weight:600;margin:8px 0;">Votre plan actuel ✓</div>'
-        if is_current else ""
+        if is_current else
+        '<div style="height:36px;margin:8px 0;"></div>'
     )
 
     # Liste des features
