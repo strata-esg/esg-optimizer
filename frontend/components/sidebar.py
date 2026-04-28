@@ -109,10 +109,3 @@ def render_sidebar() -> None:
             if st.button("Se connecter", use_container_width=True, type="primary", key="sidebar_login"):
                 st.switch_page("pages/1_Login.py")
 
-        # Version
-        st.markdown(
-            '<div style="position:fixed; bottom:16px; font-size:10px; '
-            'color:rgba(212,240,216,0.35); letter-spacing:0.04em;">'
-            'ESG Optimizer v1.0</div>',
-            unsafe_allow_html=True,
-        )

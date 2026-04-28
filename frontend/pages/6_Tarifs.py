@@ -58,8 +58,7 @@ _ps = _qp.get("payment_success", None)
 _pp = _qp.get("plan", None)
 if _ps == "1" and _pp in ("essential", "pro"):
     track_payment_completed(_pp)  # Event #6 funnel
-    st.toast(f"🎉 Paiement confirmé — bienvenue sur le plan {_pp.title()} !", icon="✅")
-    # Rafraîchir les données user immédiatement pour mettre à jour la sidebar
+    st.toast(f"Paiement confirmé — bienvenue sur le plan {_pp.title()} !")
     _tok = get_token()
     if _tok:
         try:
@@ -267,53 +266,31 @@ if is_logged_in():
         user_plan = user.get("plan", "discovery")
     token = get_token()
 
-# Si l'utilisateur vient de cliquer pour payer, on ouvre Stripe automatiquement
-if st.session_state.get("stripe_url"):
-    _stripe_url = st.session_state.pop("stripe_url")
-    _stripe_plan_clicked = st.session_state.pop("stripe_plan_clicked", "")
-    st.components.v1.html(
-        f"""
-        <script>
-        (function() {{
-            var w = window.open("{_stripe_url}", "_blank");
-            if (!w || w.closed || typeof w.closed == 'undefined') {{
-                // Popup bloqué : on bascule l'onglet courant
-                window.top.location.href = "{_stripe_url}";
-            }}
-        }})();
-        </script>
-        """,
-        height=0,
-    )
-    st.markdown(
-        f"""
-        <div style="background:#F0FDF4;border:1.5px solid #1A3D22;border-radius:12px;
-            padding:18px 22px;margin:16px 0;text-align:center;">
-            <div style="font-weight:700;color:#1A3D22;font-size:15px;margin-bottom:6px;">
-                💳 Stripe s'ouvre dans un nouvel onglet…
-            </div>
-            <div style="font-size:13px;color:#374151;margin-bottom:10px;">
-                Si l'onglet ne s'est pas ouvert, cliquez ici :
-            </div>
-            <a href="{_stripe_url}" target="_blank" rel="noopener noreferrer"
-                style="display:inline-block;background:#1A3D22;color:#D4F0D8;
-                padding:10px 28px;border-radius:8px;font-weight:600;
-                text-decoration:none;font-size:14px;">Accéder au paiement Stripe</a>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    if st.button("🔄 J'ai payé / activé mon essai — actualiser mon plan",
-                 key="refresh_plan_global", use_container_width=True, type="primary"):
-        _tok_r = get_token()
-        if _tok_r:
-            try:
-                _fresh_r = get_me(_tok_r)
-                save_user(_fresh_r)
-                st.success("Plan rafraîchi !")
-                st.rerun()
-            except Exception:
-                st.error("Impossible de rafraîchir. Réessayez dans quelques instants.")
+# Pré-fetch des URLs Stripe au chargement (évite le pattern rerun)
+stripe_urls: dict[str, str] = {}
+if is_logged_in() and token:
+    for _sp in ("essential", "pro"):
+        try:
+            _r = get_upgrade_url(token, _sp)
+            stripe_urls[_sp] = _r.get("url", "")
+        except Exception:
+            stripe_urls[_sp] = ""
+
+# Bouton "Actualiser mon plan" — visible après paiement
+if is_logged_in():
+    col_refresh, _ = st.columns([2, 3])
+    with col_refresh:
+        if st.button("J'ai payé / activé mon essai — actualiser mon plan",
+                     key="refresh_plan_global", use_container_width=True):
+            _tok_r = get_token()
+            if _tok_r:
+                try:
+                    _fresh_r = get_me(_tok_r)
+                    save_user(_fresh_r)
+                    st.success("Plan mis à jour !")
+                    st.rerun()
+                except Exception:
+                    st.error("Impossible de rafraîchir. Réessayez dans quelques instants.")
 
 # Wrapper class pour cibler les cards via CSS
 st.markdown('<div class="esg-pricing-row">', unsafe_allow_html=True)
@@ -354,46 +331,29 @@ for i, plan in enumerate(PLANS):
         elif action in ("stripe_essential", "stripe_pro"):
             stripe_plan = "essential" if action == "stripe_essential" else "pro"
             btn_type = "primary" if plan["recommended"] else "secondary"
+            track_pricing_plan_click(stripe_plan, source="pricing_page")  # Event #5 funnel
 
-            if st.button(
-                plan["cta_label"],
-                key=f"btn_{plan['slug']}",
-                use_container_width=True,
-                type=btn_type,
-            ):
-                track_pricing_plan_click(stripe_plan, source="pricing_page")  # Event #5 funnel
-                if not is_logged_in():
-                    st.warning("Connectez-vous d'abord pour souscrire.")
+            if not is_logged_in():
+                if st.button(plan["cta_label"], key=f"btn_{plan['slug']}",
+                             use_container_width=True, type=btn_type):
                     st.switch_page("pages/1_Login.py")
+            else:
+                url = stripe_urls.get(stripe_plan, "")
+                if url:
+                    st.link_button(plan["cta_label"], url,
+                                   use_container_width=True, type=btn_type)
                 else:
-                    try:
-                        result = get_upgrade_url(token, stripe_plan)
-                        url = result.get("url", "")
-                        if url:
-                            # Stocke l'URL en session_state pour rendu hors-callback
-                            st.session_state["stripe_url"] = url
-                            st.session_state["stripe_plan_clicked"] = stripe_plan
-                            st.rerun()
-                    except APIError as e:
-                        st.error(f"Erreur : {e.detail}")
+                    if st.button(plan["cta_label"], key=f"btn_{plan['slug']}",
+                                 use_container_width=True, type=btn_type):
+                        st.error("Lien Stripe indisponible. Réessayez.")
 
         elif action == "contact":
-            if st.button(
+            st.link_button(
                 plan["cta_label"],
+                "mailto:contact@esg-optimizer.fr?subject=Demande%20Enterprise%20ESG%20Optimizer",
                 key=f"btn_{plan['slug']}",
                 use_container_width=True,
-            ):
-                track_pricing_plan_click("enterprise", source="pricing_page")  # Event #5 funnel
-                st.markdown(
-                    """<div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px;
-                        padding: 16px; margin-top: 8px; text-align: center;">
-                        <div style="font-weight: 600; color: #1E40AF;">Contactez-nous</div>
-                        <div style="font-size: 13px; color: #6B7280; margin-top: 4px;">
-                            <a href="mailto:contact@esg-optimizer.fr">contact@esg-optimizer.fr</a>
-                        </div>
-                    </div>""",
-                    unsafe_allow_html=True,
-                )
+            )
 
 # Comparatif détaillé
 st.markdown("---")
@@ -558,24 +518,15 @@ with col_cta2:
             st.switch_page("pages/1_Login.py")
     else:
         if user_plan in ("discovery", "free", None):
-            if st.button(
-                "Passer au plan Pro",
-                use_container_width=True,
-                type="primary",
-                key="cta_final_upgrade",
-            ):
-                track_pricing_plan_click("pro", source="pricing_footer_cta")  # Event #5 funnel
-                try:
-                    result = get_upgrade_url(token, "pro")
-                    url = result.get("url", "")
-                    if url:
-                        st.session_state["stripe_url"] = url
-                        st.session_state["stripe_plan_clicked"] = "pro"
-                        st.rerun()
-                except APIError as e:
-                    st.error(f"Erreur : {e.detail}")
+            url_pro = stripe_urls.get("pro", "")
+            if url_pro:
+                st.link_button("Passer au plan Pro", url_pro,
+                               use_container_width=True, type="primary")
+            else:
+                if st.button("Passer au plan Pro", use_container_width=True,
+                             type="primary", key="cta_final_upgrade"):
+                    st.error("Lien Stripe indisponible. Réessayez.")
         else:
-            # Mappage label-friendly du plan (évite le crash sur None et améliore l'affichage)
             _plan_label = {
                 "essential": "Essentiel",
                 "pro": "Pro",

@@ -175,6 +175,20 @@ def download_delta_pdf(token: str, analysis_id: int) -> bytes:
     return _handle_binary_response(resp)
 
 
+def recompute_delta(token: str, analysis_id: int) -> dict:
+    """
+    POST /analysis/{id}/recompute-delta
+    Recalcule le delta pour une analyse existante (plans payants uniquement).
+    """
+    resp = requests.post(
+        f"{BACKEND_URL}/analysis/{analysis_id}/recompute-delta",
+        headers=_headers(token),
+        timeout=60,
+    )
+    _handle_response(resp)
+    return resp.json()
+
+
 # HISTORY & DASHBOARD
 
 def get_history(token: str, page: int = 1, per_page: int = 20) -> dict:

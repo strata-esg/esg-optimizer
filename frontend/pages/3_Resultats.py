@@ -19,7 +19,7 @@ seo_for("results")
 from frontend.components.score_gauge import render_score_row
 from frontend.components.esrs_coverage import render_esrs_grid
 from frontend.components.delta_card import render_delta_row
-from frontend.utils.api_client import APIError, get_analysis, download_pdf, download_delta_pdf, download_preview_pdf, get_share_info
+from frontend.utils.api_client import APIError, get_analysis, download_pdf, download_delta_pdf, download_preview_pdf, get_share_info, recompute_delta
 from frontend.components.analytics import track_event
 from frontend.utils.session import get_token, get_last_analysis_id, require_auth
 
@@ -369,7 +369,21 @@ with col_delta:
                 except APIError as e:
                     st.error(f"Erreur : {e.detail}")
     else:
-        st.caption("Pas de delta disponible (première analyse de cette entreprise).")
+        if not is_free_plan:
+            # Plan payant mais delta pas encore calculé : bouton de recalcul
+            if st.button("Calculer le Delta Report", use_container_width=True, key="recompute_delta"):
+                try:
+                    with st.spinner("Calcul du delta en cours (30-60s)..."):
+                        recompute_delta(token, analysis["id"])
+                    st.success("Delta calculé ! Rechargez la page.")
+                    st.rerun()
+                except APIError as e:
+                    if "introuvable" in e.detail.lower():
+                        st.caption("Pas de delta disponible (première analyse de cette entreprise).")
+                    else:
+                        st.error(f"Erreur : {e.detail}")
+        else:
+            st.caption("Pas de delta disponible (première analyse de cette entreprise).")
 
 # 10. Partage social (LinkedIn)
 st.markdown("---")

@@ -731,7 +731,7 @@ with pr2:
     )
     if st.button("Acheter une analyse", key="cta_essential", use_container_width=True):
         track_cta_landing_click("Acheter une analyse", source="pricing_essential")
-        st.switch_page("pages/1_Login.py")
+        st.switch_page("pages/6_Tarifs.py")
 
 # Plan Pro (RECOMMANDÉ)
 with pr3:
@@ -757,7 +757,7 @@ with pr3:
     )
     if st.button("Démarrer l'essai Pro", key="cta_pro", use_container_width=True, type="primary"):
         track_cta_landing_click("Démarrer l'essai Pro", source="pricing_pro")
-        st.switch_page("pages/1_Login.py")
+        st.switch_page("pages/6_Tarifs.py")
 
 # Plan Enterprise
 with pr4:

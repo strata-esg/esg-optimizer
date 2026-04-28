@@ -429,3 +429,55 @@ def get_share_info(
         "csrd_ready": analysis.csrd_ready,
         "report_year": analysis.report_year,
     }
+
+
+# POST /analysis/{id}/recompute-delta
+@router.post("/{analysis_id}/recompute-delta")
+def recompute_delta(
+    analysis_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Recalcule le delta pour une analyse existante.
+    Utile quand l'analyse a été effectuée avant qu'une analyse précédente existe.
+    Réservé aux plans payants (essential, pro, enterprise).
+    """
+    if current_user.plan in ("discovery", "free"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Le Delta Report est disponible à partir du plan Essentiel.",
+        )
+
+    analysis = (
+        db.query(Analysis)
+        .filter(Analysis.id == analysis_id, Analysis.user_id == current_user.id,
+                Analysis.status == "success")
+        .first()
+    )
+    if not analysis:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
+
+    previous = find_previous_analysis(db, analysis)
+    if not previous:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aucune analyse précédente trouvée pour cette entreprise.",
+        )
+
+    try:
+        delta_result = run_delta(analysis, db)
+    except Exception as exc:
+        logger.error("Recompute delta [%d] : %s", analysis_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors du calcul du delta : {exc}",
+        )
+
+    if delta_result is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aucune analyse précédente trouvée pour cette entreprise.",
+        )
+
+    return {"status": "ok", "analysis_id": analysis_id, "previous_id": previous.id}
