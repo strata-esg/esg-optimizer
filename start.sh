@@ -80,6 +80,8 @@ events {
 }
 
 http {
+    client_max_body_size 25m;
+
     map \$http_upgrade \$connection_upgrade {
         default upgrade;
         ''      close;
