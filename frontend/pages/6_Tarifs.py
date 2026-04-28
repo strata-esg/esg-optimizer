@@ -242,7 +242,7 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
         f'<div class="esg-plan-wrap">'
         f'<div class="esg-plan-card" style="background:{bg};border:{border_w} solid {border_color};'
         f'border-radius:14px;padding:32px 18px 22px 18px;text-align:center;'
-        f'height:490px;overflow:hidden;'
+        f'height:490px;overflow:visible;'
         f'position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.04);">'
         f'{rec_badge}'
         f'<div style="font-weight:700;font-size:16px;color:#111827;">{plan["name"]}</div>'
@@ -332,11 +332,11 @@ for i, plan in enumerate(PLANS):
         elif action in ("stripe_essential", "stripe_pro"):
             stripe_plan = "essential" if action == "stripe_essential" else "pro"
             btn_type = "primary" if plan["recommended"] else "secondary"
-            track_pricing_plan_click(stripe_plan, source="pricing_page")  # Event #5 funnel
 
             if not is_logged_in():
                 if st.button(plan["cta_label"], key=f"btn_{plan['slug']}",
                              use_container_width=True, type=btn_type):
+                    track_pricing_plan_click(stripe_plan, source="pricing_page")  # Event #5 funnel
                     st.switch_page("pages/1_Login.py")
             else:
                 url = stripe_urls.get(stripe_plan, "")
@@ -346,6 +346,7 @@ for i, plan in enumerate(PLANS):
                 else:
                     if st.button(plan["cta_label"], key=f"btn_{plan['slug']}",
                                  use_container_width=True, type=btn_type):
+                        track_pricing_plan_click(stripe_plan, source="pricing_page")  # Event #5 funnel
                         st.error("Lien Stripe indisponible. Réessayez.")
 
         elif action == "contact":

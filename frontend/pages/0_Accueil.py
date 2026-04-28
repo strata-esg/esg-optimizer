@@ -691,7 +691,7 @@ pr1, pr2, pr3, pr4 = st.columns(4)
 with pr1:
     st.markdown(
         """<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
-            padding: 24px 16px; text-align: center; height: 380px; overflow: hidden;">
+            padding: 24px 16px; text-align: center; height: 380px; overflow: visible;">
             <div style="font-weight: 700; font-size: 16px; color: #111827;">Découverte</div>
             <div style="font-size: 32px; font-weight: 800; color: #1A3D22; margin: 12px 0 4px 0;">0 €</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">1 analyse gratuite</div>
@@ -714,7 +714,7 @@ with pr1:
 with pr2:
     st.markdown(
         """<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
-            padding: 24px 16px; text-align: center; height: 380px; overflow: hidden;">
+            padding: 24px 16px; text-align: center; height: 380px; overflow: visible;">
             <div style="font-weight: 700; font-size: 16px; color: #111827;">Essentiel</div>
             <div style="font-size: 32px; font-weight: 800; color: #2563EB; margin: 12px 0 4px 0;">39 €</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">par analyse</div>
@@ -737,7 +737,7 @@ with pr2:
 with pr3:
     st.markdown(
         """<div style="background: #F0FDF4; border: 2px solid #1A3D22; border-radius: 12px;
-            padding: 24px 16px; text-align: center; height: 380px; overflow: hidden; position: relative;">
+            padding: 24px 16px; text-align: center; height: 380px; overflow: visible; position: relative;">
             <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
                 background: #1A3D22; color: white; padding: 2px 14px; border-radius: 10px;
                 font-size: 11px; font-weight: 700;">RECOMMANDÉ</div>
@@ -763,7 +763,7 @@ with pr3:
 with pr4:
     st.markdown(
         """<div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
-            padding: 24px 16px; text-align: center; height: 380px; overflow: hidden;">
+            padding: 24px 16px; text-align: center; height: 380px; overflow: visible;">
             <div style="font-weight: 700; font-size: 16px; color: #111827;">Enterprise</div>
             <div style="font-size: 32px; font-weight: 800; color: #7C3AED; margin: 12px 0 4px 0;">Sur devis</div>
             <div style="font-size: 12px; color: #9CA3AF; margin-bottom: 16px;">adapté à votre organisation</div>
