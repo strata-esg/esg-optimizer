@@ -3,6 +3,7 @@ ESG Optimizer MVP — Composant carte delta avec indicateur de tendance.
 Affiche le delta entre deux analyses (flèches, couleurs, valeur).
 """
 
+import json
 import streamlit as st
 
 
@@ -101,7 +102,119 @@ def render_delta_row(analysis: dict) -> None:
 
     # Synthèse narrative si disponible
     narrative = analysis.get("delta_narrative")
-    if narrative:
-        st.markdown("---")
+    if not narrative:
+        return
+
+    st.markdown("---")
+
+    # Parser le JSON (stocké en string dans la DB)
+    if isinstance(narrative, str):
+        try:
+            data = json.loads(narrative)
+        except (json.JSONDecodeError, ValueError):
+            st.info(narrative)
+            return
+    else:
+        data = narrative
+
+    # 1. Résumé global
+    summary = data.get("delta_summary", "")
+    if summary:
         st.markdown("**Synthèse d'évolution**")
-        st.info(narrative)
+        st.info(summary)
+
+    # 2. Évolution ESRS
+    esrs = data.get("esrs_evolution", {})
+    gained = esrs.get("gained") or []
+    lost = esrs.get("lost") or []
+    cov_prev = esrs.get("coverage_previous")
+    cov_curr = esrs.get("coverage_current")
+
+    if gained or lost or (cov_prev is not None and cov_curr is not None):
+        st.markdown("**Couverture ESRS**")
+        col_g, col_l = st.columns(2)
+        with col_g:
+            if cov_curr is not None and cov_prev is not None:
+                delta_cov = round(cov_curr - cov_prev, 1)
+                color_cov = "#1A3D22" if delta_cov >= 0 else "#EF4444"
+                st.markdown(
+                    f'<div style="font-size:13px;color:#374151;">Couverture : '
+                    f'<b style="color:{color_cov};">{cov_curr:.0f}%</b> '
+                    f'<span style="color:{color_cov};">({delta_cov:+.1f}% vs avant)</span></div>',
+                    unsafe_allow_html=True,
+                )
+            if gained:
+                st.markdown("**Nouveaux standards couverts**")
+                for g in gained:
+                    st.markdown(f'<span style="color:#1A3D22;">&#10003;</span> `{g}`', unsafe_allow_html=True)
+        with col_l:
+            if lost:
+                st.markdown("**Standards perdus**")
+                for l in lost:
+                    st.markdown(f'<span style="color:#EF4444;">&#10007;</span> `{l}`', unsafe_allow_html=True)
+
+    # 3. Comparaison KPIs
+    kpis = data.get("kpi_comparison") or []
+    if kpis:
+        st.markdown("**Évolution des KPIs**")
+        new_kpis = [k for k in kpis if k.get("status") == "new"]
+        removed_kpis = [k for k in kpis if k.get("status") == "removed"]
+        changed_kpis = [k for k in kpis if k.get("status") == "changed"]
+
+        col_new, col_rem = st.columns(2)
+        with col_new:
+            if new_kpis:
+                st.markdown('<span style="color:#1A3D22;font-weight:600;">Nouveaux KPIs</span>', unsafe_allow_html=True)
+                for k in new_kpis:
+                    val = f"{k.get('current_value')} {k.get('unit','')}" if k.get('current_value') else ""
+                    st.markdown(f"+ **{k['name']}** {val}")
+        with col_rem:
+            if removed_kpis:
+                st.markdown('<span style="color:#EF4444;font-weight:600;">KPIs supprimés</span>', unsafe_allow_html=True)
+                for k in removed_kpis:
+                    val = f"{k.get('previous_value')} {k.get('unit','')}" if k.get('previous_value') else ""
+                    st.markdown(f"- **{k['name']}** {val}")
+        if changed_kpis:
+            st.markdown("**KPIs modifiés**")
+            for k in changed_kpis:
+                st.markdown(f"· **{k['name']}** : {k.get('previous_value','?')} → {k.get('current_value','?')} {k.get('unit','')}")
+
+    # 4. Points d'amélioration & régressions
+    improvements = data.get("key_improvements") or []
+    regressions = data.get("key_regressions") or []
+    if improvements or regressions:
+        st.markdown("**Points clés**")
+        col_imp, col_reg = st.columns(2)
+        with col_imp:
+            if improvements:
+                st.markdown('<span style="color:#1A3D22;font-weight:600;">Améliorations</span>', unsafe_allow_html=True)
+                for item in improvements:
+                    pillar = item.get("pillar", "")
+                    desc = item.get("description", "")
+                    st.markdown(f'<div style="font-size:13px;margin-bottom:4px;">'
+                                f'<span style="background:#D4F0D8;color:#1A3D22;padding:1px 6px;'
+                                f'border-radius:4px;font-size:11px;font-weight:700;">{pillar}</span> {desc}</div>',
+                                unsafe_allow_html=True)
+        with col_reg:
+            if regressions:
+                st.markdown('<span style="color:#EF4444;font-weight:600;">Régressions</span>', unsafe_allow_html=True)
+                for item in regressions:
+                    pillar = item.get("pillar", "")
+                    desc = item.get("description", "")
+                    st.markdown(f'<div style="font-size:13px;margin-bottom:4px;">'
+                                f'<span style="background:#FEE2E2;color:#991B1B;padding:1px 6px;'
+                                f'border-radius:4px;font-size:11px;font-weight:700;">{pillar}</span> {desc}</div>',
+                                unsafe_allow_html=True)
+
+    # 5. Actions prioritaires
+    actions = data.get("priority_actions") or []
+    if actions:
+        st.markdown("**Actions prioritaires**")
+        for act in sorted(actions, key=lambda x: x.get("priority", 9)):
+            prio = act.get("priority", "?")
+            pillar = act.get("pillar", "")
+            action = act.get("action", "")
+            rationale = act.get("rationale", "")
+            with st.expander(f"Priorité {prio} — [{pillar}] {action}"):
+                if rationale:
+                    st.caption(rationale)
