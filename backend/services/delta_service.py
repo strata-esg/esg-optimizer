@@ -35,16 +35,14 @@ def find_previous_analysis(db: Session, analysis: Analysis) -> Analysis | None:
         )
     )
 
-    # Si on a un report_year, chercher l'année précédente
-    if analysis.report_year:
-        query = query.filter(Analysis.report_year < analysis.report_year)
-        query = query.order_by(Analysis.report_year.desc(), Analysis.created_at.desc())
-    else:
-        # Sinon, prendre la plus récente avant celle-ci
-        query = query.filter(Analysis.created_at < analysis.created_at)
-        query = query.order_by(Analysis.created_at.desc())
-
-    return query.first()
+    # Toute analyse créée avant celle-ci (même année acceptée),
+    # ordonnée par report_year desc puis created_at desc → la plus récente/pertinente en premier.
+    return (
+        query
+        .filter(Analysis.created_at < analysis.created_at)
+        .order_by(Analysis.report_year.desc(), Analysis.created_at.desc())
+        .first()
+    )
 
 
 # _safe_json_loads migré vers backend.utils.safe_json_loads

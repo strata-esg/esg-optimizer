@@ -270,12 +270,16 @@ st.markdown("---")
 render_delta_row(analysis)
 
 # 8b. Bandeau upgrade (si plan gratuit)
+# On récupère le plan FRAIS depuis l'API (pas le cache session qui peut être stale après upgrade Stripe)
 user_info = None
 try:
+    from frontend.utils.api_client import get_me
+    from frontend.utils.session import save_user
+    user_info = get_me(token)
+    save_user(user_info)   # met à jour le cache session pour la sidebar etc.
+except Exception:
     from frontend.utils.session import get_user
     user_info = get_user()
-except Exception:
-    pass
 
 user_plan = user_info.get("plan", "discovery") if user_info else "discovery"
 is_free_plan = user_plan in ("discovery", "free")
