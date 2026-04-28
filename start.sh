@@ -16,7 +16,7 @@ set -eu
 
 NGINX_PORT="${PORT:-8080}"
 PORT_API="${PORT_API:-8000}"
-STREAMLIT_PORT="${STREAMLIT_PORT:-8501}"
+STREAMLIT_PORT=8502   # Port interne fixe — jamais écrasé par Railway
 
 echo "================================================================"
 echo " ESG Optimizer — Boot"

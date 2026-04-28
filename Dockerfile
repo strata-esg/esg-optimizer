@@ -63,7 +63,7 @@ RUN chmod +x /app/start.sh
 # nginx écoute sur $PORT (public), FastAPI sur $PORT_API (interne), Streamlit sur 8501 (interne)
 ENV PORT=8080 \
     PORT_API=8000 \
-    STREAMLIT_PORT=8501 \
+    STREAMLIT_PORT=8502 \
     API_BASE_URL=http://localhost:8000
 
 EXPOSE 8080
