@@ -84,7 +84,7 @@ PERSONA_CONTENT = {
 
 # Contenu par défaut (générique)
 default_content = {
-    "titre": "Êtes-vous prêt pour la CSRD ?",
+    "titre": "Votre rapport CSRD analysé en 3 minutes.",
     "sous_titre": "Obtenez votre score ESG en 3 minutes. Notre agent analyse votre rapport de durabilité et génère un diagnostic complet : scores E/S/G, conformité ESRS, recommandations priorisées.",
     "cta": "Analyser mon rapport gratuitement",
     "argument": "Déjà utilisé par des PME, consultants ESG et directeurs RSE pour préparer leur conformité CSRD.",
@@ -146,7 +146,7 @@ st.markdown(
                 box-shadow:0 4px 14px rgba(27,61,32,0.3);"
                 onmouseover="this.style.background='#2A5C34'"
                 onmouseout="this.style.background='#1B3D20'">
-                &#9654;&nbsp; Analyser gratuitement &#8212; 3 min
+                &#9654;&nbsp; Analyser gratuitement · 3 min
             </a>
             {_hero_secondary_cta}
         </div>
@@ -385,7 +385,7 @@ with qc_col_center:
                         st.markdown(
                             f'<div style="font-family:\'DM Sans\',sans-serif; font-size:13px; '
                             f'color:#374151; margin-bottom:6px; padding:8px 10px; '
-                            f'background:#F0FAF0; border-radius:8px;">— {s}</div>',
+                            f'background:#F0FAF0; border-radius:8px;">· {s}</div>',
                             unsafe_allow_html=True,
                         )
                     else:
@@ -393,7 +393,7 @@ with qc_col_center:
                             f'<div style="filter:blur(4px); user-select:none; '
                             f'font-family:\'DM Sans\',sans-serif; font-size:13px; '
                             f'color:#6B7280; margin-bottom:6px; padding:8px 10px; '
-                            f'background:#F9FAFB; border-radius:8px;">— {s}</div>',
+                            f'background:#F9FAFB; border-radius:8px;">· {s}</div>',
                             unsafe_allow_html=True,
                         )
 
@@ -408,7 +408,7 @@ with qc_col_center:
                         st.markdown(
                             f'<div style="font-family:\'DM Sans\',sans-serif; font-size:13px; '
                             f'color:#374151; margin-bottom:6px; padding:8px 10px; '
-                            f'background:#FEF2F2; border-radius:8px;">— {w}</div>',
+                            f'background:#FEF2F2; border-radius:8px;">· {w}</div>',
                             unsafe_allow_html=True,
                         )
                     else:
@@ -416,7 +416,7 @@ with qc_col_center:
                             f'<div style="filter:blur(4px); user-select:none; '
                             f'font-family:\'DM Sans\',sans-serif; font-size:13px; '
                             f'color:#6B7280; margin-bottom:6px; padding:8px 10px; '
-                            f'background:#F9FAFB; border-radius:8px;">— {w}</div>',
+                            f'background:#F9FAFB; border-radius:8px;">· {w}</div>',
                             unsafe_allow_html=True,
                         )
 
@@ -507,29 +507,29 @@ if not persona:  # N'afficher que sur la landing générique
 
 st.divider()
 
-# 3. PREUVE SOCIALE (placeholder — à remplir dès 5 users)
+# 3. PREUVE SOCIALE — facts produit fixes
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">—</div>
-                <div style="font-size: 13px; color: #6B7280;">Rapports analysés</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">10</div>
+                <div style="font-size: 13px; color: #6B7280;">ESRS couverts</div>
             </div>
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">—</div>
-                <div style="font-size: 13px; color: #6B7280;">Score moyen</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">3</div>
+                <div style="font-size: 13px; color: #6B7280;">Formats acceptés</div>
             </div>
             <div>
                 <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">3 min</div>
                 <div style="font-size: 13px; color: #6B7280;">Temps d'analyse</div>
             </div>
             <div>
-                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">10</div>
-                <div style="font-size: 13px; color: #6B7280;">Standards ESRS couverts</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1A3D22;">0</div>
+                <div style="font-size: 13px; color: #6B7280;">Compte requis</div>
             </div>
         </div>
         <div style="font-size: 12px; color: #9CA3AF; margin-top: 12px;">
-            En version beta — rejoignez nos premiers utilisateurs
+            PDF · DOCX · XLSX &nbsp;·&nbsp; Résultats immédiats · Aucun engagement
         </div>
     </div>""",
     unsafe_allow_html=True,
@@ -633,7 +633,7 @@ with demo_r:
             </div>
             <div style="background: #FEF3C7; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
                 <div style="font-size: 13px; color: #92400E;">
-                    <strong>Partiellement conforme</strong> — Couverture ESRS : 68%
+                    <strong>Partiellement conforme</strong> · Couverture ESRS : 68%
                 </div>
             </div>
             <div style="font-size: 13px; color: #374151; margin-bottom: 8px; font-weight: 600;">
@@ -729,7 +729,7 @@ with pr2:
         </div>""",
         unsafe_allow_html=True,
     )
-    if st.button("Acheter une analyse", key="cta_essential", use_container_width=True):
+    if st.button("Commencer · 1 analyse gratuite", key="cta_essential", use_container_width=True):
         track_cta_landing_click("Acheter une analyse", source="pricing_essential")
         st.switch_page("pages/6_Tarifs.py")
 
