@@ -25,7 +25,13 @@ if not require_auth():
     st.stop()
 
 token = get_token()
-_user_info = get_user()
+try:
+    from frontend.utils.api_client import get_me
+    from frontend.utils.session import save_user
+    _user_info = get_me(token)
+    save_user(_user_info)
+except Exception:
+    _user_info = get_user()
 _user_plan = _user_info.get("plan", "discovery") if _user_info else "discovery"
 
 # Bandeau upgrade (plan gratuit)
