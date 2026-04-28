@@ -351,7 +351,6 @@ for i, plan in enumerate(PLANS):
             st.link_button(
                 plan["cta_label"],
                 "mailto:contact@esg-optimizer.fr?subject=Demande%20Enterprise%20ESG%20Optimizer",
-                key=f"btn_{plan['slug']}",
                 use_container_width=True,
             )
 
