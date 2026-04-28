@@ -162,7 +162,7 @@ PLANS = [
             ("Benchmark sectoriel", True),
             ("Rapport white-label", True),
         ],
-        "cta_label": "Commencer le Pro",
+        "cta_label": "Démarrer l'essai Pro",
         "cta_action": "stripe_pro",
     },
     {
@@ -242,6 +242,7 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
         f'<div class="esg-plan-wrap">'
         f'<div class="esg-plan-card" style="background:{bg};border:{border_w} solid {border_color};'
         f'border-radius:14px;padding:32px 18px 22px 18px;text-align:center;'
+        f'height:490px;overflow:hidden;'
         f'position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.04);">'
         f'{rec_badge}'
         f'<div style="font-weight:700;font-size:16px;color:#111827;">{plan["name"]}</div>'
