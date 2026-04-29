@@ -43,7 +43,7 @@ def render_sidebar() -> None:
             </div>""",
             unsafe_allow_html=True,
         )
-        st.divider()
+        st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(212,240,216,0.25) 25%,rgba(212,240,216,0.25) 75%,transparent);margin:10px 0;"></div>', unsafe_allow_html=True)
 
         # Navigation — st.button + st.switch_page est plus fiable que st.page_link
         # quand st.navigation est en mode "hidden" (sinon le clic ré-affiche juste
@@ -61,7 +61,7 @@ def render_sidebar() -> None:
         _nav("Tarifs", "pages/6_Tarifs.py", "nav_tarifs")
         _nav("Mentions", "pages/7_Mentions.py", "nav_mentions")
 
-        st.divider()
+        st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(212,240,216,0.25) 25%,rgba(212,240,216,0.25) 75%,transparent);margin:10px 0;"></div>', unsafe_allow_html=True)
 
         # Infos utilisateur
         if is_logged_in():
@@ -94,18 +94,7 @@ def render_sidebar() -> None:
                     unsafe_allow_html=True,
                 )
 
-                st.divider()
+                st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(212,240,216,0.25) 25%,rgba(212,240,216,0.25) 75%,transparent);margin:10px 0;"></div>', unsafe_allow_html=True)
 
                 if plan in ("discovery", "free"):
-                    if st.button("Passer au plan Pro", use_container_width=True, type="primary", key="sidebar_upgrade"):
-                        st.switch_page("pages/6_Tarifs.py")
-
-            if st.button("Se déconnecter", use_container_width=True, type="secondary"):
-                clear_jwt_cookie()
-                logout()
-                st.session_state.pop("_cookie_checked", None)
-                st.rerun()
-        else:
-            if st.button("Se connecter", use_container_width=True, type="primary", key="sidebar_login"):
-                st.switch_page("pages/1_Login.py")
-
+                    if st.button("Passe

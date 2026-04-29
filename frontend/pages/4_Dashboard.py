@@ -84,7 +84,7 @@ with col4:
     avg_env = stats.get("avg_score_env")
     st.metric("Score moyen E", f"{avg_env:.1f}" if avg_env else "—")
 
-st.markdown("---")
+st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
 
 # 2. HISTORIQUE DES ANALYSES (tableau paginé)
 st.subheader("Historique des analyses")
@@ -158,7 +158,7 @@ else:
 
 # 3. GRAPHIQUES (si données suffisantes)
 if analyses_list and len(analyses_list) >= 2:
-    st.markdown("---")
+    st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
 
     # Charger toutes les analyses pour les graphiques
     try:
@@ -214,10 +214,4 @@ if analyses_list and len(analyses_list) >= 2:
                 ))
                 fig_line.update_layout(
                     height=350,
-                    yaxis={"range": [0, 100], "title": "Score"},
-                    xaxis={"title": "Date"},
-                    margin={"t": 20, "b": 40},
-                )
-                st.plotly_chart(fig_line, use_container_width=True)
-            else:
-                st.caption("Au moins 2 analyses nécessaires pour le graphique temporel.")
+                    yaxis={"range": [0, 100], "title": "

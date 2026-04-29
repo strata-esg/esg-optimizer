@@ -105,7 +105,7 @@ def render_delta_row(analysis: dict) -> None:
     if not narrative:
         return
 
-    st.markdown("---")
+    st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
 
     # Parser le JSON (stocké en string dans la DB)
     if isinstance(narrative, str):
@@ -215,6 +215,3 @@ def render_delta_row(analysis: dict) -> None:
             pillar = act.get("pillar", "")
             action = act.get("action", "")
             rationale = act.get("rationale", "")
-            with st.expander(f"Priorité {prio} — [{pillar}] {action}"):
-                if rationale:
-                    st.caption(rationale)
