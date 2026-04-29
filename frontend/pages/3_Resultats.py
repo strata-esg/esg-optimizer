@@ -112,7 +112,7 @@ score_global = analysis.get("score_global") or 0
 render_score_row(score_env, score_social, score_gov, score_global)
 
 # 3. Conformité CSRD
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 csrd_ready = analysis.get("csrd_ready")
 csrd_pct = analysis.get("csrd_coverage_pct")
 
@@ -174,12 +174,12 @@ if csrd_pct is not None:
                 st.markdown(f"- {m}")
 
 # 4. Couverture ESRS (grille)
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 esrs_data = analysis.get("esrs_coverage")
 render_esrs_grid(esrs_data)
 
 # 5. KPIs détectés
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 kpis = analysis.get("kpis_detected") or []
 if kpis:
     st.subheader("KPIs détectés")
@@ -199,7 +199,7 @@ else:
     st.caption("Aucun KPI détecté dans le rapport.")
 
 # 6. Points forts & Lacunes
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 col_str, col_weak = st.columns(2)
 
 strengths = analysis.get("strengths") or []
@@ -246,7 +246,7 @@ with col_weak:
         )
 
 # 7. Recommandations
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 recommendations = analysis.get("recommendations") or []
 if recommendations:
     st.subheader("Recommandations")
@@ -266,7 +266,7 @@ if recommendations:
                 st.markdown(f"**Référence ESRS** : {esrs_ref}")
 
 # 8. Delta (évolution vs précédent)
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 render_delta_row(analysis)
 
 # 8b. Bandeau upgrade (si plan gratuit)
@@ -285,7 +285,7 @@ user_plan = user_info.get("plan", "discovery") if user_info else "discovery"
 is_free_plan = user_plan in ("discovery", "free")
 
 if is_free_plan:
-    st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+    st.markdown("---")
     st.markdown(
         """<div style="background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
             border: 2px solid #1A3D22; border-radius: 16px; padding: 24px; text-align: center;
@@ -306,7 +306,7 @@ if is_free_plan:
         st.page_link("pages/6_Tarifs.py", label="🔓 Voir les tarifs", use_container_width=True)
 
 # 9. Boutons de téléchargement
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.subheader("Téléchargements")
 
 col_pdf, col_delta = st.columns(2)
@@ -386,7 +386,7 @@ with col_delta:
             st.caption("Pas de delta disponible (première analyse de cette entreprise).")
 
 # 10. Partage social (LinkedIn)
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.subheader("Partager votre score")
 
 try:
@@ -523,4 +523,32 @@ try:
                 </div>
                 <!-- Entreprise -->
                 <div style="font-family:'DM Serif Display',Georgia,serif;
-                    font-weight:
+                    font-weight:400; font-size: 16px; color:#111827;
+                    letter-spacing:-0.01em; margin-bottom: 4px;">
+                    {company}
+                </div>
+                <div style="font-size: 11px; color:#9CA3AF; margin-bottom: 12px;">
+                    Rapport {year}
+                </div>
+                <!-- Badge conformité -->
+                <div style="margin: 6px 0 14px;">
+                    <span style="{_badge_style}padding:6px 14px;border-radius:20px;
+                        font-family:'DM Sans',sans-serif; font-size:12px;
+                        font-weight:600; letter-spacing:0.02em;">{_badge_label}</span>
+                </div>
+                <!-- Footer URL -->
+                <div style="border-top:1px solid #E5E7EB; padding-top:10px;
+                    font-family:'DM Sans',sans-serif; font-size:10.5px;
+                    color:#6B7280; letter-spacing:0.04em;">
+                    Vérifié par <strong style="color:#1A3D22;">esg-optimizer.fr</strong>
+                </div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+        # Lien direct vers l'image du badge
+        st.caption(f"URL du badge partageable : `{badge_url}`")
+
+except APIError:
+    st.caption("Partage non disponible pour cette analyse.")
+except Exception:
+    st.caption("Partage non disponible.")

@@ -358,7 +358,7 @@ for i, plan in enumerate(PLANS):
             )
 
 # Comparatif détaillé
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <h2 style="font-size: 28px; font-weight: 700; color: #111827;">Comparatif détaillé</h2>
@@ -432,7 +432,7 @@ st.markdown(
 )
 
 # FAQ Pricing
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <h2 style="font-size: 28px; font-weight: 700; color: #111827;">Questions fréquentes</h2>
@@ -495,7 +495,7 @@ for question, answer in faq_items:
         st.markdown(answer)
 
 # CTA final
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.markdown(
     """<div style="text-align: center; padding: 30px 0;">
         <div style="font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 8px;">
@@ -526,4 +526,12 @@ with col_cta2:
                                use_container_width=True, type="primary")
             else:
                 if st.button("Passer au plan Pro", use_container_width=True,
-                             type="primar
+                             type="primary", key="cta_final_upgrade"):
+                    st.error("Lien Stripe indisponible. Réessayez.")
+        else:
+            _plan_label = {
+                "essential": "Essentiel",
+                "pro": "Pro",
+                "enterprise": "Enterprise",
+            }.get(user_plan, str(user_plan).title() if user_plan else "Découverte")
+            st.success(f"Vous êtes déjà sur le plan {_plan_label}. Merci pour votre confiance !")

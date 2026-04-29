@@ -505,7 +505,7 @@ if not persona:  # N'afficher que sur la landing générique
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.divider()
 
 # 3. PREUVE SOCIALE — facts produit fixes
 st.markdown(
@@ -535,7 +535,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.divider()
 
 # 4. COMMENT ÇA MARCHE — 3 étapes
 st.markdown(
@@ -582,7 +582,7 @@ for col, num, icon, title, desc in steps:
         )
 
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.divider()
 
 # 5. DÉMO VISUELLE — Aperçu des résultats
 st.markdown(
@@ -672,7 +672,7 @@ for col, icon, title, desc in features_extra:
             unsafe_allow_html=True,
         )
 
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.divider()
 
 # 6. PRICING — 4 plans
 track_pricing_viewed(persona)
@@ -785,7 +785,7 @@ with pr4:
         use_container_width=True,
     )
 
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.divider()
 
 # 7. FAQ
 st.markdown(
@@ -857,7 +857,7 @@ with st.expander("Le rapport white-label fonctionne comment ?"):
         "livrent des analyses à leurs clients sous leur propre marque."
     )
 
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.divider()
 
 # 8. CTA FINAL
 st.markdown(
@@ -894,4 +894,20 @@ st.markdown(
                     Analyse ESG automatisée par IA
                 </div>
             </div>
-            <div style="font-size: 12px; color:
+            <div style="font-size: 12px; color: #9CA3AF; line-height: 2;">
+                <a href="/7_Mentions" style="color: #6B7280; text-decoration: none;">Mentions légales</a><br>
+                <a href="/7_Mentions#cgu" style="color: #6B7280; text-decoration: none;">CGU</a><br>
+                <a href="/7_Mentions#confidentialite" style="color: #6B7280; text-decoration: none;">Politique de confidentialité</a>
+            </div>
+            <div style="font-size: 12px; color: #9CA3AF; line-height: 2;">
+                <a href="mailto:contact@esg-optimizer.fr" style="color: #6B7280; text-decoration: none;">Contact</a><br>
+                Conforme ESRS E1-E5, S1-S4, G1<br>
+                Hébergement UE
+            </div>
+        </div>
+        <div style="text-align: center; font-size: 11px; color: #D1D5DB; margin-top: 20px;">
+            © 2026 ESG Optimizer AI — Tous droits réservés
+        </div>
+    </div>""",
+    unsafe_allow_html=True,
+)

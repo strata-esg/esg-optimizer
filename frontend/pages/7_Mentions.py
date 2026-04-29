@@ -187,6 +187,7 @@ with tab4:
 
 *Version 1.0 — Avril 2026*
 
+---
 
 ### Modèle d'analyse
 
@@ -198,6 +199,7 @@ en deux passes successives :
    préservant les tableaux et les données chiffrées
 2. **Analyse** : évaluation de la couverture des exigences CSRD selon le référentiel ESRS
 
+---
 
 ### Référentiel utilisé : ESRS (European Sustainability Reporting Standards)
 
@@ -218,6 +220,7 @@ L'analyse est calquée sur les **12 standards ESRS** publiés par l'EFRAG en 202
 | ESRS S4 | Consommateurs et utilisateurs finaux |
 | ESRS G1 | Conduite des affaires |
 
+---
 
 ### Calcul des scores
 
@@ -238,6 +241,7 @@ Chaque dimension (E, S, G) reçoit un score de **0 à 100** calculé selon :
 | 40 – 59 | Couverture minimale — travail significatif requis |
 | 0 – 39 | Non conforme — rapport à retravailler en profondeur |
 
+---
 
 ### Delta Report
 
@@ -247,6 +251,7 @@ Il identifie :
 - Les **régressions** (données présentes l'année N-1 mais absentes en N)
 - Les **écarts de périmètre** (nouvelles entités consolidées)
 
+---
 
 ### Limites de l'analyse automatique
 
@@ -261,6 +266,7 @@ ESG Optimizer est un outil d'**aide à la décision**, pas un auditeur certifié
 **Pour un audit certifié CSRD**, nous vous recommandons de faire appel à un
 Organisme Tiers Indépendant (OTI) accrédité par le COFRAC.
 
+---
 
 ### Questions sur la méthodologie ?
 
@@ -268,7 +274,7 @@ Organisme Tiers Indépendant (OTI) accrédité par le COFRAC.
 """)
 
     # Badge méthodologie
-    st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+    st.divider()
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown(
@@ -291,3 +297,9 @@ Organisme Tiers Indépendant (OTI) accrédité par le COFRAC.
                        style="color:#1A3D22; font-size:0.82rem;
                               text-decoration:underline;">
                         Consulter les standards officiels →
+                    </a>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )

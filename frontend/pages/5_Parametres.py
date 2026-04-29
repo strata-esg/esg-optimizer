@@ -52,7 +52,7 @@ st.caption(
 )
 
 # 2. ABONNEMENT
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.subheader("Abonnement")
 
 plan = user.get("plan", "discovery")
@@ -116,7 +116,7 @@ if plan in ("discovery", "free", "essential"):
         st.switch_page("pages/6_Tarifs.py")
 
 # 3. PRÉFÉRENCES EMAIL
-st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,#D1D5DB 25%,#D1D5DB 75%,transparent);margin:20px 0;"></div>', unsafe_allow_html=True)
+st.markdown("---")
 st.subheader("Notifications email")
 
 # Charger les préférences actuelles
@@ -153,4 +153,8 @@ st.caption(
 )
 
 # 4. ZONE AVANCÉE
-st.markdown('<div style="
+st.markdown("---")
+with st.expander("Zone avancée"):
+    st.caption("Ces fonctionnalités seront disponibles dans une prochaine version.")
+    st.button("Modifier mon mot de passe", disabled=True, use_container_width=True)
+    st.button("Supprimer mon compte", disabled=True, use_container_width=True, type="secondary")
