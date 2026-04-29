@@ -224,6 +224,9 @@ async def stripe_webhook(
         session_data if isinstance(session_data, dict) else session_data.to_dict()
     )
 
+    # Capturer le plan actuel AVANT upgrade — évite de renvoyer l'email si déjà à ce plan
+    previous_plan = user.plan
+
     # Calculer l'expiration
     expires_at = None
     sub_status = "one_time"
@@ -257,11 +260,16 @@ async def stripe_webhook(
         user.id, detected_plan, session_id,
     )
 
-    try:
-        amount_display = f"{(amount or 0) / 100:.0f}€" if amount else "—"
-        send_upgrade_confirmation_email(customer_email, detected_plan, amount_display)
-    except Exception as email_exc:
-        logger.warning("Email upgrade non envoyé : %s", email_exc)
+    # N'envoyer l'email que si c'est une vraie première upgrade vers ce plan
+    # (évite le spam si Stripe retente le webhook ou si plusieurs sessions coexistent)
+    if previous_plan != detected_plan:
+        try:
+            amount_display = f"{(amount or 0) / 100:.0f}€" if amount else None
+            send_upgrade_confirmation_email(customer_email, detected_plan, amount_display)
+        except Exception as email_exc:
+            logger.warning("Email upgrade non envoyé : %s", email_exc)
+    else:
+        logger.info("Email upgrade non renvoyé — user %d déjà sur le plan %s", user.id, detected_plan)
 
     return {"status": "ok", "plan": detected_plan, "user_id": user.id}
 
