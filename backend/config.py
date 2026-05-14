@@ -113,6 +113,12 @@ class Settings(BaseSettings):
     public_rate_limit_weekly: int = 10
     public_token_expiry_hours: int = 72
 
+    # --- PostHog (product analytics — funnels, session recording) ---
+    # Créer un projet sur https://app.posthog.com → Settings → Project API key
+    # Host : https://eu.i.posthog.com (EU) ou https://us.i.posthog.com (US)
+    posthog_api_key: str = ""    # ex: phc_XXXXXXXXXXXX
+    posthog_host: str = "https://eu.i.posthog.com"
+
     # --- Cloudflare R2 (stockage persistant des rapports uploadés) ---
     # Activer en prod pour éviter de perdre les fichiers lors d'un redeploy Railway.
     # En dev, use_r2_storage=False → fallback sur tempfile local.
@@ -121,6 +127,11 @@ class Settings(BaseSettings):
     r2_access_key_id: str = ""        # Clé d'accès R2 (depuis Cloudflare Dashboard)
     r2_secret_access_key: str = ""    # Clé secrète R2
     r2_bucket_name: str = "esg-reports"  # Nom du bucket R2
+
+    # --- Redis / Celery ---
+    # Upstash Redis URL format: rediss://default:<password>@<host>:<port>
+    # En local sans Redis: laisser vide, le backend bascule sur BackgroundTasks FastAPI
+    redis_url: str = ""
 
     # --- Environment ---
     environment: str = "development"

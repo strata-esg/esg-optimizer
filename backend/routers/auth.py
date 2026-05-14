@@ -20,6 +20,7 @@ from backend.services.auth_service import (
     decode_access_token,
 )
 from backend.services.email_service import send_welcome_email
+from backend.services.analytics_service import ph
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,10 @@ def register(
     # Email de bienvenue (en background pour ne pas bloquer la réponse)
     background_tasks.add_task(send_welcome_email, user.email, body.company_name)
     logger.info("Inscription réussie — user=%d, email=%s", user.id, user.email)
+
+    # PostHog : identifier le nouvel utilisateur
+    ph.identify(user.id, email=user.email, plan=user.plan, company_name=user.company_name or "")
+    ph.capture(user.id, "user_signed_up", {"plan": user.plan})
 
     return RegisterResponse(user=UserResponse.model_validate(user), access_token=token)
 

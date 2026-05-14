@@ -23,13 +23,33 @@ from backend.services.extractor import ALLOWED_EXTENSIONS
 from backend.services.reporter import generate_analysis_pdf, generate_delta_pdf, generate_preview
 from backend.services.badge_generator import generate_badge
 from backend.services.storage_service import StorageService
+from backend.services.analytics_service import ph
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
 
+def _dispatch_analysis(analysis_id: int, storage_key: str, background_tasks) -> None:
+    """
+    Dispatch le pipeline d'analyse :
+    - Si REDIS_URL configure : tache Celery (worker isole, pas de timeout HTTP).
+    - Sinon : BackgroundTasks FastAPI (fallback dev/local, risque de timeout en prod).
+    """
+    if settings.redis_url:
+        from backend.tasks.analysis_task import run_analysis_task
+        run_analysis_task.delay(analysis_id, storage_key)
+        logger.info("Analyse [%d] dispatchee vers Celery (Redis configure)", analysis_id)
+    else:
+        background_tasks.add_task(_run_pipeline_with_own_session, analysis_id, storage_key)
+        logger.warning(
+            "Analyse [%d] via BackgroundTasks (REDIS_URL absent — mode dev/local)",
+            analysis_id,
+        )
+
+
 def _check_quota(user: User) -> None:
+    # PostHog : quota atteint = signal de conversion fort
     """
     Vérifie le quota d'analyses selon le plan :
     - discovery / free : 1 analyse au total
@@ -38,6 +58,11 @@ def _check_quota(user: User) -> None:
     """
     if user.plan in ("discovery", "free"):
         if user.analyses_this_month >= settings.discovery_total_limit:
+            ph.capture(user.id, "quota_hit", {
+                "plan": user.plan,
+                "analyses_used": user.analyses_this_month,
+                "limit": settings.discovery_total_limit,
+            })
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(
@@ -147,12 +172,20 @@ async def upload_analysis(
     current_user.analyses_this_month += 1
     db.commit()
 
-    # 7. Lancer le pipeline en background
+    # 7. Lancer le pipeline (Celery si Redis configure, BackgroundTasks sinon)
     logger.info(
-        "Analyse [%d] créée — user=%d, company=%s, fichier=%s, storage_key=%s",
+        "Analyse [%d] creee — user=%d, company=%s, fichier=%s, storage_key=%s",
         analysis.id, current_user.id, company_name, file.filename, storage_key,
     )
-    background_tasks.add_task(_run_pipeline_with_own_session, analysis.id, storage_key)
+    _dispatch_analysis(analysis.id, storage_key, background_tasks)
+
+    # PostHog : analyse lancée (event de funnel critique)
+    ph.capture(current_user.id, "analysis_started", {
+        "analysis_id": analysis.id,
+        "format": file_format,
+        "sector": sector or "non_precise",
+        "plan": current_user.plan,
+    })
 
     return AnalysisCreatedResponse(analysis_id=analysis.id, status="processing")
 

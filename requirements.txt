@@ -39,7 +39,12 @@ python-dotenv==1.*
 boto3==1.35.*
 # --- Monitoring (Sprint 6H) ---
 sentry-sdk[fastapi]==2.14.*
+# --- Product analytics (PostHog) ---
+posthog==3.*
 # --- Database Connector (Alternative stable) ---
 pg8000==1.31.2
 psycopg2-binary==2.9.*
 extra-streamlit-components>=0.1.60
+# --- Async task queue ---
+celery[redis]==5.4.*
+redis==5.0.*

@@ -1,15 +1,22 @@
 """
-ESG Optimizer MVP - Composant analytics Umami.
+ESG Optimizer MVP - Composants analytics : Umami + PostHog.
+
+Umami  : trafic anonyme, pages vues, events generiques (pas de donnees perso).
+PostHog : comportement par utilisateur identifie, funnels, session recording.
+Les deux se completent et ne se remplacent pas.
 
 Pourquoi components.html et pas st.markdown ?
 Les navigateurs n'executent pas les scripts injectes via innerHTML.
-st.markdown utilise ce mecanisme -> les scripts n'arrivent jamais a Umami.
+st.markdown utilise ce mecanisme -> les scripts n'arrivent jamais.
 Solution : components.html cree un iframe (meme origine) dont les scripts
-s'executent et peuvent acceder a window.parent pour appeler Umami.
+s'executent et peuvent acceder a window.parent.
 
-Configuration : UMAMI_WEBSITE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Configuration :
+    UMAMI_WEBSITE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    POSTHOG_KEY=phc_XXXXXXXXXXXXXXXXXXXX
+    POSTHOG_HOST=https://eu.i.posthog.com
 
-Funnel de conversion (6 events) :
+Funnel de conversion (6 events Umami) :
     1. cta_landing_click     - Clic CTA landing page
     2. quick_check_submit    - Soumission quick-check
     3. upload_started        - Debut upload (authentifie)
@@ -23,6 +30,8 @@ import json
 import streamlit.components.v1 as components
 
 UMAMI_WEBSITE_ID = os.getenv("UMAMI_WEBSITE_ID", "")
+POSTHOG_KEY  = os.getenv("POSTHOG_KEY", "")
+POSTHOG_HOST = os.getenv("POSTHOG_HOST", "https://eu.i.posthog.com")
 
 
 def inject_analytics_script():
@@ -59,6 +68,85 @@ def inject_analytics_script():
 
 
 inject_umami_script = inject_analytics_script
+
+
+def inject_posthog_script(user_id: int | None = None, user_email: str | None = None):
+    """
+    Injecte le snippet PostHog dans la page parente via window.parent.
+    Si user_id est fourni, appelle posthog.identify() pour lier les sessions
+    anonymes aux utilisateurs connectes.
+    """
+    if not POSTHOG_KEY:
+        return
+
+    key  = POSTHOG_KEY
+    host = POSTHOG_HOST
+
+    # Bloc identify optionnel
+    identify_js = ""
+    if user_id is not None:
+        email_js = f'"{user_email}"' if user_email else "undefined"
+        identify_js = f"""
+            window.__ph_ready = function(ph) {{
+                ph.identify('user_{user_id}', {{email: {email_js}}});
+            }};
+"""
+
+    components.html(
+        f"""<script>
+(function(){{
+    var p=window.parent;
+    if(!p||!p.document)return;
+    if(p.document.getElementById('_posthog_sdk'))return;
+    {identify_js}
+    var s=p.document.createElement('script');
+    s.id='_posthog_sdk';
+    s.defer=true;
+    s.src='{host}/static/array.js';
+    s.onload=function(){{
+        p.posthog.init('{key}',{{
+            api_host:'{host}',
+            person_profiles:'identified_only',
+            session_recording:{{
+                maskAllInputs: false,
+                maskInputOptions: {{ password: true }}
+            }},
+            loaded: function(ph){{
+                if(p.__ph_ready) p.__ph_ready(ph);
+            }}
+        }});
+    }};
+    p.document.head.appendChild(s);
+}})();
+</script>""",
+        height=0,
+    )
+
+
+def track_posthog_event(event_name: str, properties: dict | None = None):
+    """Envoie un event PostHog depuis le frontend via window.parent."""
+    if not POSTHOG_KEY:
+        return
+    props_js = json.dumps(properties) if properties else "{}"
+    name_safe = event_name.replace("'", "\\'")
+    components.html(
+        f"""<script>
+(function(){{
+    var p=window.parent;
+    if(!p)return;
+    var r=0;
+    function fire(){{
+        if(p.posthog&&typeof p.posthog.capture==='function'){{
+            p.posthog.capture('{name_safe}',{props_js});
+        }}else if(r++<15){{
+            setTimeout(fire,400);
+        }}
+    }}
+    fire();
+}})();
+</script>""",
+        height=0,
+    )
 
 
 def track_event(event_name, data=None):

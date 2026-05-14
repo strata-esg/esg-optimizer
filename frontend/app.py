@@ -26,7 +26,7 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from frontend.components.sidebar import render_sidebar
-from frontend.components.analytics import inject_umami_script
+from frontend.components.analytics import inject_umami_script, inject_posthog_script
 from frontend.utils.styles import inject_global_styles
 from frontend.utils.session import get_token, save_token, save_user, clear_token, clear_user
 
@@ -74,5 +74,12 @@ pg = st.navigation(pages, position="hidden")
 # Sidebar + Analytics (toutes les pages)
 render_sidebar()
 inject_umami_script()
+
+# PostHog : injecter le snippet et identifier l'utilisateur connecté si dispo
+_ph_user = st.session_state.get("user")
+inject_posthog_script(
+    user_id=_ph_user.get("id") if _ph_user else None,
+    user_email=_ph_user.get("email") if _ph_user else None,
+)
 
 pg.run()

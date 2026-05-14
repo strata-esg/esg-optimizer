@@ -18,6 +18,7 @@ from backend.services.extractor import extract_text
 from backend.services.delta_service import run_delta
 from backend.services.email_service import send_analysis_complete_email, send_analysis_failed_email
 from backend.services.storage_service import StorageService
+from backend.services.analytics_service import ph
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +140,21 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
             analysis_id, analysis.processing_time_s, analysis.score_global,
         )
 
+        # PostHog : analyse terminée avec succès
+        user_obj = db.query(User).filter(User.id == analysis.user_id).first()
+        ph.capture(analysis.user_id, "analysis_completed", {
+            "analysis_id": analysis_id,
+            "score_env": analysis.score_env,
+            "score_social": analysis.score_social,
+            "score_gov": analysis.score_gov,
+            "score_global": analysis.score_global,
+            "csrd_ready": analysis.csrd_ready,
+            "csrd_coverage_pct": analysis.csrd_coverage_pct,
+            "processing_time_s": analysis.processing_time_s,
+            "format": analysis.source_format,
+            "plan": user_obj.plan if user_obj else "unknown",
+        })
+
         # 4. Delta Report (si analyse précédente existe)
         try:
             delta_result = run_delta(analysis, db)
@@ -168,6 +184,14 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
         analysis.error_message = str(exc)[:500]
         analysis.processing_time_s = round(time.time() - start, 2)
         logger.error("Pipeline [%d] — Échec : %s", analysis_id, exc)
+
+        # PostHog : analyse échouée (signal pour debugger les cas d'erreur)
+        ph.capture(analysis.user_id, "analysis_failed", {
+            "analysis_id": analysis_id,
+            "error": str(exc)[:200],
+            "format": analysis.source_format,
+            "processing_time_s": analysis.processing_time_s,
+        })
 
         # Email de notification (échec)
         try:
