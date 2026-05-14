@@ -13,6 +13,8 @@ import { Webhook } from "svix";
 import { createSupabaseAdmin } from "@/lib/supabase";
 import { PostHog } from "posthog-node";
 
+export const dynamic = 'force-dynamic';
+
 const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
 function getPostHogClient() {
@@ -117,14 +119,4 @@ export async function POST(req: Request) {
           distinctId: data.id as string,
           event: "user_deleted",
         });
-        await ph.shutdown();
-      }
-      break;
-    }
-
-    default:
-      break;
-  }
-
-  return NextResponse.json({ received: true });
-}
+        await ph.sh
