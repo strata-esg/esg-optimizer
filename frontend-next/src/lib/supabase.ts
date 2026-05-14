@@ -1,15 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Client côté navigateur (public) — instanciation différée pour éviter les crashes au build
+// quand les env vars ne sont pas encore disponibles (Vercel build phase)
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const _supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Client côté navigateur (public)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = (_supabaseUrl && _supabaseAnonKey)
+  ? createClient(_supabaseUrl, _supabaseAnonKey)
+  : (undefined as unknown as ReturnType<typeof createClient>);
 
 // Client côté serveur (service role — uniquement dans les API routes / Server Components)
+// Lit toutes ses vars localement pour ne pas dépendre du scope module
 export function createSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  return createClient(supabaseUrl, serviceKey, {
+  return createClient(url, serviceKey, {
     auth: { persistSession: false },
   });
 }
