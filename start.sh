@@ -123,7 +123,7 @@ else
         sleep 1
     done
 
-    # nginx route /stripe/webhook → FastAPI, reste → Streamlit
+    # nginx : API → FastAPI, reste → Streamlit
     cat > /etc/nginx/nginx.conf << NGINX_EOF
 events {
     worker_connections 1024;
@@ -140,7 +140,40 @@ http {
     server {
         listen ${NGINX_PORT};
 
-        location = /stripe/webhook {
+        # --- Routes FastAPI (backend API) ---
+        location /auth/ {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_read_timeout 120s;
+        }
+
+        location /analysis/ {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_read_timeout 360s;
+        }
+
+        location /history/ {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_read_timeout 60s;
+        }
+
+        location /public/ {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_read_timeout 360s;
+        }
+
+        location /stripe/ {
             proxy_pass         http://127.0.0.1:${PORT_API};
             proxy_set_header   Host              \$host;
             proxy_set_header   X-Real-IP         \$remote_addr;
@@ -149,6 +182,31 @@ http {
             proxy_read_timeout 30s;
         }
 
+        location /email/ {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_read_timeout 30s;
+        }
+
+        location /health {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_read_timeout 10s;
+        }
+
+        location /docs {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+        }
+
+        location /openapi.json {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+        }
+
+        # --- Streamlit (frontend actuel) ---
         location / {
             proxy_pass         http://127.0.0.1:${STREAMLIT_PORT};
             proxy_http_version 1.1;
