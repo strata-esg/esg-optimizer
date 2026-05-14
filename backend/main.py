@@ -73,9 +73,14 @@ app = FastAPI(
 )
 
 # CORS
-_allowed_origins = ["http://localhost:8501"]  # Streamlit dev
+_allowed_origins = ["http://localhost:8501", "http://localhost:3000"]  # dev local
 if not settings.is_dev:
-    _allowed_origins = [APP_URL, "https://www.esg-optimizer.fr"]
+    _allowed_origins = [
+        APP_URL,
+        "https://esg-optimizer.fr",
+        "https://www.esg-optimizer.fr",
+        "https://esg-optimizer.vercel.app",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
