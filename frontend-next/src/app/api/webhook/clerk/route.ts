@@ -119,4 +119,14 @@ export async function POST(req: Request) {
           distinctId: data.id as string,
           event: "user_deleted",
         });
-        await ph.sh
+        await ph.shutdown();
+      }
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return NextResponse.json({ received: true }, { status: 200 });
+}
