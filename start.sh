@@ -7,7 +7,7 @@
 #  ENABLE_CELERY=false (defaut) — mode Streamlit (actuel)
 #    1. FastAPI   (uvicorn)   sur PORT_API       (8000)
 #    2. Streamlit             sur STREAMLIT_PORT (8502)
-#    3. nginx route : /stripe/webhook → FastAPI, reste → Streamlit
+#    3. nginx route : API → FastAPI, reste → Streamlit
 #
 #  ENABLE_CELERY=true — mode Next.js + Celery (apres migration Vercel)
 #    1. FastAPI   (uvicorn)   sur PORT_API       (8000)
