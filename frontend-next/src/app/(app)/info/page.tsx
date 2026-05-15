@@ -111,4 +111,10 @@ export default function MentionsAppPage() {
             <p><strong>Conservation :</strong> Fichiers supprimés immédiatement après extraction. Seuls les résultats sont conservés.</p>
             <p><strong>Hébergement :</strong> Railway / Google Cloud europe-west1 (Belgique) - conforme RGPD.</p>
             <p><strong>Vos droits :</strong> Accès, rectification, suppression via Paramètres ou par email. Réponse sous 72h.</p>
-            <p><strong>Cookies :</strong> Uniquement fonctionnels (ses
+            <p><strong>Cookies :</strong> Uniquement fonctionnels (sessions, Clerk et PostHog). Aucun cookie publicitaire.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

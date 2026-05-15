@@ -192,4 +192,12 @@ export default function TarifsAppPage() {
       <div className="text-center">
         <a
           href="mailto:contact@esg-optimizer.fr"
-          className="inline-flex items-center gap-2 tex
+          className="inline-flex items-center gap-2 text-sm font-semibold bg-[#1A3D22] text-[#D4F0D8] hover:bg-[#2A5C34] px-6 py-3 rounded-lg transition-colors"
+        >
+          <ExternalLink className="w-4 h-4" />
+          Nous contacter
+        </a>
+      </div>
+    </div>
+  );
+}

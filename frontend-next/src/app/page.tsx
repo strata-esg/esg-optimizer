@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle, Leaf, ArrowRight, Zap, BarChart2, Upload, FileText, Award } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { LandingNavbar } from "@/components/LandingNavbar";
 
 export const metadata: Metadata = {
@@ -410,4 +411,20 @@ export default function LandingPage() {
             <a
               href="https://www.linkedin.com/in/adama-diallo-rse"
               target="_blank"
-              rel="
+              rel="noopener noreferrer"
+              className="hover:text-[#1A3D22]"
+            >
+              LinkedIn
+            </a>
+            <a href="mailto:contact@esg-optimizer.fr" className="hover:text-[#1A3D22]">
+              contact@esg-optimizer.fr
+            </a>
+          </div>
+          <p className="text-xs text-[#6B7280]">
+            &copy; 2025 ESG Optimizer - Tous droits réservés.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
