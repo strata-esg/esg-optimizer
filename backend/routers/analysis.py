@@ -168,16 +168,16 @@ async def upload_analysis(
     db.commit()
     db.refresh(analysis)
 
-    # 6. Incrémenter le compteur d'analyses du mois
-    current_user.analyses_this_month += 1
-    db.commit()
-
-    # 7. Lancer le pipeline (Celery si Redis configure, BackgroundTasks sinon)
+    # 6. Lancer le pipeline (Celery si Redis configure, BackgroundTasks sinon)
     logger.info(
         "Analyse [%d] creee - user=%d, company=%s, fichier=%s, storage_key=%s",
         analysis.id, current_user.id, company_name, file.filename, storage_key,
     )
     _dispatch_analysis(analysis.id, storage_key, background_tasks)
+
+    # 7. Incrémenter le compteur seulement si le dispatch a reussi
+    current_user.analyses_this_month += 1
+    db.commit()
 
     # PostHog : analyse lancée (event de funnel critique)
     ph.capture(current_user.id, "analysis_started", {
