@@ -18,13 +18,17 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 def _require_admin_key(x_admin_key: str = Header(...)):
-    """Vérifie que la requête porte la CRON_API_KEY dans le header X-Admin-Key."""
-    if not settings.cron_api_key:
+    """
+    Vérifie le header X-Admin-Key.
+    Utilise CRON_API_KEY si défini, sinon JWT_SECRET comme fallback.
+    """
+    expected = settings.cron_api_key or settings.jwt_secret
+    if not expected or expected == "CHANGE_ME":
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Admin non configuré (CRON_API_KEY vide).",
+            detail="Admin non configuré (aucune clé disponible).",
         )
-    if x_admin_key != settings.cron_api_key:
+    if x_admin_key != expected:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Clé admin invalide.",
