@@ -1,4 +1,4 @@
-
+"use client";
 
 const ESRS_TOPICS = [
   { code: "E1", label: "Changement climatique", pilier: "E" },

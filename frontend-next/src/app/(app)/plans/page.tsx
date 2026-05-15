@@ -1,3 +1,4 @@
+"use client";
 
 import { CheckCircle, ExternalLink } from "lucide-react";
 
