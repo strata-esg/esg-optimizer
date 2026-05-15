@@ -21,6 +21,7 @@ from backend.routers.history import router as history_router
 from backend.routers.public import router as public_router, claim_router
 from backend.routers.stripe import router as stripe_router
 from backend.routers.email import router as email_router
+from backend.routers.admin import router as admin_router
 
 # --- Logging ------------------------------------------------------------
 logging.basicConfig(
@@ -168,6 +169,7 @@ app.include_router(public_router)
 app.include_router(claim_router)
 app.include_router(stripe_router)
 app.include_router(email_router)
+app.include_router(admin_router)
 
 
 # --- Routes racine ------------------------------------------------------
