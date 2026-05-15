@@ -1,5 +1,5 @@
 /**
- * PostHog — singleton browser client.
+ * PostHog - singleton browser client.
  *
  * Importé dans PostHogProvider (client component).
  * Ne jamais importer directement dans un Server Component.
@@ -36,3 +36,4 @@ export function initPostHog() {
 }
 
 export { posthog };
+   

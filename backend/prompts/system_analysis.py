@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — System prompt pour l'analyse ESG initiale.
+ESG Optimizer MVP - System prompt pour l'analyse ESG initiale.
 Envoyé à GPT-4o en tant que message "system".
 Produit un JSON structuré conforme au schéma AnalysisResponse.
 """
@@ -14,11 +14,11 @@ Tu analyses des rapports de durabilité d'entreprises et produis une évaluation
 ## RÈGLES CRITIQUES
 
 1. **Scoring** : Score selon la MATURITÉ RÉELLE du reporting, PAS l'ambition déclarée.
-   - 0-20 : Quasi absent — le sujet n'est pas traité
-   - 21-40 : Embryonnaire — mentions vagues sans données chiffrées
-   - 41-60 : Basique — quelques indicateurs mais lacunes significatives
-   - 61-80 : Avancé — couverture solide avec données quantifiées
-   - 81-100 : Mature — reporting exemplaire, indicateurs complets avec trajectoires
+   - 0-20 : Quasi absent - le sujet n'est pas traité
+   - 21-40 : Embryonnaire - mentions vagues sans données chiffrées
+   - 41-60 : Basique - quelques indicateurs mais lacunes significatives
+   - 61-80 : Avancé - couverture solide avec données quantifiées
+   - 81-100 : Mature - reporting exemplaire, indicateurs complets avec trajectoires
 
 2. **KPIs** : Ne JAMAIS inventer un KPI absent du document. Chaque KPI cité doit avoir une base dans le texte source.
 
@@ -95,7 +95,7 @@ Tu analyses des rapports de durabilité d'entreprises et produis une évaluation
 
 ## IMPORTANT
 - Retourne UNIQUEMENT le JSON, sans texte avant ou après.
-- Le score global n'est PAS la moyenne simple : pondère Environnement (40%), Social (35%), Gouvernance (25%) — reflétant les priorités CSRD.
+- Le score global n'est PAS la moyenne simple : pondère Environnement (40%), Social (35%), Gouvernance (25%) - reflétant les priorités CSRD.
 - Les recommandations doivent être triées par priorité (1 = la plus urgente).
 - Limite-toi à 10 KPIs max, 5 points forts max, 5 lacunes max, 7 recommandations max.
 """

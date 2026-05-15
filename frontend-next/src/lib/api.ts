@@ -4,7 +4,8 @@
  * Pour le client-side, utiliser fetch() directement avec le token Clerk.
  */
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+/** URL de base du backend FastAPI, sans slash final (l'env peut en contenir un). */
+export const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");
 
 type ApiResponse<T = unknown> = T;
 

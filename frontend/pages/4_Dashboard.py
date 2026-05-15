@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Dashboard.
+ESG Optimizer MVP - Page Dashboard.
 Historique des analyses, stats agrégées, graphiques de tendance.
 """
 
@@ -41,7 +41,7 @@ if _user_plan in ("discovery", "free"):
             border: 1px solid #1A3D22; border-radius: 12px; padding: 16px; text-align: center;
             margin-bottom: 16px;">
             <span style="font-weight: 600; color: #111827;">
-                Plan Découverte — </span>
+                Plan Découverte - </span>
             <span style="color: #6B7280;">
                 Passez au Pro pour des analyses illimitées, l'export Excel et le benchmark sectoriel.
             </span>
@@ -76,13 +76,13 @@ with col1:
     st.metric("Total analyses", stats.get("total_analyses", 0))
 with col2:
     avg = stats.get("avg_score_global")
-    st.metric("Score moyen global", f"{avg:.1f}/100" if avg else "—")
+    st.metric("Score moyen global", f"{avg:.1f}/100" if avg else "-")
 with col3:
     csrd_pct = stats.get("csrd_ready_pct")
-    st.metric("% CSRD Ready", f"{csrd_pct:.0f}%" if csrd_pct is not None else "—")
+    st.metric("% CSRD Ready", f"{csrd_pct:.0f}%" if csrd_pct is not None else "-")
 with col4:
     avg_env = stats.get("avg_score_env")
-    st.metric("Score moyen E", f"{avg_env:.1f}" if avg_env else "—")
+    st.metric("Score moyen E", f"{avg_env:.1f}" if avg_env else "-")
 
 st.markdown("---")
 
@@ -125,11 +125,11 @@ if analyses_list:
         ).fillna("?")
 
     if "CSRD Ready" in df_display.columns:
-        df_display["CSRD Ready"] = df_display["CSRD Ready"].map({True: "Oui", False: "Non", None: "—"})
+        df_display["CSRD Ready"] = df_display["CSRD Ready"].map({True: "Oui", False: "Non", None: "-"})
 
     if "Score Global" in df_display.columns:
         df_display["Score Global"] = df_display["Score Global"].apply(
-            lambda x: f"{x:.0f}/100" if pd.notnull(x) else "—"
+            lambda x: f"{x:.0f}/100" if pd.notnull(x) else "-"
         )
 
     # Affichage
@@ -141,7 +141,7 @@ if analyses_list:
         selection_mode="single-row",
     )
 
-    # Clic sur une ligne → aller aux résultats
+    # Clic sur une ligne -> aller aux résultats
     if event and event.selection and event.selection.rows:
         selected_idx = event.selection.rows[0]
         selected_id = analyses_list[selected_idx]["id"]
@@ -150,7 +150,7 @@ if analyses_list:
 
     total = history.get("total", 0)
     per_page = history.get("per_page", 20)
-    st.caption(f"Page {page} — {total} analyse(s) au total")
+    st.caption(f"Page {page} - {total} analyse(s) au total")
 
 else:
     st.info("Aucune analyse pour le moment. Lancez votre première analyse depuis la page Upload !")

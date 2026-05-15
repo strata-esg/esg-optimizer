@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Paramètres.
+ESG Optimizer MVP - Page Paramètres.
 Profil utilisateur, abonnement, préférences email, zone avancée.
 """
 

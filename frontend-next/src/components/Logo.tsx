@@ -1,129 +1,103 @@
 import React from "react";
 
+type Tone = "dark" | "light" | "white";
+
 interface LogoIconProps {
   size?: number;
   className?: string;
+  /** "dark" = posé sur un fond sombre (sidebar), sinon fond clair. */
+  variant?: Tone;
 }
 
-/** Icone seule (jauge ESG) */
-export function LogoIcon({ size = 32, className }: LogoIconProps) {
+/**
+ * Icone de marque : jauge ESG (speedometer).
+ * Reprend le logomark utilise historiquement sur l'application.
+ */
+export function LogoIcon({ size = 32, className, variant = "light" }: LogoIconProps) {
+  const onDark = variant === "dark";
+
+  const trackColor = onDark ? "rgba(212,240,216,0.3)" : "#D4F0D8";
+  const activeColor = onDark ? "#7FC686" : "#1A3D22";
+  const hubColor = onDark ? "#D4F0D8" : "#1A3D22";
+  const needleColor = onDark ? "#D4F0D8" : "#1A3D22";
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
-      viewBox="0 0 64 64"
+      viewBox="0 0 40 40"
       fill="none"
       className={className}
       aria-hidden="true"
     >
-      <rect width="64" height="64" rx="14" fill="#1A3D22" />
-      {/* Arc track (dim) */}
+      {/* Arc de fond (jauge a 270 degres) */}
       <path
-        d="M12 38 A20 20 0 0 1 52 38"
-        stroke="#D4F0D8"
-        strokeOpacity="0.3"
-        strokeWidth="5"
+        d="M 6,24 A 14,14 0 1,1 34,24"
+        stroke={trackColor}
+        strokeWidth="3.5"
         strokeLinecap="round"
         fill="none"
       />
-      {/* Active arc */}
+      {/* Arc actif */}
       <path
-        d="M12 38 A20 20 0 0 1 43.3 19.3"
-        stroke="#7FC686"
-        strokeWidth="5"
+        d="M 6,24 A 14,14 0 0,1 28,9"
+        stroke={activeColor}
+        strokeWidth="3.5"
         strokeLinecap="round"
         fill="none"
       />
-      {/* Needle */}
+      {/* Moyeu central */}
+      <circle cx="20" cy="22" r="2.5" fill={hubColor} />
+      {/* Aiguille */}
       <line
-        x1="32"
-        y1="38"
-        x2="43.3"
-        y2="19.3"
-        stroke="white"
-        strokeWidth="2.5"
+        x1="20"
+        y1="22"
+        x2="30"
+        y2="10"
+        stroke={needleColor}
+        strokeWidth="2"
         strokeLinecap="round"
       />
-      {/* Center dot */}
-      <circle cx="32" cy="38" r="4" fill="#7FC686" />
-      {/* Leaf left */}
-      <ellipse
-        cx="27"
-        cy="46"
-        rx="5"
-        ry="3"
-        fill="#7FC686"
-        fillOpacity="0.55"
-        transform="rotate(-25 27 46)"
-      />
-      {/* Leaf right */}
-      <ellipse
-        cx="37"
-        cy="46"
-        rx="5"
-        ry="3"
-        fill="#7FC686"
-        fillOpacity="0.55"
-        transform="rotate(25 37 46)"
-      />
+      {/* Pointe de l'aiguille */}
+      <circle cx="30" cy="10" r="2" fill="#7FC686" />
     </svg>
   );
 }
 
 interface LogoProps {
-  variant?: "dark" | "light" | "white";
+  variant?: Tone;
   size?: "sm" | "md" | "lg";
   showTagline?: boolean;
   className?: string;
 }
 
-/** Logo horizontal : icone + texte */
+/** Logo horizontal : icone + nom de marque. */
 export function Logo({
-  variant = "dark",
+  variant = "light",
   size = "md",
   showTagline = false,
   className,
 }: LogoProps) {
-  const iconSize = size === "sm" ? 28 : size === "md" ? 36 : 48;
+  const iconSize = size === "sm" ? 28 : size === "md" ? 34 : 46;
+  const onDark = variant === "dark";
 
-  const titleColor =
-    variant === "dark"
-      ? "text-white"
-      : "text-[#1A3D22]";
-
-  const aiColor =
-    variant === "dark"
-      ? "text-[#7FC686]"
-      : "text-[#2A5C34]";
-
-  const taglineColor =
-    variant === "dark"
-      ? "text-[#D4F0D8]/70"
-      : "text-[#6B7280]";
-
+  const titleColor = onDark ? "text-white" : "text-[#1A3D22]";
+  const taglineColor = onDark ? "text-[#D4F0D8]/70" : "text-[#6B7280]";
   const titleSize =
-    size === "sm"
-      ? "text-base"
-      : size === "md"
-      ? "text-lg"
-      : "text-2xl";
-
+    size === "sm" ? "text-base" : size === "md" ? "text-lg" : "text-2xl";
   const taglineSize = size === "sm" ? "text-[10px]" : "text-xs";
 
   return (
     <div className={`flex items-center gap-2.5 ${className ?? ""}`}>
-      <LogoIcon size={iconSize} />
+      <LogoIcon size={iconSize} variant={variant} />
       <div className="flex flex-col leading-none">
-        <div className="flex items-baseline gap-1">
-          <span
-            className={`font-bold tracking-tight ${titleSize} ${titleColor}`}
-            style={{ fontFamily: "var(--font-sans)" }}
-          >
-            ESG Optimizer
-          </span>
-          <span className={`font-bold text-sm ${aiColor}`}>AI</span>
-        </div>
+        <span
+          className={`font-bold tracking-tight ${titleSize} ${titleColor}`}
+          style={{ fontFamily: "var(--font-sans)" }}
+        >
+          ESG Optimizer
+        </span>
         {showTagline && (
           <span className={`${taglineSize} ${taglineColor} mt-0.5 font-medium tracking-wide`}>
             Audit CSRD · ESRS
@@ -134,11 +108,11 @@ export function Logo({
   );
 }
 
-/** Logo compact pour la sidebar (icone + nom court) */
+/** Logo compact pour la sidebar (fond sombre). */
 export function LogoSidebar() {
   return (
     <div className="flex items-center gap-2.5 px-4 py-3">
-      <LogoIcon size={34} />
+      <LogoIcon size={34} variant="dark" />
       <div className="flex flex-col leading-none">
         <span className="font-bold text-white text-[15px] tracking-tight">
           ESG Optimizer

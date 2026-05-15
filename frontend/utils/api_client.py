@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Client HTTP vers le backend FastAPI.
+ESG Optimizer MVP - Client HTTP vers le backend FastAPI.
 Encapsule tous les appels API avec gestion automatique du JWT.
 """
 
@@ -7,7 +7,7 @@ import os
 import requests
 from typing import Any
 
-# URL du backend — configurable via variable d'environnement
+# URL du backend - configurable via variable d'environnement
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 
@@ -152,7 +152,7 @@ def download_pdf(token: str, analysis_id: int) -> bytes:
 def download_preview_pdf(token: str, analysis_id: int) -> bytes:
     """
     GET /analysis/{id}/preview-pdf
-    Aperçu PDF 3 pages watermarked — disponible pour tous les plans.
+    Aperçu PDF 3 pages watermarked - disponible pour tous les plans.
     """
     resp = requests.get(
         f"{BACKEND_URL}/analysis/{analysis_id}/preview-pdf",
@@ -231,7 +231,7 @@ def get_stats(token: str) -> dict:
     return _handle_response(resp)
 
 
-# PUBLIC — Quick-check (sans auth)
+# PUBLIC - Quick-check (sans auth)
 
 def quick_check_upload(file_bytes: bytes, filename: str) -> dict:
     """
@@ -288,7 +288,7 @@ def get_share_info(token: str, analysis_id: int) -> dict:
     return _handle_response(resp)
 
 
-# STRIPE — Upgrade & Subscription
+# STRIPE - Upgrade & Subscription
 
 def get_upgrade_url(token: str, plan: str) -> dict:
     """
@@ -317,7 +317,7 @@ def get_my_subscription(token: str) -> dict:
     return _handle_response(resp)
 
 
-# EMAIL — Préférences
+# EMAIL - Préférences
 
 def get_email_preferences(token: str) -> dict:
     """GET /email/preferences"""

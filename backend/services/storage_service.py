@@ -1,18 +1,18 @@
 """
-ESG Optimizer — Service de stockage des fichiers uploadés.
+ESG Optimizer - Service de stockage des fichiers uploadés.
 
 En production (USE_R2_STORAGE=true) : Cloudflare R2 via API S3-compatible.
 En développement (USE_R2_STORAGE=false) : tempfile local (comportement historique).
 
 Pourquoi R2 ?
 - Les volumes Railway sont éphémères : un redeploy efface les fichiers temporaires.
-- Si le background task tourne après un restart, le fichier est introuvable → échec silencieux.
+- Si le background task tourne après un restart, le fichier est introuvable -> échec silencieux.
 - R2 : gratuit jusqu'à 10 GB, pas d'egress fees, S3-compatible avec boto3.
 
 Usage :
     from backend.services.storage_service import StorageService
-    key = StorageService.upload(content, "rapport.pdf")   # → "uploads/uuid.pdf"
-    path = StorageService.download_to_tempfile(key)       # → "/tmp/esg_xxx.pdf"
+    key = StorageService.upload(content, "rapport.pdf")   # -> "uploads/uuid.pdf"
+    path = StorageService.download_to_tempfile(key)       # -> "/tmp/esg_xxx.pdf"
     StorageService.delete(key)
 """
 
@@ -43,7 +43,7 @@ def _get_r2_client():
 
 
 class StorageService:
-    """Interface unique pour le stockage des fichiers — R2 ou local selon config."""
+    """Interface unique pour le stockage des fichiers - R2 ou local selon config."""
 
     @staticmethod
     def upload(content: bytes, filename: str) -> str:
@@ -72,10 +72,10 @@ class StorageService:
                     Body=content,
                     ContentType=content_type,
                 )
-                logger.info("StorageService — Fichier uploadé sur R2 : %s (%d octets)", key, len(content))
+                logger.info("StorageService - Fichier uploadé sur R2 : %s (%d octets)", key, len(content))
                 return key
             except Exception as exc:
-                logger.error("StorageService — Échec upload R2 (%s), fallback local : %s", key, exc)
+                logger.error("StorageService - Échec upload R2 (%s), fallback local : %s", key, exc)
                 # En cas d'échec R2, on bascule sur local pour ne pas bloquer l'utilisateur
                 return StorageService._save_local(content, ext)
         else:
@@ -87,7 +87,7 @@ class StorageService:
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}", prefix="esg_") as tmp:
             tmp.write(content)
             path = tmp.name
-        logger.debug("StorageService — Fichier sauvegardé localement : %s", path)
+        logger.debug("StorageService - Fichier sauvegardé localement : %s", path)
         return path
 
     @staticmethod
@@ -117,12 +117,12 @@ class StorageService:
                     local_path = tmp.name
 
                 logger.info(
-                    "StorageService — Fichier téléchargé depuis R2 : %s → %s (%d octets)",
+                    "StorageService - Fichier téléchargé depuis R2 : %s -> %s (%d octets)",
                     key, local_path, len(content),
                 )
                 return local_path
             except Exception as exc:
-                logger.error("StorageService — Échec download R2 (%s) : %s", key, exc)
+                logger.error("StorageService - Échec download R2 (%s) : %s", key, exc)
                 raise RuntimeError(f"Impossible de récupérer le fichier depuis le stockage : {exc}") from exc
         else:
             # Clé non-absolue en mode local : c'est un bug de configuration
@@ -138,9 +138,9 @@ class StorageService:
         if key.startswith("/") or (len(key) > 1 and key[1] == ":"):
             try:
                 Path(key).unlink(missing_ok=True)
-                logger.debug("StorageService — Fichier local supprimé : %s", key)
+                logger.debug("StorageService - Fichier local supprimé : %s", key)
             except OSError as exc:
-                logger.warning("StorageService — Impossible de supprimer %s : %s", key, exc)
+                logger.warning("StorageService - Impossible de supprimer %s : %s", key, exc)
             return
 
         # Clé R2
@@ -148,6 +148,6 @@ class StorageService:
             try:
                 client = _get_r2_client()
                 client.delete_object(Bucket=settings.r2_bucket_name, Key=key)
-                logger.info("StorageService — Fichier R2 supprimé : %s", key)
+                logger.info("StorageService - Fichier R2 supprimé : %s", key)
             except Exception as exc:
-                logger.warning("StorageService — Impossible de supprimer R2 (%s) : %s", key, exc)
+                logger.warning("StorageService - Impossible de supprimer R2 (%s) : %s", key, exc)

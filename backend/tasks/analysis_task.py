@@ -1,5 +1,5 @@
 """
-ESG Optimizer — Tache Celery : pipeline d'analyse ESG.
+ESG Optimizer - Tache Celery : pipeline d'analyse ESG.
 
 Chaque analyse GPT-4o tourne dans un worker isole.
 Le worker met a jour le statut en DB directement (pending -> processing -> success/error).

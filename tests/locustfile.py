@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Tests de charge (Sprint 6H).
+ESG Optimizer - Tests de charge.
 
 Simule 10 utilisateurs concurrents qui parcourent le scénario complet :
   1. Register (ou login si existant)
@@ -22,7 +22,7 @@ Critères d'acceptation :
   - 0 erreur 500
   - p95 < 2 s sur /auth/me et /history
   - p95 < 5 s sur le quick-check (contient un appel OpenAI)
-  - Si SQLite lock errors → migrer vers Postgres avant prod
+  - Si SQLite lock errors -> migrer vers Postgres avant prod
 
 Mode headless (CI) :
   locust -f tests/locustfile.py --host http://localhost:8000 \
@@ -84,7 +84,7 @@ class ESGOptimizerUser(HttpUser):
         if r.status_code in (200, 201):
             self.token = r.json().get("access_token")
         elif r.status_code == 409:
-            # Compte déjà existant → login
+            # Compte déjà existant -> login
             r2 = self.client.post(
                 "/auth/login",
                 data={"username": self.email, "password": self.password},
@@ -103,7 +103,7 @@ class ESGOptimizerUser(HttpUser):
 
     @task(3)
     def me(self):
-        """Vérifie que la session est valide — proxy pour toute action authentifiée."""
+        """Vérifie que la session est valide - proxy pour toute action authentifiée."""
         self.client.get("/auth/me", name="GET /auth/me")
 
     @task(2)
@@ -113,7 +113,7 @@ class ESGOptimizerUser(HttpUser):
 
     @task(1)
     def public_quick_check(self):
-        """Endpoint public (quick-check) — le plus sensible car sans auth + appel OpenAI."""
+        """Endpoint public (quick-check) - le plus sensible car sans auth + appel OpenAI."""
         files = {
             "file": ("rapport_test.pdf", io.BytesIO(fake_pdf_bytes()), "application/pdf"),
         }
@@ -138,7 +138,7 @@ def on_test_stop(environment, **kwargs):
     """Affiche un résumé santé à la fin du run."""
     stats = environment.stats.total
     print("\n" + "=" * 70)
-    print("SPRINT 6H — TESTS DE CHARGE — RÉSUMÉ")
+    print("SPRINT 6H - TESTS DE CHARGE - RÉSUMÉ")
     print("=" * 70)
     print(f"  Requêtes totales   : {stats.num_requests}")
     print(f"  Échecs             : {stats.num_failures} ({stats.fail_ratio * 100:.2f} %)")
@@ -152,8 +152,8 @@ def on_test_stop(environment, **kwargs):
         and stats.get_response_time_percentile(0.95) < 5000
     )
     if verdict_ok:
-        print("\n  ✅ VERDICT : SQLite tient la charge → OK pour déployer")
+        print("\n  [OK] VERDICT : SQLite tient la charge -> OK pour déployer")
     else:
-        print("\n  ❌ VERDICT : Migrer vers Postgres AVANT de déployer en prod")
+        print("\n  [ECHEC] VERDICT : Migrer vers Postgres AVANT de déployer en prod")
         print("     (Railway offre un addon Postgres managed en 5 min)")
     print("=" * 70 + "\n")

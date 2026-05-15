@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Service d'envoi d'emails transactionnels via Resend.
+ESG Optimizer MVP - Service d'envoi d'emails transactionnels via Resend.
 Emails : bienvenue, analyse terminée, weekly digest.
 """
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # Configure Resend SDK
 resend.api_key = settings.resend_api_key
 
-# Constantes — on lit depuis settings pour respecter les variables d'env
+# Constantes - on lit depuis settings pour respecter les variables d'env
 from backend.config import APP_URL as _APP_URL, NOREPLY_EMAIL as _NOREPLY_EMAIL  # noqa: E402
 FROM_EMAIL = f"ESG Optimizer <{_NOREPLY_EMAIL}>"
 APP_URL = _APP_URL
@@ -64,7 +64,7 @@ def _base_template(title: str, content: str) -> str:
                     <tr>
                         <td style="background: {LIGHT_BG}; padding: 20px 32px; text-align: center; border-top: 1px solid #E5E7EB;">
                             <span style="font-size: 11px; color: #9CA3AF;">
-                                ESG Optimizer AI — Analyse CSRD/ESRS automatisée
+                                ESG Optimizer AI - Analyse CSRD/ESRS automatisée
                                 <br>
                                 <a href="{APP_URL}" style="color: {GREEN}; text-decoration: none;">{APP_URL}</a>
                             </span>
@@ -81,7 +81,7 @@ def _base_template(title: str, content: str) -> str:
 def _send(to: str, subject: str, html: str) -> bool:
     """Envoie un email via Resend. Retourne True si succès."""
     if not _is_configured():
-        logger.warning("Resend non configuré — email non envoyé à %s", to)
+        logger.warning("Resend non configuré - email non envoyé à %s", to)
         return False
 
     try:
@@ -91,7 +91,7 @@ def _send(to: str, subject: str, html: str) -> bool:
             "subject": subject,
             "html": html,
         })
-        logger.info("Email envoyé à %s — id=%s", to, result.get("id", "?"))
+        logger.info("Email envoyé à %s - id=%s", to, result.get("id", "?"))
         return True
     except Exception as e:
         logger.error("Erreur envoi email à %s : %s", to, e)
@@ -150,7 +150,7 @@ def send_welcome_email(email: str, company_name: Optional[str] = None) -> bool:
     """
 
     html = _base_template("Bienvenue sur ESG Optimizer", content)
-    return _send(email, "Bienvenue sur ESG Optimizer — Votre analyse ESG gratuite vous attend", html)
+    return _send(email, "Bienvenue sur ESG Optimizer - Votre analyse ESG gratuite vous attend", html)
 
 
 # EMAIL 2 : ANALYSE TERMINÉE
@@ -217,8 +217,8 @@ def send_analysis_complete_email(
     </p>
     """
 
-    html = _base_template(f"Analyse ESG terminée — {company_name}", content)
-    subject = f"Votre analyse ESG est prête — {company_name} : {int(score_global)}/100"
+    html = _base_template(f"Analyse ESG terminée - {company_name}", content)
+    subject = f"Votre analyse ESG est prête - {company_name} : {int(score_global)}/100"
     return _send(email, subject, html)
 
 
@@ -260,8 +260,8 @@ def send_analysis_failed_email(
     </div>
     """
 
-    html = _base_template(f"Problème avec votre analyse — {company_name}", content)
-    return _send(email, f"Problème avec votre analyse ESG — {company_name}", html)
+    html = _base_template(f"Problème avec votre analyse - {company_name}", content)
+    return _send(email, f"Problème avec votre analyse ESG - {company_name}", html)
 
 
 # EMAIL 4 : WEEKLY DIGEST
@@ -274,15 +274,15 @@ def send_weekly_digest_email(
     latest_analyses: list[dict],
 ) -> bool:
     """Envoie le digest hebdomadaire avec un résumé des analyses."""
-    avg_text = f"{avg_score:.0f}/100" if avg_score else "—"
-    csrd_text = f"{csrd_ready_pct:.0f}%" if csrd_ready_pct is not None else "—"
+    avg_text = f"{avg_score:.0f}/100" if avg_score else "-"
+    csrd_text = f"{csrd_ready_pct:.0f}%" if csrd_ready_pct is not None else "-"
 
     # Lignes du tableau des dernières analyses
     rows_html = ""
     for a in latest_analyses[:5]:
         name = a.get("company_name", "?")
         score = a.get("score_global")
-        score_str = f"{score:.0f}" if score else "—"
+        score_str = f"{score:.0f}" if score else "-"
         csrd = "✓" if a.get("csrd_ready") else "✗"
         rows_html += f"""
         <tr>
@@ -368,4 +368,4 @@ def send_upgrade_confirmation_email(email: str, plan: str, amount_display: str) 
     """
 
     html = _base_template(f"Plan {plan_display} activé", content)
-    return _send(email, f"Plan {plan_display} activé — ESG Optimizer", html)
+    return _send(email, f"Plan {plan_display} activé - ESG Optimizer", html)

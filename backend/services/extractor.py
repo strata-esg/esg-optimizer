@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Extracteur de texte (PDF, DOCX, XLSX).
+ESG Optimizer MVP - Extracteur de texte (PDF, DOCX, XLSX).
 Extraction 100 % locale, pas de dépendance externe (remplace CloudConvert v1).
 """
 
@@ -101,7 +101,7 @@ def extract_text(file_path: str, file_format: str) -> str:
     max_len = settings.max_text_length
     if len(raw_text) > max_len:
         logger.warning(
-            "Texte tronqué : %d → %d caractères (%s)",
+            "Texte tronqué : %d -> %d caractères (%s)",
             len(raw_text), max_len, path.name,
         )
         raw_text = raw_text[:max_len]

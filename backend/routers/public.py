@@ -1,8 +1,8 @@
 """
-ESG Optimizer MVP — Router public (quick-check sans authentification).
-POST /public/quick-check → analyse rapide sans compte
-GET  /public/quick-check/{token} → récupérer le résultat
-POST /auth/claim-analysis → rattacher un quick-check à un compte user
+ESG Optimizer MVP - Router public (quick-check sans authentification).
+POST /public/quick-check -> analyse rapide sans compte
+GET  /public/quick-check/{token} -> récupérer le résultat
+POST /auth/claim-analysis -> rattacher un quick-check à un compte user
 """
 
 import hashlib
@@ -23,7 +23,7 @@ from backend.prompts.system_quick_check import SYSTEM_QUICK_CHECK_PROMPT
 from backend.services.extractor import extract_text, ALLOWED_EXTENSIONS
 from backend.services.storage_service import StorageService
 # Import différé de get_current_user dans la fonction claim pour éviter
-# tout risque d'import circulaire au chargement des modules (auth → public).
+# tout risque d'import circulaire au chargement des modules (auth -> public).
 # Il n'y a pas de vraie circularité, mais on garde l'import tardif par précaution.
 
 from openai import OpenAI
@@ -147,14 +147,14 @@ def _run_quick_check_pipeline(public_analysis_id: int, storage_key: str) -> None
         pa.processing_time_s = round(time.time() - start, 2)
 
         logger.info(
-            "Quick-check [%d] — Succès en %.1fs (score: %s)",
+            "Quick-check [%d] - Succès en %.1fs (score: %s)",
             public_analysis_id, pa.processing_time_s, pa.score_global,
         )
 
     except Exception as exc:
-        logger.error("Quick-check [%d] — Échec : %s", public_analysis_id, exc)
+        logger.error("Quick-check [%d] - Échec : %s", public_analysis_id, exc)
         if pa is not None:
-            # pa a été trouvé en DB — on peut marquer l'échec
+            # pa a été trouvé en DB - on peut marquer l'échec
             pa.status = "failed"
             pa.error_message = str(exc)[:500]
             pa.processing_time_s = round(time.time() - start, 2)
@@ -164,14 +164,14 @@ def _run_quick_check_pipeline(public_analysis_id: int, storage_key: str) -> None
         try:
             db.commit()
         except Exception as commit_exc:
-            logger.error("Quick-check [%d] — Commit final échoué : %s", public_analysis_id, commit_exc)
+            logger.error("Quick-check [%d] - Commit final échoué : %s", public_analysis_id, commit_exc)
         db.close()
 
         # Nettoyage : supprimer depuis le stockage R2 + tempfile local éventuel
         try:
             StorageService.delete(storage_key)
         except Exception as del_exc:
-            logger.warning("Quick-check [%d] — Impossible de supprimer storage_key=%s : %s", public_analysis_id, storage_key, del_exc)
+            logger.warning("Quick-check [%d] - Impossible de supprimer storage_key=%s : %s", public_analysis_id, storage_key, del_exc)
 
         if local_path and local_path != storage_key:
             try:
@@ -229,7 +229,7 @@ async def quick_check(
     db.refresh(pa)
 
     # 6. Lancer le pipeline en background
-    logger.info("Quick-check [%d] créé — IP=%s, fichier=%s, storage_key=%s", pa.id, ip_hash[:12], file.filename, storage_key)
+    logger.info("Quick-check [%d] créé - IP=%s, fichier=%s, storage_key=%s", pa.id, ip_hash[:12], file.filename, storage_key)
     background_tasks.add_task(_run_quick_check_pipeline, pa.id, storage_key)
 
     return {
@@ -272,7 +272,7 @@ def get_quick_check_result(token: str, db: Session = Depends(get_db)):
     return result
 
 
-# CLAIM — Rattacher un quick-check à un compte (dans auth router)
+# CLAIM - Rattacher un quick-check à un compte (dans auth router)
 # Ce endpoint est ajouté au router auth pour la cohérence, mais
 # la logique est ici pour garder le contexte.
 
@@ -306,7 +306,7 @@ def claim_analysis(
     """
     Rattache un quick-check public à un compte utilisateur après inscription.
     Le user passe le qc_token reçu lors du quick-check.
-    Protégé par JWT — authentification requise.
+    Protégé par JWT - authentification requise.
     """
     pa = db.query(PublicAnalysis).filter(PublicAnalysis.token == qc_token).first()
 

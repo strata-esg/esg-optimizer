@@ -19,6 +19,7 @@ from backend.services.auth_service import (
     create_access_token,
     decode_access_token,
 )
+from backend.services.clerk_auth import verify_clerk_token
 from backend.services.email_service import send_welcome_email
 from backend.services.analytics_service import ph
 
@@ -27,12 +28,68 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+# Valeur sentinelle pour le champ password_hash des comptes gérés par Clerk :
+# ce n'est pas un hash bcrypt valide, donc la connexion locale échouera toujours.
+_CLERK_MANAGED_PASSWORD = "clerk-managed"
 
-# Dépendance : extraire le user courant depuis le JWT
+
+def _get_or_create_clerk_user(db: Session, payload: dict) -> User:
+    """
+    Récupère le compte lié à un identifiant Clerk, ou le crée à la volée.
+
+    Le frontend Next.js gère l'inscription via Clerk : la première requête API
+    d'un nouvel utilisateur déclenche la création de son compte côté backend.
+    """
+    clerk_id = payload.get("sub")
+    if not clerk_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Jeton invalide")
+
+    user = db.query(User).filter(User.clerk_id == clerk_id).first()
+    if user is not None:
+        return user
+
+    # L'e-mail et le nom ne sont présents que si le template de jeton de session
+    # Clerk les expose. On prévoit donc un repli propre.
+    email = payload.get("email") or payload.get("email_address") or f"{clerk_id}@clerk.local"
+    full_name = payload.get("name") or payload.get("full_name")
+
+    # Si un compte historique existe déjà avec cet e-mail, on le relie à Clerk
+    # plutôt que de créer un doublon.
+    existing = db.query(User).filter(User.email == email).first()
+    if existing is not None and existing.clerk_id is None:
+        existing.clerk_id = clerk_id
+        if full_name and not existing.full_name:
+            existing.full_name = full_name
+        db.commit()
+        db.refresh(existing)
+        return existing
+
+    user = User(
+        clerk_id=clerk_id,
+        email=email,
+        full_name=full_name,
+        password_hash=_CLERK_MANAGED_PASSWORD,
+        plan="discovery",
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    logger.info("Compte créé via Clerk - user=%d, clerk_id=%s", user.id, clerk_id)
+    return user
+
+
+# Dépendance : extraire le user courant depuis le jeton d'authentification.
+# Deux formats sont acceptés :
+#  1. jeton de session Clerk (RS256) envoyé par le frontend Next.js
+#  2. JWT interne (HS256) envoyé par le frontend Streamlit historique
 def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
+    clerk_payload = verify_clerk_token(token)
+    if clerk_payload is not None:
+        return _get_or_create_clerk_user(db, clerk_payload)
+
     payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide ou expiré")
@@ -63,7 +120,7 @@ def register(
 
     # Email de bienvenue (en background pour ne pas bloquer la réponse)
     background_tasks.add_task(send_welcome_email, user.email, body.company_name)
-    logger.info("Inscription réussie — user=%d, email=%s", user.id, user.email)
+    logger.info("Inscription réussie - user=%d, email=%s", user.id, user.email)
 
     # PostHog : identifier le nouvel utilisateur
     ph.identify(user.id, email=user.email, plan=user.plan, company_name=user.company_name or "")

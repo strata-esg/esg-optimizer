@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Gestion de la session Streamlit.
+ESG Optimizer MVP - Gestion de la session Streamlit.
 Stocke/lit/supprime le token JWT et les infos utilisateur dans st.session_state.
 """
 
@@ -108,7 +108,7 @@ def require_auth() -> bool:
     return True
 
 
-# ── Cookie helpers (utilisés par login + logout) ──────────────────────────────
+# -- Cookie helpers (utilisés par login + logout) ------------------------------
 
 def save_jwt_cookie(token: str) -> None:
     """Persiste le JWT dans un cookie browser 30 jours (survit aux refreshs)."""

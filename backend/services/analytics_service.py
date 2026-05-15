@@ -39,10 +39,10 @@ def _get_client():
         # Desactiver les logs PostHog (verbeux en dev)
         ph_sdk.disabled = False
         _client = ph_sdk
-        logger.info("PostHog initialise — host=%s", settings.posthog_host)
+        logger.info("PostHog initialise - host=%s", settings.posthog_host)
         return _client
     except ImportError:
-        logger.warning("Librairie posthog non installee — analytics desactivees")
+        logger.warning("Librairie posthog non installee - analytics desactivees")
         return None
     except Exception as exc:
         logger.warning("PostHog init echoue : %s", exc)

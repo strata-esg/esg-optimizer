@@ -1,12 +1,12 @@
 -- ============================================================
--- ESG Optimizer — Schema Supabase
+-- ESG Optimizer - Schema Supabase
 -- Coller dans : Supabase Dashboard > SQL Editor > Run
 -- ============================================================
 
 -- Extension UUID (activée par défaut dans Supabase)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ── TABLE USERS ──────────────────────────────────────────────
+-- -- TABLE USERS ----------------------------------------------
 -- Synchronisée avec Clerk via webhook (api/webhook/clerk)
 -- La colonne `id` = clerk user_id (format "user_2abc...")
 CREATE TABLE IF NOT EXISTS public.users (
@@ -40,7 +40,7 @@ CREATE TRIGGER users_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 
--- ── TABLE ANALYSES ────────────────────────────────────────────
+-- -- TABLE ANALYSES --------------------------------------------
 -- Stocke le résumé de chaque analyse (la partie lourde reste dans FastAPI/PostgreSQL Railway)
 -- Optionnel : utilisez-la pour la synchro cross-service ou le dashboard temps réel
 CREATE TABLE IF NOT EXISTS public.analyses (
@@ -67,7 +67,7 @@ CREATE TRIGGER analyses_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 
--- ── ROW LEVEL SECURITY (RLS) ─────────────────────────────────
+-- -- ROW LEVEL SECURITY (RLS) ---------------------------------
 -- Les utilisateurs ne voient que leurs propres données
 
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -93,11 +93,11 @@ CREATE POLICY "analyses_update_own" ON public.analyses
 CREATE POLICY "analyses_delete_own" ON public.analyses
   FOR DELETE USING (auth.uid()::TEXT = user_id);
 
--- Service role bypass (pour le webhook Clerk — côté serveur seulement)
+-- Service role bypass (pour le webhook Clerk - côté serveur seulement)
 -- Le service role ignore automatiquement le RLS, pas besoin de policy supplémentaire.
 
 
--- ── FONCTION PLANS ────────────────────────────────────────────
+-- -- FONCTION PLANS --------------------------------------------
 -- Mise à jour du plan + limite d'analyses en une seule requête
 CREATE OR REPLACE FUNCTION public.upgrade_user_plan(
   p_user_id TEXT,
@@ -114,7 +114,4 @@ BEGIN
     ELSE 3
   END;
   UPDATE public.users
-     SET plan = p_plan, analyses_limit = v_limit
-   WHERE id = p_user_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+ 

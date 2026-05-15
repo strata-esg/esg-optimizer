@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Générateur de badge social partageable.
+ESG Optimizer MVP - Générateur de badge social partageable.
 Produit une image PNG 1200x630 (format Open Graph optimal pour LinkedIn/Twitter).
 
 Contenu du badge :
@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 # Couleurs
-BG_COLOR = (249, 250, 251)          # #F9FAFB — gris très clair
+BG_COLOR = (249, 250, 251)          # #F9FAFB - gris très clair
 BRAND_GREEN = (26, 61, 34)           # #1A3D22 (Forest)
 BRAND_DARK = (17, 24, 39)           # #111827
 BRAND_GRAY = (107, 114, 128)        # #6B7280
@@ -196,7 +196,7 @@ def generate_badge(
     draw.text((50, H - 35), app_url, fill=BRAND_GREEN, font=font_url)
 
     font_cta = _get_font(14)
-    cta = "Analysez votre rapport ESG gratuitement →"
+    cta = "Analysez votre rapport ESG gratuitement ->"
     bbox_cta = draw.textbbox((0, 0), cta, font=font_cta)
     tw_cta = bbox_cta[2] - bbox_cta[0]
     draw.text((W - tw_cta - 50, H - 33), cta, fill=BRAND_GRAY, font=font_cta)

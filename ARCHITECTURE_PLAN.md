@@ -1,6 +1,6 @@
-# ESG Optimizer AI — Plan d'Architecture MVP Web App
+# ESG Optimizer AI - Plan d'Architecture MVP Web App
 
-> Version 1.0 — 16 avril 2026
+> Version 1.0 - 16 avril 2026
 > Stack : Python 3.11+ · FastAPI · Streamlit · SQLite · GPT-4o · Railway/Render
 
 ---
@@ -10,31 +10,31 @@
 Le MVP transforme le pipeline Make.com existant en application web autonome. L'utilisateur uploade un rapport de durabilité, obtient une analyse ESG structurée en moins de 3 minutes, et peut consulter son historique.
 
 ```
-┌─────────────────────────────────────────────────────────┐
+┌---------------------------------------------------------┐
 │                    STREAMLIT (Frontend)                  │
-│  ┌──────────┐ ┌──────────────┐ ┌──────────────────────┐ │
+│  ┌----------┐ ┌--------------┐ ┌----------------------┐ │
 │  │  Login /  │ │   Upload &   │ │  Dashboard &         │ │
 │  │  Register │ │   Analyse    │ │  Historique          │ │
-│  └──────────┘ └──────────────┘ └──────────────────────┘ │
-└────────────────────────┬────────────────────────────────┘
+│  └----------┘ └--------------┘ └----------------------┘ │
+└------------------------┬--------------------------------┘
                          │ HTTP (requests)
-┌────────────────────────▼────────────────────────────────┐
+┌------------------------▼--------------------------------┐
 │                    FASTAPI (Backend)                     │
-│  ┌──────────┐ ┌──────────────┐ ┌──────────────────────┐ │
+│  ┌----------┐ ┌--------------┐ ┌----------------------┐ │
 │  │  Auth     │ │  Analyse     │ │  History &           │ │
 │  │  Routes   │ │  Pipeline    │ │  Reports             │ │
-│  └──────────┘ └──────────────┘ └──────────────────────┘ │
+│  └----------┘ └--------------┘ └----------------------┘ │
 │         │              │                    │            │
-│  ┌──────▼──────────────▼────────────────────▼─────────┐ │
+│  ┌------▼--------------▼--------------------▼---------┐ │
 │  │              Services Layer                         │ │
 │  │  auth_service · extractor · analyzer · reporter     │ │
-│  └─────────┬───────────┬────────────────────┬─────────┘ │
-└────────────┼───────────┼────────────────────┼───────────┘
+│  └---------┬-----------┬--------------------┬---------┘ │
+└------------┼-----------┼--------------------┼-----------┘
              │           │                    │
-     ┌───────▼──┐  ┌─────▼──────┐  ┌─────────▼────────┐
+     ┌-------▼--┐  ┌-----▼------┐  ┌---------▼--------┐
      │  SQLite  │  │  OpenAI    │  │  File Extractors  │
      │  (DB)    │  │  GPT-4o    │  │  (PDF/DOCX/XLSX)  │
-     └──────────┘  └────────────┘  └──────────────────┘
+     └----------┘  └------------┘  └------------------┘
 ```
 
 ---
@@ -44,62 +44,62 @@ Le MVP transforme le pipeline Make.com existant en application web autonome. L'u
 ```
 esg-optimizer-mvp/
 │
-├── backend/
-│   ├── main.py                  # Point d'entrée FastAPI
-│   ├── config.py                # Settings (Pydantic BaseSettings)
-│   ├── database.py              # Connexion SQLite + session factory
-│   ├── models.py                # Modèles SQLAlchemy (User, Analysis, Company)
-│   ├── schemas.py               # Schémas Pydantic (request/response)
+├-- backend/
+│   ├-- main.py                  # Point d'entrée FastAPI
+│   ├-- config.py                # Settings (Pydantic BaseSettings)
+│   ├-- database.py              # Connexion SQLite + session factory
+│   ├-- models.py                # Modèles SQLAlchemy (User, Analysis, Company)
+│   ├-- schemas.py               # Schémas Pydantic (request/response)
 │   │
-│   ├── routers/
-│   │   ├── __init__.py
-│   │   ├── auth.py              # POST /auth/register, /auth/login, /auth/me
-│   │   ├── analysis.py          # POST /analysis/upload, GET /analysis/{id}
-│   │   └── history.py           # GET /history, GET /history/{company}
+│   ├-- routers/
+│   │   ├-- __init__.py
+│   │   ├-- auth.py              # POST /auth/register, /auth/login, /auth/me
+│   │   ├-- analysis.py          # POST /analysis/upload, GET /analysis/{id}
+│   │   └-- history.py           # GET /history, GET /history/{company}
 │   │
-│   ├── services/
-│   │   ├── __init__.py
-│   │   ├── auth_service.py      # Hashing passwords, JWT tokens
-│   │   ├── extractor.py         # PDF/DOCX/XLSX → texte brut
-│   │   ├── analyzer.py          # Appel GPT-4o + parsing JSON
-│   │   ├── delta_service.py     # Comparaison N vs N-1, calcul des deltas
-│   │   └── reporter.py          # Génération du rapport PDF final
+│   ├-- services/
+│   │   ├-- __init__.py
+│   │   ├-- auth_service.py      # Hashing passwords, JWT tokens
+│   │   ├-- extractor.py         # PDF/DOCX/XLSX -> texte brut
+│   │   ├-- analyzer.py          # Appel GPT-4o + parsing JSON
+│   │   ├-- delta_service.py     # Comparaison N vs N-1, calcul des deltas
+│   │   └-- reporter.py          # Génération du rapport PDF final
 │   │
-│   ├── prompts/
-│   │   ├── system_analysis.py   # System prompt pour l'analyse ESG initiale
-│   │   └── system_delta.py      # System prompt pour le Delta Report
+│   ├-- prompts/
+│   │   ├-- system_analysis.py   # System prompt pour l'analyse ESG initiale
+│   │   └-- system_delta.py      # System prompt pour le Delta Report
 │   │
-│   └── tests/
-│       ├── test_extractor.py
-│       ├── test_analyzer.py
-│       └── test_auth.py
+│   └-- tests/
+│       ├-- test_extractor.py
+│       ├-- test_analyzer.py
+│       └-- test_auth.py
 │
-├── frontend/
-│   ├── app.py                   # Point d'entrée Streamlit (routing pages)
-│   ├── pages/
-│   │   ├── 1_🔐_Login.py        # Authentification
-│   │   ├── 2_📤_Upload.py       # Upload & lancement analyse
-│   │   ├── 3_📊_Résultats.py    # Affichage résultats + téléchargement PDF
-│   │   ├── 4_📈_Dashboard.py    # Dashboard historique & tendances
-│   │   └── 5_⚙️_Paramètres.py   # Profil utilisateur & paramètres
-│   ├── components/
-│   │   ├── score_gauge.py       # Widget jauge score 0-100
-│   │   ├── esrs_coverage.py     # Grille couverture ESRS
-│   │   ├── delta_card.py        # Carte delta avec indicateur tendance
-│   │   └── sidebar.py           # Sidebar navigation + branding
-│   └── utils/
-│       ├── api_client.py        # Wrapper requests vers le backend
-│       └── session.py           # Gestion du token JWT en session_state
+├-- frontend/
+│   ├-- app.py                   # Point d'entrée Streamlit (routing pages)
+│   ├-- pages/
+│   │   ├-- 1_🔐_Login.py        # Authentification
+│   │   ├-- 2_📤_Upload.py       # Upload & lancement analyse
+│   │   ├-- 3_📊_Résultats.py    # Affichage résultats + téléchargement PDF
+│   │   ├-- 4_📈_Dashboard.py    # Dashboard historique & tendances
+│   │   └-- 5_⚙️_Paramètres.py   # Profil utilisateur & paramètres
+│   ├-- components/
+│   │   ├-- score_gauge.py       # Widget jauge score 0-100
+│   │   ├-- esrs_coverage.py     # Grille couverture ESRS
+│   │   ├-- delta_card.py        # Carte delta avec indicateur tendance
+│   │   └-- sidebar.py           # Sidebar navigation + branding
+│   └-- utils/
+│       ├-- api_client.py        # Wrapper requests vers le backend
+│       └-- session.py           # Gestion du token JWT en session_state
 │
-├── data/
-│   └── esg_optimizer.db         # Base SQLite (gitignored)
+├-- data/
+│   └-- esg_optimizer.db         # Base SQLite (gitignored)
 │
-├── .env.example                 # Template variables d'environnement
-├── requirements.txt             # Dépendances Python
-├── Dockerfile                   # Build multi-stage (backend + frontend)
-├── docker-compose.yml           # Orchestration locale dev
-├── railway.toml                 # Config déploiement Railway
-└── README.md
+├-- .env.example                 # Template variables d'environnement
+├-- requirements.txt             # Dépendances Python
+├-- Dockerfile                   # Build multi-stage (backend + frontend)
+├-- docker-compose.yml           # Orchestration locale dev
+├-- railway.toml                 # Config déploiement Railway
+└-- README.md
 ```
 
 ---
@@ -123,20 +123,20 @@ esg-optimizer-mvp/
 | Colonne | Type | Contraintes | Description |
 |---------|------|-------------|-------------|
 | id | INTEGER | PK, AUTOINCREMENT | |
-| user_id | INTEGER | FK → users.id | Propriétaire |
+| user_id | INTEGER | FK -> users.id | Propriétaire |
 | name | VARCHAR(255) | NOT NULL | Nom entreprise analysée |
 | sector | VARCHAR(255) | | Secteur d'activité |
 | created_at | DATETIME | DEFAULT NOW | |
 
-**Contrainte unique** : (user_id, name) — un utilisateur ne peut pas avoir deux entreprises du même nom.
+**Contrainte unique** : (user_id, name) - un utilisateur ne peut pas avoir deux entreprises du même nom.
 
 ### 3.3 Table `analyses`
 
 | Colonne | Type | Contraintes | Description |
 |---------|------|-------------|-------------|
 | id | INTEGER | PK, AUTOINCREMENT | |
-| company_id | INTEGER | FK → companies.id | Entreprise analysée |
-| user_id | INTEGER | FK → users.id | Utilisateur |
+| company_id | INTEGER | FK -> companies.id | Entreprise analysée |
+| user_id | INTEGER | FK -> users.id | Utilisateur |
 | report_year | INTEGER | | Année du rapport source |
 | source_filename | VARCHAR(255) | NOT NULL | Nom du fichier uploadé |
 | source_format | VARCHAR(10) | | pdf, docx, xlsx |
@@ -176,7 +176,7 @@ esg-optimizer-mvp/
 | POST | `/auth/login` | `{email, password}` | `{token, user}` | Connexion, retourne JWT |
 | GET | `/auth/me` | Header: `Authorization: Bearer <token>` | `{user}` | Profil utilisateur |
 
-**Auth technique** : JWT (PyJWT), expiration 24h, secret dans `.env`. Pas d'OAuth pour le MVP — on reste simple.
+**Auth technique** : JWT (PyJWT), expiration 24h, secret dans `.env`. Pas d'OAuth pour le MVP - on reste simple.
 
 ### 4.2 Analysis
 
@@ -200,8 +200,8 @@ esg-optimizer-mvp/
 | Méthode | Route | Params | Réponse | Description |
 |---------|-------|--------|---------|-------------|
 | GET | `/history` | Query: `?page=1&per_page=20` | `{analyses[], total, page}` | Liste paginée |
-| GET | `/history/companies` | — | `{companies[]}` | Liste des entreprises analysées |
-| GET | `/history/stats` | — | `{total_analyses, avg_scores, csrd_ready_pct}` | Stats agrégées pour dashboard |
+| GET | `/history/companies` | - | `{companies[]}` | Liste des entreprises analysées |
+| GET | `/history/stats` | - | `{total_analyses, avg_scores, csrd_ready_pct}` | Stats agrégées pour dashboard |
 
 ---
 
@@ -211,9 +211,9 @@ esg-optimizer-mvp/
 
 ```python
 # Librairies utilisées :
-# - PDF : PyMuPDF (fitz) — extraction texte rapide, pas de dépendance externe
-# - DOCX : python-docx — lecture paragraphes + tableaux
-# - XLSX : openpyxl — lecture cellules, conversion en texte structuré
+# - PDF : PyMuPDF (fitz) - extraction texte rapide, pas de dépendance externe
+# - DOCX : python-docx - lecture paragraphes + tableaux
+# - XLSX : openpyxl - lecture cellules, conversion en texte structuré
 
 def extract_text(file_path: str, file_format: str) -> str:
     """Retourne le texte brut du document, tronqué à 30 000 caractères."""
@@ -245,7 +245,7 @@ async def analyze_report(text: str, company_name: str, sector: str) -> dict:
 
 **Paramètre clé** : `response_format={"type": "json_object"}` force GPT-4o à retourner un JSON valide, éliminant les erreurs de parsing de la v1.
 
-### 5.3 System Prompt — Analyse initiale (`system_analysis.py`)
+### 5.3 System Prompt - Analyse initiale (`system_analysis.py`)
 
 Le system prompt est le cœur métier. Il doit produire un JSON nested avec cette structure exacte :
 
@@ -325,7 +325,7 @@ def compute_deltas(current: Analysis, previous: Analysis) -> dict:
     }
 ```
 
-Si un historique existe → 2e appel GPT-4o avec le system prompt delta qui reçoit les deux analyses en contexte et produit une synthèse narrative d'évolution.
+Si un historique existe -> 2e appel GPT-4o avec le system prompt delta qui reçoit les deux analyses en contexte et produit une synthèse narrative d'évolution.
 
 ### 5.5 Génération PDF (`reporter.py`)
 
@@ -354,9 +354,9 @@ Utilisation de **ReportLab** pour générer les rapports PDF côté serveur (plu
 
 - `st.file_uploader` avec accept = [".pdf", ".docx", ".xlsx"]
 - Champs : nom entreprise, année du rapport, secteur (selectbox)
-- Bouton "Analyser" → POST /analysis/upload
+- Bouton "Analyser" -> POST /analysis/upload
 - `st.spinner` + polling GET /analysis/{id} toutes les 3 secondes
-- Affichage du statut en temps réel (processing → success)
+- Affichage du statut en temps réel (processing -> success)
 
 ### 6.3 Page Résultats
 
@@ -367,7 +367,7 @@ Utilisation de **ReportLab** pour générer les rapports PDF côté serveur (plu
 - **Conformité CSRD** : badge "CSRD Ready ✓" ou "Non conforme ✗" + % couverture
 - **KPIs détectés** : st.dataframe triable par pilier
 - **Recommandations** : st.expander par priorité
-- **Delta** (si disponible) : cartes avec flèches ↑↓→ et synthèse narrative
+- **Delta** (si disponible) : cartes avec flèches ↑↓-> et synthèse narrative
 - **Boutons** : Télécharger rapport PDF, Télécharger Delta Report PDF
 
 ### 6.4 Page Dashboard
@@ -433,9 +433,9 @@ openai==1.*
 slowapi==0.1.*
 
 # Extractors
-PyMuPDF==1.24.*      # PDF → texte
-python-docx==1.*     # DOCX → texte
-openpyxl==3.*        # XLSX → texte
+PyMuPDF==1.24.*      # PDF -> texte
+python-docx==1.*     # DOCX -> texte
+openpyxl==3.*        # XLSX -> texte
 
 # Report generation
 reportlab==4.*       # Génération PDF
@@ -459,10 +459,10 @@ python-dotenv==1.*
 ### 10.1 Développement local
 
 ```bash
-# Terminal 1 — Backend
+# Terminal 1 - Backend
 cd backend && uvicorn main:app --reload --port 8000
 
-# Terminal 2 — Frontend
+# Terminal 2 - Frontend
 cd frontend && streamlit run app.py --server.port 8501
 ```
 
@@ -500,39 +500,39 @@ services:
 
 L'implémentation se fait en 6 sprints logiques. Chaque sprint produit un incrément testable.
 
-### Sprint 1 — Fondations (backend skeleton)
+### Sprint 1 - Fondations (backend skeleton)
 1. `config.py` + `.env.example`
 2. `database.py` + `models.py` (créer les 3 tables)
 3. `schemas.py` (tous les schémas Pydantic)
 4. `main.py` (FastAPI app avec CORS)
 5. **Test** : `uvicorn main:app` démarre sans erreur
 
-### Sprint 2 — Auth
+### Sprint 2 - Auth
 1. `services/auth_service.py` (hash, JWT, verify)
 2. `routers/auth.py` (register, login, me)
 3. **Test** : créer un user via curl, obtenir un token, appeler /auth/me
 
-### Sprint 3 — Pipeline d'analyse
+### Sprint 3 - Pipeline d'analyse
 1. `services/extractor.py` (PDF, DOCX, XLSX)
 2. `prompts/system_analysis.py`
 3. `services/analyzer.py` (appel GPT-4o)
 4. `routers/analysis.py` (upload + background task)
 5. **Test** : upload un PDF via curl, vérifier que l'analyse est en DB
 
-### Sprint 4 — Delta + Rapport PDF
+### Sprint 4 - Delta + Rapport PDF
 1. `services/delta_service.py`
 2. `prompts/system_delta.py`
 3. `services/reporter.py` (génération PDF)
 4. Endpoints `/analysis/{id}/pdf` et `/analysis/{id}/delta-pdf`
 5. **Test** : uploader deux rapports de la même entreprise, vérifier le delta
 
-### Sprint 5 — Frontend Streamlit
+### Sprint 5 - Frontend Streamlit
 1. `app.py` + `utils/api_client.py` + `utils/session.py`
-2. Pages Login → Upload → Résultats → Dashboard → Paramètres
+2. Pages Login -> Upload -> Résultats -> Dashboard -> Paramètres
 3. Composants visuels (jauges, grille ESRS, delta cards)
-4. **Test** : parcours complet login → upload → voir résultats → dashboard
+4. **Test** : parcours complet login -> upload -> voir résultats -> dashboard
 
-### Sprint 6 — Polish & Deploy
+### Sprint 6 - Polish & Deploy
 1. Error handling robuste (try/except, messages utilisateur)
 2. Dockerfile + docker-compose.yml
 3. railway.toml + déploiement
@@ -563,4 +563,4 @@ L'implémentation se fait en 6 sprints logiques. Chaque sprint produit un incré
 - Notifications email automatiques (réintégration Make.com)
 - Multi-langue (EN/FR)
 - API publique avec clés API pour intégrateurs
-- Migration SQLite → PostgreSQL si >100 users
+- Migration SQLite -> PostgreSQL si >100 users

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PostHogProvider — wrapper client à placer dans le root layout.
+ * PostHogProvider - wrapper client à placer dans le root layout.
  *
  * Responsabilités :
  * 1. Initialise posthog-js au premier rendu
@@ -16,7 +16,7 @@ import { useUser } from "@clerk/nextjs";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { initPostHog, posthog } from "@/lib/posthog";
 
-// ── Pageview tracker (séparé pour éviter les re-renders inutiles) ────────────
+// -- Pageview tracker (séparé pour éviter les re-renders inutiles) ------------
 function PostHogPageview() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -34,7 +34,7 @@ function PostHogPageview() {
   return null;
 }
 
-// ── Identify Clerk user dans PostHog ─────────────────────────────────────────
+// -- Identify Clerk user dans PostHog -----------------------------------------
 function PostHogIdentity() {
   const { user, isLoaded, isSignedIn } = useUser();
   const identifiedRef = useRef<string | null>(null);
@@ -52,7 +52,7 @@ function PostHogIdentity() {
         name: user.fullName ?? undefined,
       });
     } else {
-      // Déconnexion → reset pour ne pas mélanger les sessions
+      // Déconnexion -> reset pour ne pas mélanger les sessions
       if (identifiedRef.current !== null) {
         posthog.reset();
         identifiedRef.current = null;
@@ -63,7 +63,7 @@ function PostHogIdentity() {
   return null;
 }
 
-// ── Provider principal ────────────────────────────────────────────────────────
+// -- Provider principal --------------------------------------------------------
 export default function PostHogProvider({
   children,
 }: {

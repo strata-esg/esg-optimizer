@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # ================================================================
-#  ESG Optimizer MVP — Script de demarrage production
+#  ESG Optimizer MVP - Script de demarrage production
 # ----------------------------------------------------------------
 #  Deux modes, controles par ENABLE_CELERY :
 #
-#  ENABLE_CELERY=false (defaut) — mode Streamlit (actuel)
+#  ENABLE_CELERY=false (defaut) - mode Streamlit (actuel)
 #    1. FastAPI   (uvicorn)   sur PORT_API       (8000)
 #    2. Streamlit             sur STREAMLIT_PORT (8502)
-#    3. nginx route : API → FastAPI, reste → Streamlit
+#    3. nginx route : API -> FastAPI, reste -> Streamlit
 #
-#  ENABLE_CELERY=true — mode Next.js + Celery (apres migration Vercel)
+#  ENABLE_CELERY=true - mode Next.js + Celery (apres migration Vercel)
 #    1. FastAPI   (uvicorn)   sur PORT_API       (8000)
 #    2. Celery worker         (background, sans port)
-#    3. nginx route : tout → FastAPI (Next.js est sur Vercel)
+#    3. nginx route : tout -> FastAPI (Next.js est sur Vercel)
 #
 #  Bascule : definir ENABLE_CELERY=true dans Railway Variables
 #            en meme temps que tu actives le front Next.js sur Vercel.
@@ -26,7 +26,7 @@ STREAMLIT_PORT=8502
 ENABLE_CELERY="${ENABLE_CELERY:-false}"
 
 echo "================================================================"
-echo " ESG Optimizer — Boot"
+echo " ESG Optimizer - Boot"
 echo "   Environment   : ${ENVIRONMENT:-production}"
 echo "   PORT nginx     : ${NGINX_PORT}"
 echo "   PORT FastAPI   : ${PORT_API}"
@@ -98,7 +98,7 @@ NGINX_EOF
 
 else
 
-    # Mode Streamlit (defaut — front actuel)
+    # Mode Streamlit (defaut - front actuel)
     echo "  -> Mode Streamlit (ENABLE_CELERY=false)"
     streamlit run frontend/app.py \
         --server.port "${STREAMLIT_PORT}" \
@@ -112,117 +112,4 @@ else
         --theme.secondaryBackgroundColor "#FFFFFF" \
         --theme.textColor "#1A3D22" &
     STREAMLIT_PID=$!
-    echo "  -> Streamlit demarre (pid=${STREAMLIT_PID}) sur port ${STREAMLIT_PORT}"
-
-    # Attend Streamlit
-    for i in $(seq 1 30); do
-        if curl -sf "http://localhost:${STREAMLIT_PORT}/_stcore/health" >/dev/null 2>&1; then
-            echo "  -> Streamlit healthy"
-            break
-        fi
-        sleep 1
-    done
-
-    # nginx : API → FastAPI, reste → Streamlit
-    cat > /etc/nginx/nginx.conf << NGINX_EOF
-events {
-    worker_connections 1024;
-}
-
-http {
-    client_max_body_size 25m;
-
-    map \$http_upgrade \$connection_upgrade {
-        default upgrade;
-        ''      close;
-    }
-
-    server {
-        listen ${NGINX_PORT};
-
-        # --- Routes FastAPI (backend API) ---
-        location /auth/ {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_set_header   X-Real-IP         \$remote_addr;
-            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-            proxy_read_timeout 120s;
-        }
-
-        location /analysis/ {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_set_header   X-Real-IP         \$remote_addr;
-            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-            proxy_read_timeout 360s;
-        }
-
-        location /history/ {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_set_header   X-Real-IP         \$remote_addr;
-            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-            proxy_read_timeout 60s;
-        }
-
-        location /public/ {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_set_header   X-Real-IP         \$remote_addr;
-            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-            proxy_read_timeout 360s;
-        }
-
-        location /stripe/ {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_set_header   X-Real-IP         \$remote_addr;
-            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-            proxy_set_header   Stripe-Signature  \$http_stripe_signature;
-            proxy_read_timeout 30s;
-        }
-
-        location /email/ {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_set_header   X-Real-IP         \$remote_addr;
-            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-            proxy_read_timeout 30s;
-        }
-
-        location /health {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-            proxy_read_timeout 10s;
-        }
-
-        location /docs {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-        }
-
-        location /openapi.json {
-            proxy_pass         http://127.0.0.1:${PORT_API};
-            proxy_set_header   Host              \$host;
-        }
-
-        # --- Streamlit (frontend actuel) ---
-        location / {
-            proxy_pass         http://127.0.0.1:${STREAMLIT_PORT};
-            proxy_http_version 1.1;
-            proxy_set_header   Upgrade    \$http_upgrade;
-            proxy_set_header   Connection \$connection_upgrade;
-            proxy_set_header   Host       \$host;
-            proxy_set_header   X-Real-IP  \$remote_addr;
-            proxy_read_timeout 86400s;
-        }
-    }
-}
-NGINX_EOF
-
-fi
-
-echo "  -> Config nginx generee (port public ${NGINX_PORT})"
-
-# --- Lance nginx au premier plan (PID 1 → Railway surveille) ----
-exec nginx -g 'daemon off;'
+    echo " 

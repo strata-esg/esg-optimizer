@@ -58,7 +58,7 @@ export default function MentionsAppPage() {
         <section className="card">
           <h2 className="text-xl text-[#1A3D22] mb-4 font-semibold">Mentions légales</h2>
           <div className="text-sm text-[#6B7280] space-y-2 leading-relaxed">
-            <p><strong className="text-[#1C1C1C]">Éditeur :</strong> Adama Diallo — ESG Optimizer AI</p>
+            <p><strong className="text-[#1C1C1C]">Éditeur :</strong> Adama Diallo - ESG Optimizer AI</p>
             <p><strong className="text-[#1C1C1C]">Site :</strong> esg-optimizer.fr</p>
             <p><strong className="text-[#1C1C1C]">Contact :</strong> contact@esg-optimizer.fr</p>
             <p><strong className="text-[#1C1C1C]">Hébergeur :</strong> Railway (backend) · Vercel (frontend)</p>
@@ -76,7 +76,7 @@ export default function MentionsAppPage() {
           <h2 className="text-xl text-[#1A3D22] mb-4 font-semibold">Méthodologie d'analyse</h2>
           <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
             Notre moteur IA (GPT-4o, temperature 0.2) analyse vos rapports de durabilité en s'appuyant sur les{" "}
-            <strong className="text-[#1C1C1C]">ESRS — European Sustainability Reporting Standards</strong> définis par l'EFRAG
+            <strong className="text-[#1C1C1C]">ESRS - European Sustainability Reporting Standards</strong> définis par l'EFRAG
             dans le cadre de la directive CSRD. Nous couvrons les 10 thématiques suivantes :
           </p>
           <div className="grid md:grid-cols-2 gap-3 mb-4">
@@ -106,15 +106,9 @@ export default function MentionsAppPage() {
         <section className="card md:col-span-2">
           <h2 className="text-xl text-[#1A3D22] mb-4 font-semibold">Protection des données (RGPD)</h2>
           <div className="grid md:grid-cols-2 gap-4 text-sm text-[#1C1C1C] leading-relaxed">
-            <p><strong>Responsable :</strong> Adama Diallo — contact@esg-optimizer.fr</p>
+            <p><strong>Responsable :</strong> Adama Diallo - contact@esg-optimizer.fr</p>
             <p><strong>Données collectées :</strong> Email, nom, fichiers uploadés pour analyse.</p>
             <p><strong>Conservation :</strong> Fichiers supprimés immédiatement après extraction. Seuls les résultats sont conservés.</p>
-            <p><strong>Hébergement :</strong> Railway / Google Cloud europe-west1 (Belgique) — conforme RGPD.</p>
+            <p><strong>Hébergement :</strong> Railway / Google Cloud europe-west1 (Belgique) - conforme RGPD.</p>
             <p><strong>Vos droits :</strong> Accès, rectification, suppression via Paramètres ou par email. Réponse sous 72h.</p>
-            <p><strong>Cookies :</strong> Uniquement fonctionnels (session) et analytiques anonymisés (Umami).</p>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-}
+            <p><strong>Cookies :</strong> Uniquement fonctionnels (ses

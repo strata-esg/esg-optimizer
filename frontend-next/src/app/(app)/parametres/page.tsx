@@ -1,19 +1,10 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { UserProfile } from "@clerk/nextjs";
 
 export default function ParametresPage() {
-  const { user, isLoaded } = useUser();
-
-  const nom = user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "—";
-  const email = user?.primaryEmailAddress?.emailAddress ?? "—";
-  const depuis = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString("fr-FR")
-    : "—";
-
   return (
-    <div className="w-full">
+    <div className="w-full max-w-4xl">
       <div className="mb-8">
         <h1
           className="text-4xl text-[#1A3D22] mb-2"
@@ -21,44 +12,41 @@ export default function ParametresPage() {
         >
           Paramètres
         </h1>
-        <p className="text-[#6B7280]">Gérez votre compte et vos préférences</p>
+        <p className="text-[#6B7280]">
+          Gérez votre compte, votre sécurité et vos préférences.
+        </p>
       </div>
 
-      {/* Infos compte */}
-      <div className="card mb-6">
-        <h3 className="font-semibold text-[#1A3D22] mb-4">Mon compte</h3>
-        {!isLoaded ? (
-          <div className="h-16 flex items-center text-sm text-[#6B7280]">Chargement…</div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-[#6B7280] mb-0.5">Nom</p>
-              <p className="font-medium text-[#1C1C1C]">{nom}</p>
-            </div>
-            <div>
-              <p className="text-[#6B7280] mb-0.5">Email</p>
-              <p className="font-medium text-[#1C1C1C]">{email}</p>
-            </div>
-            <div>
-              <p className="text-[#6B7280] mb-0.5">Membre depuis</p>
-              <p className="font-medium text-[#1C1C1C]">{depuis}</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Clerk UserProfile */}
-      <div className="card overflow-hidden p-0 w-full">
+      {/* Profil Clerk : informations, sécurité, sessions. Le conteneur force
+          le composant à rester fluide pour éviter tout débordement. */}
+      <div className="rounded-xl border border-[#E5E0D8] bg-white shadow-sm overflow-hidden">
         <UserProfile
+          routing="hash"
           appearance={{
             elements: {
               rootBox: "w-full",
-              card: "shadow-none border-0 rounded-none",
-              navbar: "border-r border-[#E5E0D8]",
-              navbarButton: "text-[#1C1C1C] hover:text-[#1A3D22] hover:bg-[#F7F2E8]",
-              navbarButtonActive: "text-[#1A3D22] bg-[#D4F0D8]",
-              formButtonPrimary: "bg-[#1A3D22] hover:bg-[#2A5C34] text-[#D4F0D8] rounded-lg",
-              formFieldInput: "border-[#E5E0D8] rounded-lg focus:border-[#1A3D22]",
+              cardBox: "w-full max-w-full shadow-none border-0 rounded-none",
+              card: "w-full max-w-full shadow-none border-0 rounded-none",
+              navbar: "border-r border-[#E5E0D8] bg-[#F7F2E8]",
+              navbarButton:
+                "text-[#1C1C1C] hover:text-[#1A3D22] hover:bg-white transition-colors",
+              navbarButtonActive: "text-[#1A3D22] bg-white font-semibold",
+              scrollBox: "w-full",
+              pageScrollBox: "w-full",
+              header: "text-[#1A3D22]",
+              formButtonPrimary:
+                "bg-[#1A3D22] hover:bg-[#2A5C34] text-[#D4F0D8] rounded-lg normal-case",
+              formFieldInput:
+                "border-[#E5E0D8] rounded-lg focus:border-[#1A3D22] focus:ring-[#1A3D22]/10",
+              profileSectionPrimaryButton: "text-[#1A3D22]",
+              badge: "bg-[#D4F0D8] text-[#1A3D22]",
+              footer: "hidden",
+            },
+            variables: {
+              colorPrimary: "#1A3D22",
+              colorText: "#1C1C1C",
+              colorTextSecondary: "#6B7280",
+              borderRadius: "0.625rem",
             },
           }}
         />

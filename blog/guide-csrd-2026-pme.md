@@ -13,7 +13,7 @@ reading_time: "12 min"
 
 # Guide CSRD 2026 pour PME : ce qui change vraiment
 
-> **TL;DR** — Si votre PME dépasse 2 des 3 seuils (250 salariés, 50 M€ de CA, 25 M€ de bilan), la CSRD vous concerne pour l'exercice fiscal 2025 avec un premier rapport à publier en 2026. Ce guide explique sans jargon ce qui change, les 12 ESRS à couvrir et les 5 étapes pour s'y préparer sans se ruiner en conseil.
+> **TL;DR** - Si votre PME dépasse 2 des 3 seuils (250 salariés, 50 M€ de CA, 25 M€ de bilan), la CSRD vous concerne pour l'exercice fiscal 2025 avec un premier rapport à publier en 2026. Ce guide explique sans jargon ce qui change, les 12 ESRS à couvrir et les 5 étapes pour s'y préparer sans se ruiner en conseil.
 
 La **Corporate Sustainability Reporting Directive** (CSRD, directive européenne 2022/2464) est probablement le changement réglementaire le plus structurant pour votre entreprise depuis le RGPD en 2018. Comme le RGPD, elle paraît technique vue de loin, mais elle impose des changements opérationnels concrets. Contrairement au RGPD, elle impose aussi de **publier** ces changements dans un rapport annuel audité.
 
@@ -28,13 +28,13 @@ Le calendrier d'application a été étalé par catégorie :
 | 2026 | 2027 | PME cotées sur marché réglementé |
 | 2028 | 2029 | Entreprises non-UE ayant > 150 M€ CA dans l'UE |
 
-**La catégorie qui explose en 2026**, c'est celle des **grandes entreprises non cotées** — typiquement les ETI familiales, filiales françaises de groupes étrangers, grosses PME industrielles. L'Autorité des marchés financiers (AMF) et la Compagnie nationale des commissaires aux comptes (CNCC) estiment que **~10 000 à 15 000 entreprises françaises basculent sous CSRD en 2026**, contre ~300 avant.
+**La catégorie qui explose en 2026**, c'est celle des **grandes entreprises non cotées** - typiquement les ETI familiales, filiales françaises de groupes étrangers, grosses PME industrielles. L'Autorité des marchés financiers (AMF) et la Compagnie nationale des commissaires aux comptes (CNCC) estiment que **~10 000 à 15 000 entreprises françaises basculent sous CSRD en 2026**, contre ~300 avant.
 
 ### Et si je suis une « vraie » PME (< 250 salariés) ?
 
 Vous n'êtes pas formellement soumis, mais vous serez massivement touché par **effet de ruissellement** : vos clients grands comptes, soumis à la CSRD, vont vous réclamer vos données ESG pour alimenter leur propre **ESRS S2** (Chaîne de valeur en amont). Si vous ne pouvez pas répondre, vous perdez les appels d'offres. **La VSME** (Voluntary Standard for SMEs, publiée par EFRAG en janvier 2025) est conçue pour cet usage : un reporting light, proportionné, qui vous permet de répondre sans construire l'usine à gaz des grands.
 
-> 💡 **Action** — Si vos principaux clients sont des grandes entreprises, anticipez : demandez-leur dès maintenant leur questionnaire fournisseur ESG pour 2026. [Testez gratuitement votre état de préparation en 60 secondes avec notre quick-check →](https://esg-optimizer.fr/quick-check)
+> 💡 **Action** - Si vos principaux clients sont des grandes entreprises, anticipez : demandez-leur dès maintenant leur questionnaire fournisseur ESG pour 2026. [Testez gratuitement votre état de préparation en 60 secondes avec notre quick-check ->](https://esg-optimizer.fr/quick-check)
 
 ## 2. Les 12 ESRS : ce qu'il faut couvrir
 
@@ -43,20 +43,20 @@ La CSRD impose le reporting selon les **European Sustainability Reporting Standa
 **ESRS transverses** : ESRS 1 (principes généraux, double matérialité), ESRS 2 (informations générales).
 
 **Environnement (5 standards)** :
-- **ESRS E1 — Climat** : émissions Scope 1/2/3 (GHG Protocol), trajectoire de décarbonation, risques physiques et de transition, CapEx/OpEx verts. C'est le plus lourd.
-- **ESRS E2 — Pollution** : air, eau, sol, substances préoccupantes.
-- **ESRS E3 — Ressources hydriques et marines** : consommation, prélèvement, stress hydrique.
-- **ESRS E4 — Biodiversité** : impact sur les écosystèmes, sites en zones protégées.
-- **ESRS E5 — Économie circulaire** : flux de matières, déchets, recyclabilité.
+- **ESRS E1 - Climat** : émissions Scope 1/2/3 (GHG Protocol), trajectoire de décarbonation, risques physiques et de transition, CapEx/OpEx verts. C'est le plus lourd.
+- **ESRS E2 - Pollution** : air, eau, sol, substances préoccupantes.
+- **ESRS E3 - Ressources hydriques et marines** : consommation, prélèvement, stress hydrique.
+- **ESRS E4 - Biodiversité** : impact sur les écosystèmes, sites en zones protégées.
+- **ESRS E5 - Économie circulaire** : flux de matières, déchets, recyclabilité.
 
 **Social (4 standards)** :
-- **ESRS S1 — Effectifs propres** : diversité, formation, santé-sécurité, salaires décents.
-- **ESRS S2 — Chaîne de valeur** : conditions de travail chez les fournisseurs.
-- **ESRS S3 — Communautés affectées** : impact sur les populations locales.
-- **ESRS S4 — Consommateurs** : protection des données, accessibilité, sécurité produits.
+- **ESRS S1 - Effectifs propres** : diversité, formation, santé-sécurité, salaires décents.
+- **ESRS S2 - Chaîne de valeur** : conditions de travail chez les fournisseurs.
+- **ESRS S3 - Communautés affectées** : impact sur les populations locales.
+- **ESRS S4 - Consommateurs** : protection des données, accessibilité, sécurité produits.
 
 **Gouvernance (1 standard)** :
-- **ESRS G1 — Conduite des affaires** : éthique, lutte anticorruption, lobbying, paiements fournisseurs.
+- **ESRS G1 - Conduite des affaires** : éthique, lutte anticorruption, lobbying, paiements fournisseurs.
 
 ### Le principe clé : la double matérialité
 
@@ -68,7 +68,7 @@ Vous n'êtes **pas obligé** de tout couvrir. Vous devez d'abord mener une **ana
 
 Si vous publiiez déjà un rapport RSE volontaire (GRI, Global Compact, bilan carbone), trois choses changent :
 
-**1. L'audit obligatoire**. Le rapport doit être **certifié par un commissaire aux comptes ou un prestataire accrédité** (en France : CAC ou OTI — Organisme Tiers Indépendant). L'assurance est d'abord « limitée » jusqu'en 2028, puis « raisonnable » (équivalent à l'audit financier). **Concrètement** : tout chiffre non sourcé, toute méthode non explicitée, toute omission non justifiée sera relevée.
+**1. L'audit obligatoire**. Le rapport doit être **certifié par un commissaire aux comptes ou un prestataire accrédité** (en France : CAC ou OTI - Organisme Tiers Indépendant). L'assurance est d'abord « limitée » jusqu'en 2028, puis « raisonnable » (équivalent à l'audit financier). **Concrètement** : tout chiffre non sourcé, toute méthode non explicitée, toute omission non justifiée sera relevée.
 
 **2. Le format électronique structuré (ESEF/iXBRL)**. Le rapport doit être publié en XHTML avec balisage XBRL des données ESG. Oubliez le PDF plat : il faut du contenu structuré, machine-readable, pour alimenter la future base européenne ESAP (European Single Access Point).
 
@@ -76,17 +76,17 @@ Si vous publiiez déjà un rapport RSE volontaire (GRI, Global Compact, bilan ca
 
 ## 4. Les 5 étapes pour s'y préparer (sans se ruiner)
 
-**Étape 1 — Cartographie (1-2 semaines).** Faites l'inventaire des données déjà disponibles en interne : factures énergie (E1), registre du personnel (S1), audit fournisseurs (S2), organigramme et procédures (G1). La plupart des PME ont déjà **60-70 % des données brutes** ; elles n'ont juste jamais été structurées en ESRS.
+**Étape 1 - Cartographie (1-2 semaines).** Faites l'inventaire des données déjà disponibles en interne : factures énergie (E1), registre du personnel (S1), audit fournisseurs (S2), organigramme et procédures (G1). La plupart des PME ont déjà **60-70 % des données brutes** ; elles n'ont juste jamais été structurées en ESRS.
 
-**Étape 2 — Analyse de double matérialité (2-4 semaines).** Impliquez COMEX + représentants des parties prenantes (salariés, clients, fournisseurs clés). Produisez une **matrice de matérialité** documentée. C'est votre premier livrable auditable.
+**Étape 2 - Analyse de double matérialité (2-4 semaines).** Impliquez COMEX + représentants des parties prenantes (salariés, clients, fournisseurs clés). Produisez une **matrice de matérialité** documentée. C'est votre premier livrable auditable.
 
-**Étape 3 — Collecte des données chiffrées (2-3 mois).** C'est l'étape la plus longue. GHG Protocol pour Scope 1/2, méthode Bilan Carbone ADEME pour Scope 3, indicateurs sociaux du tableau de bord RH, indicateurs G1 des procédures compliance.
+**Étape 3 - Collecte des données chiffrées (2-3 mois).** C'est l'étape la plus longue. GHG Protocol pour Scope 1/2, méthode Bilan Carbone ADEME pour Scope 3, indicateurs sociaux du tableau de bord RH, indicateurs G1 des procédures compliance.
 
-**Étape 4 — Rédaction & pré-audit (1 mois).** Rédigez selon la structure ESRS. Faites relire par un tiers (CAC ou outil d'audit comme ESG Optimizer) pour identifier les trous **avant** la mission officielle.
+**Étape 4 - Rédaction & pré-audit (1 mois).** Rédigez selon la structure ESRS. Faites relire par un tiers (CAC ou outil d'audit comme ESG Optimizer) pour identifier les trous **avant** la mission officielle.
 
-**Étape 5 — Audit officiel & publication (1-2 mois).** Le commissaire aux comptes (ou OTI) émet son rapport d'assurance limitée. Publication sur votre site + dépôt au greffe.
+**Étape 5 - Audit officiel & publication (1-2 mois).** Le commissaire aux comptes (ou OTI) émet son rapport d'assurance limitée. Publication sur votre site + dépôt au greffe.
 
-> 💡 **Gain de temps** — ESG Optimizer automatise l'étape 4 (pré-audit) en 3 minutes. Uploadez votre brouillon, nous identifions les non-conformités ESRS avant que votre CAC ne les trouve. [Essayez gratuitement →](https://esg-optimizer.fr/quick-check)
+> 💡 **Gain de temps** - ESG Optimizer automatise l'étape 4 (pré-audit) en 3 minutes. Uploadez votre brouillon, nous identifions les non-conformités ESRS avant que votre CAC ne les trouve. [Essayez gratuitement ->](https://esg-optimizer.fr/quick-check)
 
 ## 5. Combien ça coûte ?
 
@@ -94,9 +94,9 @@ Fourchettes observées sur le marché français mi-2026 :
 
 | Taille entreprise | 1ère année (setup) | Années suivantes |
 |---|---|---|
-| PME 250-500 salariés | 15 000 – 40 000 € | 8 000 – 20 000 € |
-| ETI 500-2000 | 40 000 – 120 000 € | 20 000 – 60 000 € |
-| Grande entreprise | 100 000 – 500 000 € | 50 000 – 250 000 € |
+| PME 250-500 salariés | 15 000 - 40 000 € | 8 000 - 20 000 € |
+| ETI 500-2000 | 40 000 - 120 000 € | 20 000 - 60 000 € |
+| Grande entreprise | 100 000 - 500 000 € | 50 000 - 250 000 € |
 
 Ces chiffres incluent le conseil méthodologique (double matérialité, structuration ESRS), la collecte/consolidation, la rédaction, la certification. **80 % du coût est sur la 1ère année** (effet de rampe).
 
@@ -132,7 +132,7 @@ Celles qui attendent le dernier moment paient 2× le prix et s'exposent à des n
 
 **💡 Passez à l'action maintenant**
 
-[**Testez gratuitement votre conformité CSRD en 60 secondes →**](https://esg-optimizer.fr/quick-check)
+[**Testez gratuitement votre conformité CSRD en 60 secondes ->**](https://esg-optimizer.fr/quick-check)
 
 Uploadez votre brouillon de rapport (ou un rapport existant), obtenez un score sur les 12 ESRS, identifiez les 3 principales non-conformités à corriger **avant** l'audit CAC. Sans inscription, 100% gratuit pour le plan Découverte.
 

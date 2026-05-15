@@ -1,6 +1,6 @@
 """
-ESG Optimizer — Module watermark PDF pour le plan Découverte.
-Applique un bandeau diagonal semi-transparent "ESG Optimizer — Rapport partiel"
+ESG Optimizer - Module watermark PDF pour le plan Découverte.
+Applique un bandeau diagonal semi-transparent "ESG Optimizer - Rapport partiel"
 sur chaque page d'un PDF généré par ReportLab.
 
 Usage dans reporter.py :
@@ -21,7 +21,7 @@ from typing import Optional
 def build_watermark_page(
     width: float = 595,
     height: float = 842,
-    text: str = "ESG Optimizer — Rapport partiel",
+    text: str = "ESG Optimizer - Rapport partiel",
     color_hex: str = "#1A3D22",
     opacity: float = 0.12,
     font_size: float = 32,
@@ -35,7 +35,7 @@ def build_watermark_page(
         height:    Hauteur de la page en points (842 = A4)
         text:      Texte à afficher
         color_hex: Couleur Forest brand (#1A3D22)
-        opacity:   Opacité du texte (0–1). 0.12 = visible mais discret
+        opacity:   Opacité du texte (0-1). 0.12 = visible mais discret
         font_size: Taille de la police en points
         repeat:    Nombre de fois où le texte est répété verticalement
 
@@ -86,7 +86,7 @@ def build_watermark_page(
 def apply_watermark_to_pdf(
     input_path: str,
     output_path: str,
-    text: str = "ESG Optimizer — Rapport partiel",
+    text: str = "ESG Optimizer - Rapport partiel",
     max_pages: Optional[int] = None,
 ) -> None:
     """
@@ -138,7 +138,7 @@ def apply_watermark_to_pdf(
 
 def apply_watermark_to_bytes(
     pdf_bytes: bytes,
-    text: str = "ESG Optimizer — Rapport partiel",
+    text: str = "ESG Optimizer - Rapport partiel",
     max_pages: Optional[int] = None,
 ) -> bytes:
     """
@@ -191,7 +191,7 @@ def apply_watermark_to_bytes(
 # Helpers
 
 def _hex_to_rgb(hex_color: str) -> tuple[float, float, float]:
-    """Convertit #RRGGBB en tuple (r, g, b) normalisé 0–1."""
+    """Convertit #RRGGBB en tuple (r, g, b) normalisé 0-1."""
     hex_color = hex_color.lstrip("#")
     r = int(hex_color[0:2], 16) / 255
     g = int(hex_color[2:4], 16) / 255

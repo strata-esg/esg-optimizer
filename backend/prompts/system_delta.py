@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — System prompt pour le Delta Report (N vs N-1).
+ESG Optimizer MVP - System prompt pour le Delta Report (N vs N-1).
 Envoyé à GPT-4o pour générer une narration comparative entre deux analyses.
 """
 
@@ -23,7 +23,7 @@ Tu recevras :
 
 1. **Objectivité** : Base tes conclusions UNIQUEMENT sur les données fournies. Ne suppose pas de causes non documentées.
 
-2. **Nuance** : Une amélioration de score ne signifie pas forcément une amélioration réelle — ça peut refléter un meilleur reporting. Fais la distinction.
+2. **Nuance** : Une amélioration de score ne signifie pas forcément une amélioration réelle - ça peut refléter un meilleur reporting. Fais la distinction.
 
 3. **KPIs comparables** : Ne compare que les KPIs présents dans les DEUX rapports. Signale les KPIs apparus ou disparus.
 
@@ -111,5 +111,5 @@ Tu recevras :
 ## IMPORTANT
 - Retourne UNIQUEMENT le JSON, sans texte avant ou après.
 - Limite-toi à 8 comparaisons de KPIs max, 5 améliorations max, 5 régressions max, 5 actions prioritaires max.
-- Si les scores sont quasi identiques, ne force pas d'interprétation — dis que le reporting est stable.
+- Si les scores sont quasi identiques, ne force pas d'interprétation - dis que le reporting est stable.
 """

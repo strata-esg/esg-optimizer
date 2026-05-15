@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Modèles SQLAlchemy (4 tables : users, companies, analyses, public_analyses).
+ESG Optimizer MVP - Modèles SQLAlchemy (4 tables : users, companies, analyses, public_analyses).
 """
 
 import uuid
@@ -39,8 +39,13 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    password_hash = Column(String(255), nullable=False)
+    # Identifiant Clerk (frontend Next.js). Null pour les comptes historiques
+    # créés via le frontend Streamlit (auth e-mail / mot de passe).
+    clerk_id = Column(String(255), unique=True, nullable=True, index=True)
+    # Nullable : les comptes gérés par Clerk n'ont pas de mot de passe local.
+    password_hash = Column(String(255), nullable=True)
     company_name = Column(String(255), nullable=True)
+    full_name = Column(String(255), nullable=True)
     plan = Column(String(20), default="discovery")  # 'discovery' | 'essential' | 'pro' | 'enterprise'
     analyses_this_month = Column(Integer, default=0)
     email_notifications = Column(Boolean, default=True)  # Opt-in emails (digest, analyses)

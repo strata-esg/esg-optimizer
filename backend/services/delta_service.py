@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Service Delta (comparaison N vs N-1).
+ESG Optimizer MVP - Service Delta (comparaison N vs N-1).
 Calcule les écarts de scores, compare les couvertures ESRS,
 et appelle GPT-4o pour générer la narration comparative.
 """
@@ -36,7 +36,7 @@ def find_previous_analysis(db: Session, analysis: Analysis) -> Analysis | None:
     )
 
     # Toute analyse créée avant celle-ci (même année acceptée),
-    # ordonnée par report_year desc puis created_at desc → la plus récente/pertinente en premier.
+    # ordonnée par report_year desc puis created_at desc -> la plus récente/pertinente en premier.
     return (
         query
         .filter(Analysis.created_at < analysis.created_at)
@@ -113,7 +113,7 @@ def call_gpt4o_delta(current: Analysis, previous: Analysis, company_name: str) -
 
     except json.JSONDecodeError as exc:
         logger.error("JSON invalide retourné par GPT-4o (delta) : %s", exc)
-        raise RuntimeError(f"GPT-4o delta — JSON invalide : {exc}") from exc
+        raise RuntimeError(f"GPT-4o delta - JSON invalide : {exc}") from exc
     except Exception as exc:
         logger.error("Erreur appel GPT-4o (delta) : %s", exc)
         raise RuntimeError(f"Erreur appel GPT-4o delta : {exc}") from exc
@@ -131,11 +131,11 @@ def run_delta(analysis: Analysis, db: Session) -> dict | None:
     """
     previous = find_previous_analysis(db, analysis)
     if previous is None:
-        logger.info("Delta [%d] — Aucune analyse précédente trouvée, skip.", analysis.id)
+        logger.info("Delta [%d] - Aucune analyse précédente trouvée, skip.", analysis.id)
         return None
 
     logger.info(
-        "Delta [%d] — Comparaison avec analyse [%d] (année %s vs %s)",
+        "Delta [%d] - Comparaison avec analyse [%d] (année %s vs %s)",
         analysis.id, previous.id, previous.report_year, analysis.report_year,
     )
 
@@ -156,7 +156,7 @@ def run_delta(analysis: Analysis, db: Session) -> dict | None:
     db.commit()
 
     logger.info(
-        "Delta [%d] — Terminé. Deltas: E=%s, S=%s, G=%s, Global=%s",
+        "Delta [%d] - Terminé. Deltas: E=%s, S=%s, G=%s, Global=%s",
         analysis.id, analysis.delta_env, analysis.delta_social,
         analysis.delta_gov, analysis.delta_global,
     )

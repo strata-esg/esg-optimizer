@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Composant grille de couverture ESRS.
+ESG Optimizer MVP - Composant grille de couverture ESRS.
 Affiche les 10 catégories ESRS avec indicateur visuel couvert/non couvert.
 """
 

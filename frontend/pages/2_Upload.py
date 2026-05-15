@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Upload & Analyse.
+ESG Optimizer MVP - Page Upload & Analyse.
 Upload d'un rapport ESG + lancement de l'analyse avec polling.
 """
 
@@ -150,7 +150,7 @@ sector = st.selectbox(
         "Tourisme & Hôtellerie",
         "Autre",
     ],
-    format_func=lambda x: "— Sélectionner un secteur —" if x is None else x,
+    format_func=lambda x: "- Sélectionner un secteur -" if x is None else x,
 )
 
 # Bouton Analyser
@@ -250,7 +250,7 @@ if st.button(
                 progress_bar.progress(100, text="Analyse terminée !")
                 _render_steps(4)
                 status_container.success("Analyse terminée avec succès !")
-                # Event #4 funnel — score récupéré depuis la réponse API
+                # Event #4 funnel - score récupéré depuis la réponse API
                 _user_plan = get_user().get("plan") if get_user() else None
                 track_analysis_completed(
                     score=analysis.get("score_global"),
@@ -284,7 +284,7 @@ if st.button(
             _msg = str(e.detail)
 
         if e.status_code == 403:
-            # Plan insuffisant → proposer upgrade
+            # Plan insuffisant -> proposer upgrade
             st.markdown(
                 '<div style="background:#FFF7ED;border:1.5px solid #FB923C;border-radius:12px;'
                 'padding:20px;text-align:center;margin:8px 0;">'
@@ -302,7 +302,7 @@ if st.button(
                          use_container_width=True, key="upload_upgrade"):
                 st.switch_page("pages/6_Tarifs.py")
         elif e.status_code == 429:
-            st.warning("Trop de requêtes — merci de patienter quelques instants avant de réessayer.")
+            st.warning("Trop de requêtes - merci de patienter quelques instants avant de réessayer.")
         elif e.status_code and e.status_code >= 500:
             st.error("Le service est temporairement indisponible. Merci de réessayer dans quelques minutes.")
         else:
@@ -320,7 +320,7 @@ if _upload_user:
         if remaining == 0:
             st.info("Vous avez utilisé votre analyse gratuite. Passez à un plan payant pour continuer.")
         else:
-            st.caption(f"Plan Découverte — {remaining} analyse gratuite restante.")
+            st.caption(f"Plan Découverte - {remaining} analyse gratuite restante.")
 
 # Aide
 if not can_submit:
@@ -328,9 +328,9 @@ if not can_submit:
 
 with st.expander("Comment ça marche ?"):
     st.markdown(
-        """1. **Upload** — Déposez votre rapport de durabilité (PDF, Word ou Excel)
-2. **Extraction** — Le texte est extrait automatiquement du document
-3. **Analyse IA** — GPT-4o analyse le contenu selon les standards ESRS/CSRD
-4. **Résultats** — Scores E/S/G, conformité CSRD, KPIs détectés, recommandations
-5. **Rapport PDF** — Téléchargez un rapport professionnel prêt à partager"""
+        """1. **Upload** - Déposez votre rapport de durabilité (PDF, Word ou Excel)
+2. **Extraction** - Le texte est extrait automatiquement du document
+3. **Analyse IA** - GPT-4o analyse le contenu selon les standards ESRS/CSRD
+4. **Résultats** - Scores E/S/G, conformité CSRD, KPIs détectés, recommandations
+5. **Rapport PDF** - Téléchargez un rapport professionnel prêt à partager"""
     )

@@ -13,11 +13,11 @@ reading_time: "9 min"
 
 # Les 10 erreurs à éviter dans votre rapport ESG
 
-> **TL;DR** — En analysant 200+ rapports ESG soumis à ESG Optimizer depuis 6 mois, on voit revenir les mêmes erreurs. Certaines sont éliminatoires à l'audit CAC. Voici la check-list que vous devriez passer **avant** de soumettre votre rapport.
+> **TL;DR** - En analysant 200+ rapports ESG soumis à ESG Optimizer depuis 6 mois, on voit revenir les mêmes erreurs. Certaines sont éliminatoires à l'audit CAC. Voici la check-list que vous devriez passer **avant** de soumettre votre rapport.
 
 Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplémentaire, 15 000 à 40 000 € de conseil correctif, et un risque de publication tardive qui active les sanctions prévues par l'ordonnance du 6 décembre 2023. La bonne nouvelle : **80 % des rapports ratés le sont pour les 10 mêmes raisons**. Apprenez-les par cœur.
 
-## Erreur n°1 — Pas d'analyse de double matérialité documentée
+## Erreur n°1 - Pas d'analyse de double matérialité documentée
 
 **Ce qu'on voit** : un rapport qui couvre tous les ESRS sans jamais justifier pourquoi, ou au contraire qui en omet un (souvent E4 biodiversité, S3 communautés) sans dire qu'il a été jugé non matériel.
 
@@ -25,7 +25,7 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : l'ESRS 1 §29-46 détaille exactement ce qui est attendu. Consacrez 2 à 4 semaines à cet exercice **avant** de commencer la rédaction du reste. Sans matérialité, aucun rapport ne passe l'audit.
 
-## Erreur n°2 — Mélanger déclaratif et chiffré
+## Erreur n°2 - Mélanger déclaratif et chiffré
 
 **Ce qu'on voit** : « Notre entreprise est fortement engagée dans la réduction de son empreinte carbone et met en œuvre de nombreuses actions ambitieuses. »
 
@@ -33,7 +33,7 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : chaque affirmation doit être appuyée par **un chiffre + une unité + une période + une source méthodologique**. L'ESG Optimizer scanne automatiquement ce ratio : en moyenne, les rapports qu'on rejette contiennent **< 20 % de phrases chiffrées**. Objectif : **> 60 %**.
 
-## Erreur n°3 — Scope 3 escamoté
+## Erreur n°3 - Scope 3 escamoté
 
 **Ce qu'on voit** : un bilan carbone qui affiche Scope 1 et 2 correctement mais qui cite le Scope 3 en une phrase (« en cours de calcul ») ou qui ne couvre que 1-2 catégories sur les 15 du GHG Protocol.
 
@@ -41,15 +41,15 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : pour une PME industrielle, les catégories 1 (achats de biens et services), 4 (transport amont), 11 (utilisation des produits vendus) et 12 (fin de vie) représentent typiquement 70-90 % du Scope 3. Si vous ne pouvez pas les chiffrer, **dites-le explicitement** avec un plan pour y arriver à N+1. L'omission non justifiée est éliminatoire.
 
-## Erreur n°4 — Trajectoire de décarbonation vague
+## Erreur n°4 - Trajectoire de décarbonation vague
 
-**Ce qu'on voit** : « Nous visons la neutralité carbone à l'horizon 2050 » — sans trajectoire intermédiaire, sans périmètre, sans définition de la « neutralité ».
+**Ce qu'on voit** : « Nous visons la neutralité carbone à l'horizon 2050 » - sans trajectoire intermédiaire, sans périmètre, sans définition de la « neutralité ».
 
 **Ce qui est attendu** : objectifs 2030 et 2050 **chiffrés en tonnes CO2e** (pas en pourcentage seul), ventilés par Scope, alignés sur une trajectoire 1.5°C (SBTi validé ou méthode équivalente), avec pas intermédiaires tous les 5 ans et indicateurs de suivi annuel.
 
 **Correctif** : si vous n'avez pas validé vos cibles SBTi, utilisez la [méthodologie SDA (Sectoral Decarbonization Approach)](https://sciencebasedtargets.org/sda) publiquement accessible. L'important est la **cohérence** entre vos émissions actuelles et la pente requise.
 
-## Erreur n°5 — Indicateurs sociaux cherry-picking
+## Erreur n°5 - Indicateurs sociaux cherry-picking
 
 **Ce qu'on voit** : rapport qui met en avant « 48 % de femmes dans l'effectif » mais n'affiche pas la répartition F/H par niveau de rémunération (ce que demande explicitement l'ESRS S1-16).
 
@@ -57,7 +57,7 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : votre bilan social annuel et votre index égalité professionnelle contiennent déjà 80 % des données. Il suffit de les structurer au format ESRS S1.
 
-## Erreur n°6 — Pas de plan d'action concret
+## Erreur n°6 - Pas de plan d'action concret
 
 **Ce qu'on voit** : longues listes d'« engagements » et de « démarches » sans livrable daté, sans responsable, sans budget.
 
@@ -65,7 +65,7 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : empruntez le format OKR trimestriel. Un tableau propre avec 8-15 lignes d'actions concrètes vaut mieux que 40 pages de storytelling.
 
-## Erreur n°7 — Gouvernance du sujet ESG absente
+## Erreur n°7 - Gouvernance du sujet ESG absente
 
 **Ce qu'on voit** : pas un mot sur **qui**, au sein de la gouvernance, supervise les enjeux ESG ; pas de mention du comité RSE du conseil, pas de lien avec la rémunération variable des dirigeants.
 
@@ -73,15 +73,15 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : même si votre dispositif est embryonnaire, décrivez-le honnêtement + plan de montée en maturité. L'absence totale est éliminatoire, l'imperfection transparente est acceptable.
 
-## Erreur n°8 — Oublier les risques climatiques physiques
+## Erreur n°8 - Oublier les risques climatiques physiques
 
 **Ce qu'on voit** : reporting des risques de transition (prix du carbone, évolution réglementaire) mais rien sur les risques physiques (canicules, inondations, stress hydrique sur sites).
 
 **Ce qui est attendu (ESRS E1 §19-22, aligné TCFD)** : analyse sur 3 horizons (court, moyen, long terme), scénarios climatiques (typiquement RCP 2.6 et RCP 8.5), identification des actifs et activités exposés, quantification de l'impact financier potentiel, mesures d'adaptation prévues.
 
-**Correctif** : outils gratuits accessibles — [Climat HD de Météo-France](https://meteofrance.com/climathd) pour les projections locales, [ClimateImpactExplorer](https://climate-impact-explorer.climateanalytics.org/) pour l'impact sectoriel. Une analyse qualitative bien structurée suffit pour le 1er rapport.
+**Correctif** : outils gratuits accessibles - [Climat HD de Météo-France](https://meteofrance.com/climathd) pour les projections locales, [ClimateImpactExplorer](https://climate-impact-explorer.climateanalytics.org/) pour l'impact sectoriel. Une analyse qualitative bien structurée suffit pour le 1er rapport.
 
-## Erreur n°9 — Chaîne de valeur traitée en 3 lignes
+## Erreur n°9 - Chaîne de valeur traitée en 3 lignes
 
 **Ce qu'on voit** : « Nos fournisseurs respectent notre code de conduite. » Point. Aucune donnée, aucun indicateur de suivi.
 
@@ -89,7 +89,7 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 **Correctif** : commencez par les 20 % de fournisseurs qui représentent 80 % du poids stratégique. Pour eux, demandez le formulaire fournisseur standard (Sedex, EcoVadis, ou votre propre questionnaire aligné ESRS). Les autres : approche proportionnée avec clause contractuelle.
 
-## Erreur n°10 — Cohérence financier / extra-financier absente
+## Erreur n°10 - Cohérence financier / extra-financier absente
 
 **Ce qu'on voit** : le rapport ESG annonce 50 M€ d'investissements verts, mais le rapport financier ne les retrouve nulle part. Ou l'inverse : le DPEF parle d'une trajectoire de baisse des émissions, le rapport d'activité évoque une croissance qui mécaniquement les ferait monter.
 
@@ -118,7 +118,7 @@ Un rapport ESG qui échoue à l'audit, c'est 3 à 6 semaines de travail supplém
 
 L'[outil ESG Optimizer](https://esg-optimizer.fr/quick-check) passe automatiquement votre brouillon au crible de ces 10 points (et de 40 autres). Score global, identification des 3 principales non-conformités, recommandations priorisées. **Gratuit pour la première analyse, pas d'inscription requise.**
 
-[**Lancer l'audit express →**](https://esg-optimizer.fr/quick-check)
+[**Lancer l'audit express ->**](https://esg-optimizer.fr/quick-check)
 
 ---
 

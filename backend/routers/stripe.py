@@ -1,8 +1,8 @@
 """
-ESG Optimizer MVP — Router Stripe.
-POST /stripe/webhook         → Webhook Stripe (checkout.session.completed)
-GET  /stripe/upgrade-url     → Génère l'URL de Payment Link avec prefilled_email
-GET  /stripe/my-subscription → Retourne l'abonnement actif de l'utilisateur
+ESG Optimizer MVP - Router Stripe.
+POST /stripe/webhook         -> Webhook Stripe (checkout.session.completed)
+GET  /stripe/upgrade-url     -> Génère l'URL de Payment Link avec prefilled_email
+GET  /stripe/my-subscription -> Retourne l'abonnement actif de l'utilisateur
 """
 
 import logging
@@ -57,7 +57,7 @@ def _detect_plan_from_session(session: dict) -> str:
         return "pro"
 
     # FIX : un essai gratuit ou un code promo 100% met amount_total=0
-    # → on s'appuie sur le mode/subscription_id pour distinguer Pro (subscription) vs Essential (one-shot)
+    # -> on s'appuie sur le mode/subscription_id pour distinguer Pro (subscription) vs Essential (one-shot)
     mode = session.get("mode")
     subscription_id = session.get("subscription")
     if mode == "subscription" or subscription_id:
@@ -68,9 +68,9 @@ def _detect_plan_from_session(session: dict) -> str:
     # Fallback : vérifier le montant
     amount = session.get("amount_total", 0) or 0
     if amount:
-        if amount <= 5000:  # <= 50€ → Essentiel (39€)
+        if amount <= 5000:  # <= 50€ -> Essentiel (39€)
             return "essential"
-        else:  # > 50€ → Pro (129€/mois)
+        else:  # > 50€ -> Pro (129€/mois)
             return "pro"
 
     return "essential"  # Default
@@ -80,12 +80,12 @@ def _extract_payment_link_id(url: str) -> str | None:
     """Extrait l'ID du Payment Link depuis l'URL Stripe (dernier segment)."""
     if not url:
         return None
-    # https://buy.stripe.com/xxx → xxx
+    # https://buy.stripe.com/xxx -> xxx
     parts = url.rstrip("/").split("/")
     return parts[-1] if parts else None
 
 
-# POST /stripe/webhook — Webhook Stripe
+# POST /stripe/webhook - Webhook Stripe
 
 @router.post("/webhook")
 async def stripe_webhook(
@@ -160,7 +160,7 @@ async def stripe_webhook(
         # Plan = pro pour toute subscription active/en essai
         if sub_status_remote in ("active", "trialing"):
             _upgrade_user_plan(db, target_user.id, "pro")
-            logger.info("Subscription %s → user %s upgraded to PRO via %s",
+            logger.info("Subscription %s -> user %s upgraded to PRO via %s",
                         sub_status_remote, target_user.email, event_type)
             return {"status": "ok", "plan": "pro", "user_id": target_user.id, "via": event_type}
         return {"status": "ignored_subscription_status", "remote_status": sub_status_remote}
@@ -199,7 +199,7 @@ async def stripe_webhook(
     payment_link = session_data.get("payment_link") if isinstance(session_data, dict) else session_data.payment_link
 
     logger.info(
-        "Stripe checkout completed — email=%s, session=%s, amount=%s, payment_link=%s",
+        "Stripe checkout completed - email=%s, session=%s, amount=%s, payment_link=%s",
         customer_email, session_id, amount, payment_link,
     )
 
@@ -224,7 +224,7 @@ async def stripe_webhook(
         session_data if isinstance(session_data, dict) else session_data.to_dict()
     )
 
-    # Capturer le plan actuel AVANT upgrade — évite de renvoyer l'email si déjà à ce plan
+    # Capturer le plan actuel AVANT upgrade - évite de renvoyer l'email si déjà à ce plan
     previous_plan = user.plan
 
     # Calculer l'expiration
@@ -256,7 +256,7 @@ async def stripe_webhook(
     db.commit()
 
     logger.info(
-        "Subscription créée — user=%d, plan=%s, session=%s",
+        "Subscription créée - user=%d, plan=%s, session=%s",
         user.id, detected_plan, session_id,
     )
 
@@ -269,7 +269,7 @@ async def stripe_webhook(
         except Exception as email_exc:
             logger.warning("Email upgrade non envoyé : %s", email_exc)
     else:
-        logger.info("Email upgrade non renvoyé — user %d déjà sur le plan %s", user.id, detected_plan)
+        logger.info("Email upgrade non renvoyé - user %d déjà sur le plan %s", user.id, detected_plan)
 
     return {"status": "ok", "plan": detected_plan, "user_id": user.id}
 

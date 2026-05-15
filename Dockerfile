@@ -1,5 +1,5 @@
 # ================================================================
-#  ESG Optimizer MVP — Dockerfile multi-process
+#  ESG Optimizer MVP - Dockerfile multi-process
 # ----------------------------------------------------------------
 #  Lance en parallèle :
 #    - nginx      (reverse proxy) sur $PORT   (exposé par Railway)
@@ -7,8 +7,8 @@
 #    - streamlit  (Frontend)       sur 8501     (interne)
 #
 #  nginx route :
-#    POST /stripe/webhook  →  FastAPI (8000)
-#    tout le reste         →  Streamlit (8501)
+#    POST /stripe/webhook  ->  FastAPI (8000)
+#    tout le reste         ->  Streamlit (8501)
 #
 #  Build local :
 #     docker build -t esg-optimizer .

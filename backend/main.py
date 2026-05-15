@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Point d'entrée FastAPI.
+ESG Optimizer - Point d'entrée FastAPI.
 Lancer avec : uvicorn backend.main:app --reload --port 8000
 """
 
@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger("esg-optimizer")
 
 
-# --- Sentry (Sprint 6H) -------------------------------------------------
+# --- Sentry -------------------------------------------------------------
 # On initialise AVANT la création de l'app FastAPI pour que l'intégration
 # auto-wrap tous les handlers et capture les exceptions non gérées.
 if settings.sentry_dsn:
@@ -59,7 +59,7 @@ else:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_tables()
-    logger.info("Base SQLite prête — API démarrée")
+    logger.info("Base de données prête - API démarrée")
     yield
     logger.info("API stoppée proprement")
 
@@ -67,36 +67,49 @@ async def lifespan(app: FastAPI):
 # --- App FastAPI --------------------------------------------------------
 app = FastAPI(
     title="ESG Optimizer API",
-    description="Agent autonome de reporting ESG — Analyse CSRD/ESRS automatisée",
+    description="Agent autonome de reporting ESG - Analyse CSRD/ESRS automatisée",
     version="0.1.0",
     lifespan=lifespan,
 )
 
 # CORS
-_allowed_origins = ["http://localhost:8501", "http://localhost:3000"]  # dev local
-if not settings.is_dev:
-    _allowed_origins = [
-        APP_URL,
-        "https://esg-optimizer.fr",
-        "https://www.esg-optimizer.fr",
-        "https://esg-optimizer.vercel.app",
+# On autorise systématiquement les domaines connus (dev local, domaine de prod,
+# déploiements Vercel) afin que le frontend Next.js puisse appeler l'API quel
+# que soit l'environnement. Des origines supplémentaires peuvent être ajoutées
+# via la variable EXTRA_CORS_ORIGINS (valeurs séparées par des virgules).
+_allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:8501",
+    "https://esg-optimizer.fr",
+    "https://www.esg-optimizer.fr",
+    "https://esg-optimizer.vercel.app",
+    APP_URL,
+]
+if settings.extra_cors_origins:
+    _allowed_origins += [
+        origin.strip()
+        for origin in settings.extra_cors_origins.split(",")
+        if origin.strip()
     ]
+_allowed_origins = sorted({origin for origin in _allowed_origins if origin})
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allowed_origins,
+    # Couvre les URL de prévisualisation Vercel (deploy previews).
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# --- Error handlers globaux (Sprint 6H) --------------------------------
+# --- Error handlers globaux --------------------------------------------
 # Messages user-friendly en français, pas de stack trace exposée en prod.
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    """Gère les erreurs HTTP classiques (404, 401, 403, 429…)."""
+    """Gère les erreurs HTTP classiques (404, 401, 403, 429...)."""
     user_messages = {
         400: "Requête invalide. Vérifiez les données envoyées.",
         401: "Authentification requise. Connectez-vous à votre compte.",
@@ -115,9 +128,9 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Pydantic validation → message clair côté front."""
+    """Validation Pydantic : message clair côté front."""
     first_error = exc.errors()[0] if exc.errors() else {}
-    loc = " → ".join(str(x) for x in first_error.get("loc", []) if x != "body")
+    loc = " -> ".join(str(x) for x in first_error.get("loc", []) if x != "body")
     msg = first_error.get("msg", "Champ invalide")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -174,7 +187,7 @@ async def health():
     return {"status": "ok"}
 
 
-# --- SEO : robots.txt & sitemap.xml (Sprint 6H) ------------------------
+# --- SEO : robots.txt & sitemap.xml ------------------------------------
 ROBOTS_TXT = f"""User-agent: *
 Allow: /
 Disallow: /api/
@@ -194,22 +207,12 @@ SITEMAP_XML = f"""<?xml version="1.0" encoding="UTF-8"?>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>{APP_URL}/quick-check</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
-    <url>
-        <loc>{APP_URL}/pricing</loc>
+        <loc>{APP_URL}/tarifs</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>{APP_URL}/methodologie</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>{APP_URL}/rgpd</loc>
+        <loc>{APP_URL}/mentions</loc>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
@@ -246,5 +249,5 @@ async def sitemap():
 if settings.is_dev:
     @app.get("/debug/sentry", include_in_schema=False)
     async def trigger_error():
-        _ = 1 / 0  # déclenche ZeroDivisionError → doit apparaître dans Sentry
+        _ = 1 / 0  # déclenche ZeroDivisionError -> doit apparaître dans Sentry
         return {"ok": True}

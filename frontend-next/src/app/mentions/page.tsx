@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Leaf } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Mentions légales & Méthodologie",
+  description:
+    "Mentions légales, méthodologie d'analyse ESRS et politique de protection des données (RGPD) d'ESG Optimizer.",
+  alternates: { canonical: "/mentions" },
+};
 
 const ESRS_TOPICS = [
   { code: "E1", label: "Changement climatique", pilier: "E" },
@@ -60,7 +68,7 @@ export default function MentionsPage() {
               rel="noopener noreferrer"
               className="btn-secondary text-sm"
             >
-              LinkedIn — Adama Diallo RSE
+              LinkedIn - Adama Diallo RSE
             </a>
             <a href="mailto:contact@esg-optimizer.fr" className="btn-ghost text-sm">
               contact@esg-optimizer.fr
@@ -76,7 +84,7 @@ export default function MentionsPage() {
           <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
             Notre moteur IA (GPT-4o, temperature 0.2 pour des résultats reproductibles) analyse
             vos rapports de durabilité en s'appuyant sur les{" "}
-            <strong>ESRS — European Sustainability Reporting Standards</strong> définis par l'EFRAG
+            <strong>ESRS - European Sustainability Reporting Standards</strong> définis par l'EFRAG
             dans le cadre de la directive CSRD. Nous couvrons les 10 thématiques suivantes :
           </p>
           <div className="grid md:grid-cols-2 gap-3 mb-4">
@@ -150,14 +158,14 @@ export default function MentionsPage() {
             Protection des données (RGPD)
           </h2>
           <div className="space-y-3 text-sm text-[#1C1C1C] leading-relaxed">
-            <p><strong>Responsable du traitement :</strong> Adama Diallo — contact@esg-optimizer.fr</p>
+            <p><strong>Responsable du traitement :</strong> Adama Diallo - contact@esg-optimizer.fr</p>
             <p><strong>Données collectées :</strong> Email, nom, fichiers uploadés pour analyse.</p>
             <p>
               <strong>Durée de conservation des fichiers :</strong> Vos fichiers sont supprimés
               immédiatement après extraction du texte. Seuls les résultats d'analyse sont conservés.
             </p>
             <p>
-              <strong>Hébergement :</strong> Railway / Google Cloud europe-west1 (Belgique) — conforme RGPD.
+              <strong>Hébergement :</strong> Railway / Google Cloud europe-west1 (Belgique) - conforme RGPD.
               Les adresses IP ne sont jamais stockées en clair (hachage SHA-256).
             </p>
             <p>
@@ -177,7 +185,7 @@ export default function MentionsPage() {
             Mentions légales
           </h2>
           <div className="text-sm text-[#6B7280] space-y-2 leading-relaxed">
-            <p><strong className="text-[#1C1C1C]">Éditeur :</strong> Adama Diallo — ESG Optimizer AI</p>
+            <p><strong className="text-[#1C1C1C]">Éditeur :</strong> Adama Diallo - ESG Optimizer AI</p>
             <p><strong className="text-[#1C1C1C]">Site :</strong> esg-optimizer.fr</p>
             <p><strong className="text-[#1C1C1C]">Contact :</strong> contact@esg-optimizer.fr</p>
             <p><strong className="text-[#1C1C1C]">Hébergeur :</strong> Railway (hébergement principal) · Vercel (frontend)</p>
@@ -188,11 +196,17 @@ export default function MentionsPage() {
               aux comptes agréé.
             </p>
             <p>
-              Toute reproduction, même partielle, des contenus de ce site est interdite sans
-              autorisation écrite de l'éditeur.
+              Toute reproduction, même partielle, du contenu de ce site est interdite
+              sans autorisation écrite préalable de l&apos;éditeur.
             </p>
           </div>
         </section>
+
+        <div className="text-center pt-4">
+          <Link href="/" className="btn-secondary text-sm">
+            Retour à l&apos;accueil
+          </Link>
+        </div>
       </main>
     </div>
   );

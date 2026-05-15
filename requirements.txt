@@ -1,5 +1,5 @@
 # ============================================
-# ESG Optimizer MVP — Dépendances Python
+# ESG Optimizer MVP - Dépendances Python
 
 # --- Backend core ---
 fastapi==0.111.*
@@ -37,14 +37,10 @@ httpx==0.27.*
 python-dotenv==1.*
 # --- Cloudflare R2 / S3-compatible storage ---
 boto3==1.35.*
-# --- Monitoring (Sprint 6H) ---
+# --- Monitoring (Sentry) ---
 sentry-sdk[fastapi]==2.14.*
 # --- Product analytics (PostHog) ---
 posthog==3.*
 # --- Database Connector (Alternative stable) ---
 pg8000==1.31.2
-psycopg2-binary==2.9.*
-extra-streamlit-components>=0.1.60
-# --- Async task queue ---
-celery[redis]==5.4.*
-redis==5.0.*
+psycopg2-bina

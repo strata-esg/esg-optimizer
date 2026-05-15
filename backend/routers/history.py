@@ -1,8 +1,8 @@
 """
-ESG Optimizer MVP — Router historique & dashboard.
-GET /history           → liste paginée des analyses
-GET /history/companies → liste des entreprises analysées
-GET /history/stats     → stats agrégées pour le dashboard
+ESG Optimizer MVP - Router historique & dashboard.
+GET /history           -> liste paginée des analyses
+GET /history/companies -> liste des entreprises analysées
+GET /history/stats     -> stats agrégées pour le dashboard
 """
 
 from sqlalchemy import func

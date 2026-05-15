@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Mentions légales, CGU, Confidentialité, Méthodologie.
+ESG Optimizer MVP - Page Mentions légales, CGU, Confidentialité, Méthodologie.
 Page publique, accessible sans connexion.
 """
 
@@ -42,14 +42,14 @@ tab1, tab2, tab3, tab4 = st.tabs([
 ])
 
 
-# Onglet 1 — Mentions légales
+# Onglet 1 - Mentions légales
 with tab1:
     st.markdown("""
 ## Mentions légales
 
 **Éditeur du service**
 
-ESG Optimizer — Entreprise individuelle
+ESG Optimizer - Entreprise individuelle
 Représentant légal : Adama
 Email : [hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 
@@ -77,7 +77,7 @@ Pour toute question relative au service : [hello@esg-optimizer.fr](mailto:hello@
 """)
 
 
-# Onglet 2 — CGU
+# Onglet 2 - CGU
 with tab2:
     st.markdown("""
 ## Conditions Générales d'Utilisation
@@ -131,7 +131,7 @@ chercheront d'abord une résolution amiable avant tout recours judiciaire.
 """)
 
 
-# Onglet 3 — Confidentialité
+# Onglet 3 - Confidentialité
 with tab3:
     st.markdown("""
 ## Politique de Confidentialité (RGPD)
@@ -150,7 +150,7 @@ ESG Optimizer · Email : [hello@esg-optimizer.fr](mailto:hello@esg-optimizer.fr)
 | Rapports uploadés | Analyse ESG | Contrat | 12 mois (plan Essentiel+) |
 | Résultats d'analyse | Historique utilisateur | Contrat | 12 mois |
 | Logs de connexion | Sécurité | Intérêt légitime | 90 jours |
-| Analytics anonymes (Plausible) | Amélioration du service | Intérêt légitime | Agrégats — pas de données perso |
+| Analytics anonymes (Plausible) | Amélioration du service | Intérêt légitime | Agrégats - pas de données perso |
 
 ### Données non collectées
 
@@ -180,12 +180,12 @@ réalisé via Plausible, solution sans cookies conforme RGPD.
 """)
 
 
-# Onglet 4 — Méthodologie
+# Onglet 4 - Méthodologie
 with tab4:
     st.markdown("""
 ## Méthodologie d'analyse ESG Optimizer
 
-*Version 1.0 — Avril 2026*
+*Version 1.0 - Avril 2026*
 
 ---
 
@@ -236,10 +236,10 @@ Chaque dimension (E, S, G) reçoit un score de **0 à 100** calculé selon :
 
 | Score | Signification |
 |---|---|
-| 80 – 100 | Couverture CSRD solide — rapport prêt pour publication |
-| 60 – 79 | Couverture partielle — lacunes identifiées à corriger |
-| 40 – 59 | Couverture minimale — travail significatif requis |
-| 0 – 39 | Non conforme — rapport à retravailler en profondeur |
+| 80 - 100 | Couverture CSRD solide - rapport prêt pour publication |
+| 60 - 79 | Couverture partielle - lacunes identifiées à corriger |
+| 40 - 59 | Couverture minimale - travail significatif requis |
+| 0 - 39 | Non conforme - rapport à retravailler en profondeur |
 
 ---
 
@@ -257,7 +257,7 @@ Il identifie :
 
 ESG Optimizer est un outil d'**aide à la décision**, pas un auditeur certifié.
 
-1. L'analyse repose sur le texte extrait du document — les graphiques et tableaux
+1. L'analyse repose sur le texte extrait du document - les graphiques et tableaux
    en image ne sont pas analysés
 2. La pertinence des divulgations (double matérialité) n'est pas évaluée
 3. Les rapports très longs (>200 pages) peuvent être tronqués à 30 000 caractères
@@ -284,7 +284,7 @@ Organisme Tiers Indépendant (OTI) accrédité par le COFRAC.
                         border: 1px solid #E5E0D8;">
                 <div style="font-family:'DM Serif Display',Georgia,serif;
                             font-size:1.1rem; color:#1A3D22; margin-bottom:8px;">
-                    Référentiel ESRS — EFRAG 2023
+                    Référentiel ESRS - EFRAG 2023
                 </div>
                 <div style="font-size:0.82rem; color:#6B7280; line-height:1.6;">
                     Notre scoring est aligné sur les standards publiés par<br>
@@ -296,7 +296,7 @@ Organisme Tiers Indépendant (OTI) accrédité par le COFRAC.
                        target="_blank"
                        style="color:#1A3D22; font-size:0.82rem;
                               text-decoration:underline;">
-                        Consulter les standards officiels →
+                        Consulter les standards officiels ->
                     </a>
                 </div>
             </div>

@@ -175,7 +175,7 @@ def track_event(event_name, data=None):
     )
 
 
-# ── 6 events du funnel ──────────────────────────────────────────────────────
+# -- 6 events du funnel ------------------------------------------------------
 
 def track_cta_landing_click(cta_label="unknown", source="landing"):
     """1. Clic CTA landing page."""
@@ -219,7 +219,7 @@ def track_payment_completed(plan):
     track_event("payment_completed", {"plan": plan})
 
 
-# ── Legacy (retro-compat) ────────────────────────────────────────────────────
+# -- Legacy (retro-compat) ----------------------------------------------------
 
 def track_landing_view(persona=None):
     track_event("landing_view", {"persona": persona} if persona else None)

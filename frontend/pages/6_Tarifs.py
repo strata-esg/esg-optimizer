@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Tarifs & Pricing.
+ESG Optimizer MVP - Page Tarifs & Pricing.
 Affiche les 4 plans, comparatif des features, FAQ, et CTA Stripe Payment Links.
 """
 
@@ -52,13 +52,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Détection paiement complété (redirect Stripe depuis 6_Tarifs) ─────────────
+# -- Détection paiement complété (redirect Stripe depuis 6_Tarifs) -------------
 _qp = st.query_params
 _ps = _qp.get("payment_success", None)
 _pp = _qp.get("plan", None)
 if _ps == "1" and _pp in ("essential", "pro"):
     track_payment_completed(_pp)  # Event #6 funnel
-    st.toast(f"Paiement confirmé — bienvenue sur le plan {_pp.title()} !")
+    st.toast(f"Paiement confirmé - bienvenue sur le plan {_pp.title()} !")
     _tok = get_token()
     if _tok:
         try:
@@ -67,8 +67,8 @@ if _ps == "1" and _pp in ("essential", "pro"):
         except Exception:
             pass
 
-# ── Auto-refresh du plan utilisateur (capture les essais Pro et code promos
-#    dès que le webhook Stripe a tagué le compte côté backend) ───────────────
+# -- Auto-refresh du plan utilisateur (capture les essais Pro et code promos
+#    dès que le webhook Stripe a tagué le compte côté backend) ---------------
 if is_logged_in():
     _tok_auto = get_token()
     if _tok_auto:
@@ -78,7 +78,7 @@ if is_logged_in():
         except Exception:
             pass
 
-# ── Tracking vue page ─────────────────────────────────────────────────────────
+# -- Tracking vue page ---------------------------------------------------------
 track_event("pricing_viewed")
 
 # Header
@@ -192,7 +192,7 @@ PLANS = [
 
 # Helper : générer une card de plan (HTML card identique à la homepage)
 def _render_plan_card(plan: dict, user_plan: str | None) -> None:
-    """Affiche une card de plan avec ses features — HTML cards style homepage."""
+    """Affiche une card de plan avec ses features - HTML cards style homepage."""
     is_recommended = plan["recommended"]
     is_current = user_plan == plan["slug"]
 
@@ -213,7 +213,7 @@ def _render_plan_card(plan: dict, user_plan: str | None) -> None:
         if is_recommended else ""
     )
 
-    # Badge "Votre plan actuel" — placeholder invisible si non-courant pour garder la même hauteur
+    # Badge "Votre plan actuel" - placeholder invisible si non-courant pour garder la même hauteur
     current_badge = (
         '<div style="background:#D4F0D8;color:#1A3D22;text-align:center;padding:6px 10px;'
         'border-radius:6px;font-size:12px;font-weight:600;margin:8px 0;">Votre plan actuel ✓</div>'
@@ -278,11 +278,11 @@ if is_logged_in() and token:
         except Exception:
             stripe_urls[_sp] = ""
 
-# Bouton "Actualiser mon plan" — visible après paiement
+# Bouton "Actualiser mon plan" - visible après paiement
 if is_logged_in():
     col_refresh, _ = st.columns([2, 3])
     with col_refresh:
-        if st.button("J'ai payé / activé mon essai — actualiser mon plan",
+        if st.button("J'ai payé / activé mon essai - actualiser mon plan",
                      key="refresh_plan_global", use_container_width=True):
             _tok_r = get_token()
             if _tok_r:
@@ -375,17 +375,17 @@ comparison_features = [
     ("KPIs détectés", "✓", "✓", "✓", "✓"),
     ("Points forts & lacunes", "✓", "✓", "✓", "✓"),
     ("Recommandations priorisées", "✓", "✓", "✓", "✓"),
-    ("Rapport PDF complet", "—", "✓", "✓", "✓"),
-    ("Delta Report (N vs N-1)", "—", "✓", "✓", "✓"),
+    ("Rapport PDF complet", "-", "✓", "✓", "✓"),
+    ("Delta Report (N vs N-1)", "-", "✓", "✓", "✓"),
     ("Conservation des données", "30 jours", "12 mois", "Illimitée", "Illimitée"),
-    ("Export Excel des KPIs", "—", "—", "✓", "✓"),
-    ("Benchmark sectoriel", "—", "—", "✓", "✓"),
-    ("Rapport white-label", "—", "—", "✓", "✓"),
-    ("Partage LinkedIn (badge)", "—", "✓", "✓", "✓"),
-    ("SSO / SAML", "—", "—", "—", "✓"),
-    ("Multi-utilisateurs", "—", "—", "—", "✓"),
-    ("Accès API", "—", "—", "—", "✓"),
-    ("Hébergement dédié", "—", "—", "—", "✓"),
+    ("Export Excel des KPIs", "-", "-", "✓", "✓"),
+    ("Benchmark sectoriel", "-", "-", "✓", "✓"),
+    ("Rapport white-label", "-", "-", "✓", "✓"),
+    ("Partage LinkedIn (badge)", "-", "✓", "✓", "✓"),
+    ("SSO / SAML", "-", "-", "-", "✓"),
+    ("Multi-utilisateurs", "-", "-", "-", "✓"),
+    ("Accès API", "-", "-", "-", "✓"),
+    ("Hébergement dédié", "-", "-", "-", "✓"),
     ("Support", "Email", "Email", "Prioritaire", "Account manager"),
 ]
 
@@ -407,8 +407,8 @@ for idx, (feat, d, e, p, ent) in enumerate(comparison_features):
     def _cell(val: str) -> str:
         if val == "✓":
             return '<span style="color: #1A3D22; font-weight: 700; font-size: 16px;">✓</span>'
-        elif val == "—":
-            return '<span style="color: #D1D5DB;">—</span>'
+        elif val == "-":
+            return '<span style="color: #D1D5DB;">-</span>'
         return f'<span style="color: #374151; font-size: 13px;">{val}</span>'
 
     body_rows += (
@@ -445,7 +445,7 @@ faq_items = [
         "Puis-je tester avant d'acheter ?",
         "Oui ! Le plan Découverte vous offre une analyse complète gratuite. "
         "Vous obtenez vos scores E/S/G, la conformité CSRD, et des recommandations priorisées. "
-        "C'est la même IA que les plans payants — seule la durée de conservation et le PDF complet changent.",
+        "C'est la même IA que les plans payants - seule la durée de conservation et le PDF complet changent.",
     ),
     (
         "Comment fonctionne le plan Essentiel à 39€ ?",
@@ -502,7 +502,7 @@ st.markdown(
             Prêt à optimiser votre conformité ESG ?
         </div>
         <div style="font-size: 16px; color: #6B7280; margin-bottom: 20px;">
-            Commencez gratuitement — aucune carte bancaire requise.
+            Commencez gratuitement - aucune carte bancaire requise.
         </div>
     </div>""",
     unsafe_allow_html=True,

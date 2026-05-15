@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { CheckCircle, Leaf, ArrowRight, Zap, BarChart2, Upload, FileText, Award } from "lucide-react";
 import { Logo } from "@/components/Logo";
+
+export const metadata: Metadata = {
+  title: "Audit de conformité CSRD / ESRS pour les PME",
+  description:
+    "ESG Optimizer analyse vos rapports de durabilité, calcule votre score ESG (E/S/G) et identifie vos écarts de conformité CSRD / ESRS. Première analyse offerte.",
+  alternates: { canonical: "/" },
+};
 
 const PLANS = [
   {
@@ -74,13 +82,13 @@ const HOW = [
   {
     step: "1",
     title: "Uploadez votre rapport",
-    desc: "PDF, DOCX ou XLSX — notre extracteur IA gère tous les formats jusqu'à 500 pages.",
+    desc: "PDF, DOCX ou XLSX - notre extracteur IA gère tous les formats jusqu'à 500 pages.",
     icon: Upload,
   },
   {
     step: "2",
     title: "Analyse GPT-4o en 3 min",
-    desc: "Notre IA score les 10 ESRS (E1→G1), détecte vos non-conformités et génère des recommandations actionables.",
+    desc: "Notre moteur d'analyse score les 10 ESRS (E1 à G1), détecte vos non-conformités et génère des recommandations concrètes.",
     icon: BarChart2,
   },
   {
@@ -94,7 +102,7 @@ const HOW = [
 const STATS = [
   { value: "3 min", label: "Durée d'une analyse", color: "#16a34a" },
   { value: "10", label: "Standards ESRS couverts", color: "#2563eb" },
-  { value: "39€", label: "Prix d'entrée (vs 5 000–30 000€ cabinet)", color: "#1A3D22" },
+  { value: "39€", label: "Prix d'entrée (vs 5 000-30 000€ cabinet)", color: "#1A3D22" },
   { value: "15 000+", label: "Entreprises françaises concernées CSRD 2026", color: "#7c3aed" },
 ];
 
@@ -104,12 +112,12 @@ const FAQ = [
     a: "Un cabinet facture 5 000 à 30 000€ avec 4 à 6 semaines de délai. ESG Optimizer AI produit un rapport complet en 3 minutes pour 39€. Vous gardez le contrôle, nous automatisons l'analyse.",
   },
   {
-    q: "Le quick-check, c'est quoi exactement ?",
-    a: "Vous uploadez votre rapport sans créer de compte. En 3 minutes vous recevez un score partiel + 3 forces + 3 faiblesses. Pour le rapport complet et les recommandations détaillées, vous créez un compte et payez.",
+    q: "La première analyse est-elle vraiment gratuite ?",
+    a: "Oui. À la création de votre compte, vous bénéficiez d'une analyse complète offerte, sans carte bancaire. Vous obtenez votre score ESG global et un aperçu de vos forces et faiblesses. Les rapports détaillés et le suivi dans le temps sont ensuite accessibles via les offres payantes.",
   },
   {
     q: "Quels formats de rapports acceptez-vous ?",
-    a: "PDF, DOCX et XLSX. Nos extracteurs IA gèrent les rapports de 1 à 500 pages.",
+    a: "PDF, DOCX et XLSX. Nos extracteurs gèrent les rapports de 1 à 500 pages.",
   },
   {
     q: "Vos scores sont-ils reconnus officiellement ?",
@@ -125,7 +133,7 @@ function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#F7F2E8]/95 backdrop-blur-sm border-b border-[#E5E0D8]">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" aria-label="ESG Optimizer AI — Accueil">
+        <Link href="/" aria-label="ESG Optimizer AI - Accueil">
           <Logo variant="light" size="md" showTagline={false} />
         </Link>
 
@@ -146,7 +154,7 @@ function Navbar() {
           </SignedOut>
           <SignedIn>
             <Link href="/dashboard" className="btn-primary text-sm">
-              Dashboard →
+              Tableau de bord
             </Link>
           </SignedIn>
         </div>
@@ -155,17 +163,67 @@ function Navbar() {
   );
 }
 
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://esg-optimizer.fr/#organization",
+      name: "ESG Optimizer",
+      url: "https://esg-optimizer.fr",
+      logo: "https://esg-optimizer.fr/icon-512x512.png",
+      description:
+        "Plateforme d'audit de conformité CSRD / ESRS pour les PME françaises.",
+      email: "contact@esg-optimizer.fr",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://esg-optimizer.fr/#website",
+      url: "https://esg-optimizer.fr",
+      name: "ESG Optimizer",
+      inLanguage: "fr-FR",
+      publisher: { "@id": "https://esg-optimizer.fr/#organization" },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "ESG Optimizer",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: "https://esg-optimizer.fr",
+      description:
+        "Analyse automatisée de rapports de durabilité : scoring ESG (E/S/G), couverture ESRS et recommandations de conformité CSRD.",
+      offers: [
+        { "@type": "Offer", name: "Découverte", price: "0", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Essentiel", price: "39", priceCurrency: "EUR" },
+        { "@type": "Offer", name: "Pro", price: "129", priceCurrency: "EUR" },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ.map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#F7F2E8]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       <Navbar />
 
-      {/* ── Hero ─────────────────────────────────────── */}
+      {/* -- Hero --------------------------------------- */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4F0D8] text-[#1A3D22] text-sm font-medium mb-6">
             <Zap className="w-3.5 h-3.5" />
-            CSRD 2026 — Deadline imminente pour 15 000+ entreprises françaises
+            CSRD 2026 - Deadline imminente pour 15 000+ entreprises françaises
           </div>
           <h1
             className="text-5xl md:text-6xl text-[#1A3D22] mb-6 leading-tight"
@@ -191,12 +249,12 @@ export default function LandingPage() {
             </a>
           </div>
           <p className="mt-4 text-sm text-[#6B7280]">
-            Quick-check sans compte · 1 analyse gratuite · Pas de carte bancaire
+            1 analyse offerte à l&apos;inscription · Sans carte bancaire · Résultat en quelques minutes
           </p>
         </div>
       </section>
 
-      {/* ── Stats ────────────────────────────────────── */}
+      {/* -- Stats -------------------------------------- */}
       <section className="py-12 px-6 bg-[#1A3D22]">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map(({ value, label }) => (
@@ -213,37 +271,36 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Quick-check CTA ──────────────────────────── */}
+      {/* -- Première analyse offerte ------------------- */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] text-sm font-medium mb-4">
-            <Zap className="w-3.5 h-3.5" /> Sans compte, sans carte bancaire
+            <Zap className="w-3.5 h-3.5" /> Première analyse offerte, sans carte bancaire
           </div>
           <h2
             className="text-3xl text-[#1A3D22] mb-4"
             style={{ fontFamily: "DM Serif Display, Georgia, serif" }}
           >
-            Testez d'abord — Quick-Check gratuit
+            Commencez gratuitement
           </h2>
           <p className="text-[#6B7280] mb-6 leading-relaxed">
-            Uploadez votre rapport sans créer de compte. En 3 minutes vous recevez
-            votre score partiel + 3 forces + 3 faiblesses. Pour le rapport complet
-            (8+ pages, recommandations, PDF), créez votre compte.
+            Créez votre compte en moins d&apos;une minute, déposez votre rapport de
+            durabilité et obtenez votre score ESG ainsi que vos premières
+            recommandations. Aucun engagement, aucune carte bancaire demandée.
           </p>
           <Link
-            href="https://www.esg-optimizer.fr/#quick-check"
+            href="/sign-up"
             className="btn-primary text-base px-8 py-3 inline-flex"
-            target="_blank"
           >
-            Faire mon quick-check →
+            Créer mon compte et lancer l&apos;analyse
           </Link>
           <p className="mt-3 text-xs text-[#6B7280]">
-            Limité à 3 analyses/jour par IP · Résultat valable 72h
+            Vos fichiers restent confidentiels et sont supprimés après extraction.
           </p>
         </div>
       </section>
 
-      {/* ── Comment ça marche ────────────────────────── */}
+      {/* -- Comment ça marche -------------------------- */}
       <section id="comment" className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <h2
@@ -279,13 +336,13 @@ export default function LandingPage() {
             <p className="text-[#D4F0D8]/70 text-sm max-w-lg mx-auto leading-relaxed">
               Après chaque analyse, générez votre badge CSRD (PNG 1200×630) avec votre score,
               le nom de votre entreprise et votre statut "CSRD Ready". Partagez-le sur LinkedIn
-              et créez un effet viral — vos fournisseurs voudront aussi se conformer.
+              et créez un effet viral - vos fournisseurs voudront aussi se conformer.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── Pricing ──────────────────────────────────── */}
+      {/* -- Pricing ------------------------------------ */}
       <section id="tarifs" className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -296,7 +353,7 @@ export default function LandingPage() {
               Tarifs simples, sans engagement
             </h2>
             <p className="text-[#6B7280]">
-              vs. 5 000–30 000€ et 4–6 semaines de délai en cabinet traditionnel
+              vs. 5 000-30 000€ et 4-6 semaines de délai en cabinet traditionnel
             </p>
           </div>
           <div className="grid md:grid-cols-4 gap-6 items-stretch">
@@ -354,7 +411,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FAQ ──────────────────────────────────────── */}
+      {/* -- FAQ ---------------------------------------- */}
       <section className="py-20 px-6">
         <div className="max-w-2xl mx-auto">
           <h2
@@ -374,7 +431,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────── */}
+      {/* -- Footer ------------------------------------- */}
       <footer className="py-12 px-6 border-t border-[#E5E0D8] bg-white">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -387,16 +444,4 @@ export default function LandingPage() {
             <a
               href="https://www.linkedin.com/in/adama-diallo-rse"
               target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#1A3D22]"
-            >
-              LinkedIn
-            </a>
-            <a href="mailto:contact@esg-optimizer.fr" className="hover:text-[#1A3D22]">Contact</a>
-          </div>
-          <p className="text-xs text-[#6B7280]">© 2026 ESG Optimizer — RGPD · Hébergement EU</p>
-        </div>
-      </footer>
-    </div>
-  );
-}
+              rel="

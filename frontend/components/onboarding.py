@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Composant Onboarding 3 étapes.
+ESG Optimizer MVP - Composant Onboarding 3 étapes.
 Affiché après la première inscription pour qualifier l'utilisateur
 et le guider vers sa première analyse.
 """
@@ -70,11 +70,11 @@ def render_onboarding() -> bool:
 
 
 def _on_role_change():
-    """Callback on_change : sélection du rôle → avance automatiquement à l'étape 2."""
+    """Callback on_change : sélection du rôle -> avance automatiquement à l'étape 2."""
     val = st.session_state.get("ob_radio_role")
     if not val:
         return
-    # Extraire la clé depuis le label "key — label — desc"
+    # Extraire la clé depuis le label "key - label - desc"
     for key, label, desc in ROLES:
         if val.startswith(label):
             st.session_state["onboarding_data"]["role"] = key
@@ -83,7 +83,7 @@ def _on_role_change():
 
 
 def _on_report_type_change():
-    """Callback on_change : sélection du type → avance automatiquement à l'étape 3."""
+    """Callback on_change : sélection du type -> avance automatiquement à l'étape 3."""
     val = st.session_state.get("ob_radio_rtype")
     if not val:
         return
@@ -99,7 +99,7 @@ def _step_role():
     st.markdown("**Quel est votre profil ?**")
     st.caption("Cliquez sur votre profil pour passer directement à l'étape suivante.")
 
-    role_options = [f"{label} — {desc}" for _, label, desc in ROLES]
+    role_options = [f"{label} - {desc}" for _, label, desc in ROLES]
 
     # Pré-sélectionner si déjà renseigné
     current_role = st.session_state["onboarding_data"].get("role")

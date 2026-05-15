@@ -13,13 +13,13 @@ reading_time: "14 min"
 
 # ESRS E1 à E5 expliqués simplement : le guide environnemental complet
 
-> **TL;DR** — Les 5 standards ESRS Environnement représentent 60 % du volume d'un rapport CSRD. Ce guide les explique sans jargon, donne les KPI clés à calculer et pointe les pièges qu'on voit le plus souvent dans les rapports.
+> **TL;DR** - Les 5 standards ESRS Environnement représentent 60 % du volume d'un rapport CSRD. Ce guide les explique sans jargon, donne les KPI clés à calculer et pointe les pièges qu'on voit le plus souvent dans les rapports.
 
 Sur les 12 standards ESRS, 5 concernent l'environnement : **E1 Climat, E2 Pollution, E3 Eau, E4 Biodiversité, E5 Économie circulaire**. Chacun pèse lourd dans un rapport CSRD bien fait, et chacun a ses spécificités méthodologiques. Voici le guide que j'aurais aimé avoir quand j'ai démarré mon premier rapport.
 
 ---
 
-## ESRS E1 — Changement climatique (le plus lourd)
+## ESRS E1 - Changement climatique (le plus lourd)
 
 ### Ce que le standard exige
 
@@ -47,11 +47,11 @@ L'ESRS E1 est **de loin** le standard le plus détaillé (47 pages, 67 points de
 2. **Scope 3 catégorie 11 (utilisation des produits vendus) absent** pour des industriels dont c'est pourtant la catégorie dominante.
 3. **Trajectoire exprimée en % de baisse sans baseline claire** : « -40 % d'ici 2030 » par rapport à quoi ? 2015 ? 2019 ? 2024 ? Précisez l'année de référence et le périmètre couvert.
 
-> 💡 **Repère** — Pour une PME de services, Scope 3 pèse typiquement 70-85 % de l'empreinte totale. Pour un industriel, Scope 1+2 pèse souvent 50-70 %. Connaître ce ratio vous permet de prioriser les efforts de calcul.
+> 💡 **Repère** - Pour une PME de services, Scope 3 pèse typiquement 70-85 % de l'empreinte totale. Pour un industriel, Scope 1+2 pèse souvent 50-70 %. Connaître ce ratio vous permet de prioriser les efforts de calcul.
 
 ---
 
-## ESRS E2 — Pollution
+## ESRS E2 - Pollution
 
 ### Ce que le standard exige
 
@@ -65,7 +65,7 @@ Bien moins connu que E1, l'ESRS E2 couvre :
 
 ### Qui est concerné
 
-Matériel pour : industriel (chimie, métallurgie, agroalimentaire), BTP, transport lourd, exploitations agricoles. **Non matériel** pour : services, tech, finance pure — mais ne l'omettez pas sans justification documentée.
+Matériel pour : industriel (chimie, métallurgie, agroalimentaire), BTP, transport lourd, exploitations agricoles. **Non matériel** pour : services, tech, finance pure - mais ne l'omettez pas sans justification documentée.
 
 ### Les pièges fréquents
 
@@ -74,12 +74,12 @@ Matériel pour : industriel (chimie, métallurgie, agroalimentaire), BTP, transp
 
 ---
 
-## ESRS E3 — Ressources hydriques et marines
+## ESRS E3 - Ressources hydriques et marines
 
 ### Ce que le standard exige
 
 - **Prélèvements d'eau** par source (eau municipale, eaux souterraines, eaux de surface, eau de mer)
-- **Consommation d'eau** (prélèvement – rejets)
+- **Consommation d'eau** (prélèvement - rejets)
 - **Rejets d'eau** par destination (station d'épuration, milieu naturel)
 - **Exposition au stress hydrique** : % des sites/opérations dans des zones de stress hydrique élevé ou extrême (selon cartographie WRI Aqueduct)
 - **Politiques de gestion de l'eau** et objectifs de réduction
@@ -93,12 +93,12 @@ Matériel pour : industriel (chimie, métallurgie, agroalimentaire), BTP, transp
 | KPI | Unité | Commentaire |
 |---|---|---|
 | Prélèvements totaux | m³ ou ML | Ventilés par source |
-| Consommation nette | m³ ou ML | Prélèvement – rejet |
+| Consommation nette | m³ ou ML | Prélèvement - rejet |
 | % d'activités en zone de stress hydrique élevé/extrême | % | Selon Aqueduct, indicateur clé |
 
 ---
 
-## ESRS E4 — Biodiversité et écosystèmes
+## ESRS E4 - Biodiversité et écosystèmes
 
 ### Ce que le standard exige (et pourquoi il fait peur)
 
@@ -120,12 +120,12 @@ Le **Taskforce on Nature-related Financial Disclosures (TNFD)** publie depuis 20
 
 ### Les pièges
 
-- **« Nous sommes dans des locaux en ville, E4 est non matériel »** — vrai en direct, mais votre Scope 3 (achats de biens et services) a un impact biodiversité via vos fournisseurs (soja, huile de palme, coton, bois). Interrogez toute la chaîne.
+- **« Nous sommes dans des locaux en ville, E4 est non matériel »** - vrai en direct, mais votre Scope 3 (achats de biens et services) a un impact biodiversité via vos fournisseurs (soja, huile de palme, coton, bois). Interrogez toute la chaîne.
 - **Aucune mesure de dépendance** : E4 impose d'évaluer aussi les dépendances (ex. : un industriel dépendant de l'eau de rivière subit un risque biodiversité via la qualité des écosystèmes aquatiques).
 
 ---
 
-## ESRS E5 — Économie circulaire et utilisation des ressources
+## ESRS E5 - Économie circulaire et utilisation des ressources
 
 ### Ce que le standard exige
 
@@ -138,16 +138,16 @@ Le **Taskforce on Nature-related Financial Disclosures (TNFD)** publie depuis 20
 
 La doctrine de l'économie circulaire UE s'appuie sur les **9R**, du plus vertueux au moins vertueux :
 
-1. **Refuse** — refuser une consommation superflue
-2. **Rethink** — repenser l'usage (ex : mutualisation)
-3. **Reduce** — réduire la matière utilisée
-4. **Reuse** — réemployer en l'état
-5. **Repair** — réparer
-6. **Refurbish** — rénover
-7. **Remanufacture** — reconstruire
-8. **Repurpose** — détourner
-9. **Recycle** — recycler
-10. **Recover** — valoriser énergétiquement
+1. **Refuse** - refuser une consommation superflue
+2. **Rethink** - repenser l'usage (ex : mutualisation)
+3. **Reduce** - réduire la matière utilisée
+4. **Reuse** - réemployer en l'état
+5. **Repair** - réparer
+6. **Refurbish** - rénover
+7. **Remanufacture** - reconstruire
+8. **Repurpose** - détourner
+9. **Recycle** - recycler
+10. **Recover** - valoriser énergétiquement
 
 **Astuce** : structurez votre narratif E5 en plaçant vos actions sur cette échelle. Un rapport qui ne parle que de recyclage (9) sans aborder les 8 premiers échelons perd des points d'évaluation.
 
@@ -193,7 +193,7 @@ Un rapport bien fait **met explicitement en évidence ces interconnexions**, typ
 
 L'[outil ESG Optimizer](https://esg-optimizer.fr/quick-check) scanne automatiquement votre rapport sur les 5 standards E1-E5, chiffre votre couverture ESRS, identifie les KPI manquants et vous renvoie un plan d'action priorisé. **Gratuit pour votre première analyse.**
 
-[**Lancer le diagnostic →**](https://esg-optimizer.fr/quick-check)
+[**Lancer le diagnostic ->**](https://esg-optimizer.fr/quick-check)
 
 ---
 

@@ -1,7 +1,7 @@
 """
-ESG Optimizer MVP — Router analyse.
-POST /analysis/upload  → lance l'analyse en background
-GET  /analysis/{id}    → récupère les résultats
+ESG Optimizer - Router analyse.
+POST /analysis/upload  : lance l'analyse en arrière-plan
+GET  /analysis/{id}    : récupère les résultats
 """
 
 import logging
@@ -43,7 +43,7 @@ def _dispatch_analysis(analysis_id: int, storage_key: str, background_tasks) -> 
     else:
         background_tasks.add_task(_run_pipeline_with_own_session, analysis_id, storage_key)
         logger.warning(
-            "Analyse [%d] via BackgroundTasks (REDIS_URL absent — mode dev/local)",
+            "Analyse [%d] via BackgroundTasks (REDIS_URL absent - mode dev/local)",
             analysis_id,
         )
 
@@ -174,7 +174,7 @@ async def upload_analysis(
 
     # 7. Lancer le pipeline (Celery si Redis configure, BackgroundTasks sinon)
     logger.info(
-        "Analyse [%d] creee — user=%d, company=%s, fichier=%s, storage_key=%s",
+        "Analyse [%d] creee - user=%d, company=%s, fichier=%s, storage_key=%s",
         analysis.id, current_user.id, company_name, file.filename, storage_key,
     )
     _dispatch_analysis(analysis.id, storage_key, background_tasks)
@@ -206,14 +206,16 @@ def get_analysis(
     if not analysis:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analyse introuvable.")
 
-    return _serialize_analysis(analysis)
+    company = db.query(Company).filter(Company.id == analysis.company_id).first()
+    return _serialize_analysis(analysis, company.name if company else None)
 
 
-def _serialize_analysis(analysis: Analysis) -> dict:
+def _serialize_analysis(analysis: Analysis, company_name: str | None = None) -> dict:
     """Convertit les champs JSON string en objets Python pour la réponse."""
     return {
         "id": analysis.id,
         "company_id": analysis.company_id,
+        "company_name": company_name,
         "user_id": analysis.user_id,
         "report_year": analysis.report_year,
         "source_filename": analysis.source_filename,
@@ -286,7 +288,7 @@ def download_analysis_pdf(
     )
 
 
-# GET /analysis/{analysis_id}/preview-pdf  — disponible tous plans (watermark PRÉVISUALISATION)
+# GET /analysis/{analysis_id}/preview-pdf : disponible tous plans (watermark PREVISUALISATION)
 @router.get("/{analysis_id}/preview-pdf")
 def download_preview_pdf(
     analysis_id: int,
@@ -393,12 +395,12 @@ def download_delta_pdf(
 
 
 # GET /analysis/badge/{share_token}
-# PUBLIC — pas d'auth, sécurisé par share_token UUID non-devinable
+# PUBLIC : pas d'auth, sécurisé par share_token UUID non-devinable
 @router.get("/badge/{share_token}")
 def get_badge(share_token: str, db: Session = Depends(get_db)):
     """
     Génère et retourne le badge PNG pour le partage social.
-    Endpoint public — pas besoin d'auth, le share_token est un UUID unique.
+    Endpoint public : pas besoin d'auth, le share_token est un UUID unique.
     """
     analysis = (
         db.query(Analysis)

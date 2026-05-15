@@ -1,8 +1,8 @@
 """
-ESG Optimizer MVP — Router Email.
-POST /email/weekly-digest     → Envoie le digest hebdomadaire (cron ou manuel)
-PUT  /email/preferences       → Met à jour les préférences email
-GET  /email/preferences       → Récupère les préférences email
+ESG Optimizer MVP - Router Email.
+POST /email/weekly-digest     -> Envoie le digest hebdomadaire (cron ou manuel)
+PUT  /email/preferences       -> Met à jour les préférences email
+GET  /email/preferences       -> Récupère les préférences email
 """
 
 import logging
@@ -49,11 +49,11 @@ def update_email_preferences(
     """Met à jour les préférences email."""
     current_user.email_notifications = body.email_notifications
     db.commit()
-    logger.info("User %d — email_notifications = %s", current_user.id, body.email_notifications)
+    logger.info("User %d - email_notifications = %s", current_user.id, body.email_notifications)
     return {"email_notifications": current_user.email_notifications}
 
 
-# POST /email/weekly-digest — Digest hebdomadaire
+# POST /email/weekly-digest - Digest hebdomadaire
 
 @router.post("/weekly-digest")
 def trigger_weekly_digest(
@@ -63,7 +63,7 @@ def trigger_weekly_digest(
     """
     Envoie le digest hebdomadaire à tous les utilisateurs opt-in.
     Sécurisé par une clé API (à appeler via cron ou manuellement).
-    Utilise JWT_SECRET comme clé pour simplifier — en prod, ajouter une clé dédiée.
+    Utilise JWT_SECRET comme clé pour simplifier - en prod, ajouter une clé dédiée.
     """
     # Utiliser CRON_API_KEY dédiée (et non JWT_SECRET qui est un secret critique)
     valid_key = settings.cron_api_key or settings.jwt_secret  # fallback pour rétro-compat
@@ -92,7 +92,7 @@ def trigger_weekly_digest(
             ).scalar() or 0
 
             if total == 0:
-                continue  # Pas d'analyses → pas de digest
+                continue  # Pas d'analyses -> pas de digest
 
             avg_score = db.query(func.avg(Analysis.score_global)).filter(
                 Analysis.user_id == user.id,
@@ -150,7 +150,7 @@ def trigger_weekly_digest(
             logger.error("Digest user %d erreur : %s", user.id, e)
             error_count += 1
 
-    logger.info("Weekly digest — %d envoyés, %d erreurs sur %d users", sent_count, error_count, len(users))
+    logger.info("Weekly digest - %d envoyés, %d erreurs sur %d users", sent_count, error_count, len(users))
     return {
         "status": "ok",
         "total_users": len(users),

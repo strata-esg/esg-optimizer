@@ -45,7 +45,7 @@ def render_sidebar() -> None:
         )
         st.divider()
 
-        # Navigation — st.button + st.switch_page est plus fiable que st.page_link
+        # Navigation - st.button + st.switch_page est plus fiable que st.page_link
         # quand st.navigation est en mode "hidden" (sinon le clic ré-affiche juste
         # la même page sans changer de route).
         def _nav(label: str, target: str, key: str) -> None:

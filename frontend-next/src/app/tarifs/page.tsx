@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle, Leaf } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Tarifs",
+  description:
+    "Tarifs ESG Optimizer : analyse de conformité CSRD / ESRS à partir de 39 € par rapport, sans engagement. Première analyse offerte à l'inscription.",
+  alternates: { canonical: "/tarifs" },
+};
 
 const PLANS = [
   {
@@ -27,12 +35,12 @@ const PLANS = [
       "Rapport PDF 8+ pages complet",
       "Sans watermark",
       "Scores E / S / G / Global détaillés",
-      "10 ESRS couverts (E1→G1)",
+      "10 ESRS couverts (E1->G1)",
       "Delta Report N vs N-1",
       "Conservation historique 12 mois",
       "Support email",
     ],
-    cta: "Payer 39€ — Accès immédiat",
+    cta: "Payer 39€ - Accès immédiat",
     href: "/sign-up?plan=essential",
     highlighted: false,
     badge: null,
@@ -104,8 +112,8 @@ const FAQ = [
 ];
 
 const COMPARISON = [
-  { item: "Prix", cabinet: "5 000–30 000€", esg: "39€ par analyse" },
-  { item: "Délai", cabinet: "4–6 semaines", esg: "3 minutes" },
+  { item: "Prix", cabinet: "5 000-30 000€", esg: "39€ par analyse" },
+  { item: "Délai", cabinet: "4-6 semaines", esg: "3 minutes" },
   { item: "ESRS couverts", cabinet: "10/10", esg: "10/10" },
   { item: "PDF structuré", cabinet: "✓", esg: "✓" },
   { item: "Delta Report N/N-1", cabinet: "✓", esg: "✓ (Essentiel+)" },
@@ -141,7 +149,7 @@ export default function TarifsPage() {
             Tarifs simples, sans engagement
           </h1>
           <p className="text-lg text-[#6B7280]">
-            Les cabinets facturent 5 000–30 000€ et prennent 4–6 semaines.
+            Les cabinets facturent 5 000-30 000€ et prennent 4-6 semaines.
           </p>
           <p className="text-lg font-semibold text-[#1A3D22]">
             Nous faisons ça en 3 minutes pour 39€.
@@ -244,6 +252,18 @@ export default function TarifsPage() {
                 <p className="text-sm text-[#6B7280] leading-relaxed">{a}</p>
               </div>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              href="/sign-up"
+              className="btn-primary text-base px-8 py-3 inline-flex"
+            >
+              Commencer gratuitement
+            </Link>
+            <p className="mt-3 text-xs text-[#6B7280]">
+              Première analyse offerte, sans carte bancaire.
+            </p>
           </div>
         </div>
       </main>

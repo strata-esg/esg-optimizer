@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Composant carte delta avec indicateur de tendance.
+ESG Optimizer MVP - Composant carte delta avec indicateur de tendance.
 Affiche le delta entre deux analyses (flèches, couleurs, valeur).
 """
 
@@ -177,7 +177,7 @@ def render_delta_row(analysis: dict) -> None:
         if changed_kpis:
             st.markdown("**KPIs modifiés**")
             for k in changed_kpis:
-                st.markdown(f"· **{k['name']}** : {k.get('previous_value','?')} → {k.get('current_value','?')} {k.get('unit','')}")
+                st.markdown(f"· **{k['name']}** : {k.get('previous_value','?')} -> {k.get('current_value','?')} {k.get('unit','')}")
 
     # 4. Points d'amélioration & régressions
     improvements = data.get("key_improvements") or []
@@ -215,6 +215,6 @@ def render_delta_row(analysis: dict) -> None:
             pillar = act.get("pillar", "")
             action = act.get("action", "")
             rationale = act.get("rationale", "")
-            with st.expander(f"Priorité {prio} — [{pillar}] {action}"):
+            with st.expander(f"Priorité {prio} - [{pillar}] {action}"):
                 if rationale:
                     st.caption(rationale)

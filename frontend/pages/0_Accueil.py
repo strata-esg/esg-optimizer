@@ -1,6 +1,6 @@
 """
-ESG Optimizer MVP — Landing page publique.
-Première page Streamlit (préfixe 0_) — accessible sans connexion.
+ESG Optimizer MVP - Landing page publique.
+Première page Streamlit (préfixe 0_) - accessible sans connexion.
 Contient : Hero, cards persona, preuve sociale, démo, comment ça marche,
 pricing 4 plans, FAQ, footer.
 """
@@ -35,14 +35,14 @@ inject_global_styles()
 params = st.query_params
 persona = params.get("persona", None)
 
-# ── Détection paiement complété (redirect Stripe) ─────────────────────────────
+# -- Détection paiement complété (redirect Stripe) -----------------------------
 # Stripe Payment Link doit être configuré avec :
 #   success_url = https://<app-url>/?payment_success=1&plan=essential  (ou pro)
 _payment_success = params.get("payment_success", None)
 _payment_plan    = params.get("plan", None)
 if _payment_success == "1" and _payment_plan in ("essential", "pro"):
     track_payment_completed(_payment_plan)
-    st.toast(f"🎉 Paiement confirmé — bienvenue sur le plan {_payment_plan.title()} !", icon="✅")
+    st.toast(f"🎉 Paiement confirmé - bienvenue sur le plan {_payment_plan.title()} !", icon="✅")
     # Rafraîchir les données utilisateur pour mettre à jour la sidebar
     _tok = get_token()
     if _tok:
@@ -93,9 +93,9 @@ default_content = {
 content = PERSONA_CONTENT.get(persona, default_content) if persona else default_content
 
 # Bouton secondaire du HERO :
-#   - quand AUCUN persona : "Je suis consultant →" (lien vers ?persona=consultant)
+#   - quand AUCUN persona : "Je suis consultant ->" (lien vers ?persona=consultant)
 #   - quand un persona est déjà actif : "← Retour à la version générale"
-#   Ça évite la boucle "je clique sur Je suis consultant → ça ouvre la même page".
+#   Ça évite la boucle "je clique sur Je suis consultant -> ça ouvre la même page".
 if persona:
     _hero_secondary_cta = (
         '<a href="?" style="display:inline-block;background:transparent;'
@@ -112,7 +112,7 @@ else:
     )
 
 
-# 1. HERO — Logo + CTA proéminent above the fold
+# 1. HERO - Logo + CTA proéminent above the fold
 st.markdown(
     f"""<div style="text-align: center; padding: 40px 20px 10px 20px;">
         <div style="margin-bottom: 18px;">
@@ -157,11 +157,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── QUICK-CHECK PUBLIC — Redesign avec design tokens ────────────────────────
+# -- QUICK-CHECK PUBLIC - Redesign avec design tokens ------------------------
 st.markdown(
     """
     <style>
-    /* File uploader zone — dashed green */
+    /* File uploader zone - dashed green */
     [data-testid="stFileUploaderDropzone"] {
         background: #FFFFFF !important;
         border: 2px dashed #4DB862 !important;
@@ -194,7 +194,7 @@ st.markdown(
 # Ancre HTML pour le scroll depuis le CTA hero
 st.markdown('<div id="quick-check" style="height:0;margin:0;padding:0;"></div>', unsafe_allow_html=True)
 
-# JS : traduit les textes anglais de Streamlit — flag anti-boucle infinie
+# JS : traduit les textes anglais de Streamlit - flag anti-boucle infinie
 st.components.v1.html(
     """<script>
     var _busy = false;
@@ -241,7 +241,7 @@ with _qh:
             padding:28px 36px 16px; margin:4px 0 0 0; text-align:center;">
             <div style="font-family:'DM Serif Display',Georgia,serif; font-size:1.6rem;
                 color:#1B3D20; letter-spacing:-0.02em; margin-bottom:6px;">
-                Analysez votre rapport ESG — gratuit
+                Analysez votre rapport ESG - gratuit
             </div>
             <div style="font-family:'DM Sans',sans-serif; font-size:13px; color:#6B7280;">
                 Aucun compte requis &nbsp;·&nbsp; PDF, DOCX ou XLSX &nbsp;·&nbsp; Résultat en ~3 minutes
@@ -257,7 +257,7 @@ with qc_col_center:
     uploaded_file = st.file_uploader(
         "Glissez ou sélectionnez votre rapport de durabilité",
         type=["pdf", "docx", "xlsx"],
-        help="PDF, DOCX ou XLSX — 10 Mo max. Aucun compte requis.",
+        help="PDF, DOCX ou XLSX - 10 Mo max. Aucun compte requis.",
         key="quick_check_uploader",
         label_visibility="collapsed",
     )
@@ -310,7 +310,7 @@ with qc_col_center:
                     progress_bar.progress(pct, text=step)
                     _time.sleep(3)
 
-        # ── Résultat ──────────────────────────────────────────────────────────
+        # -- Résultat ----------------------------------------------------------
         if "qc_result" in st.session_state:
             qc = st.session_state["qc_result"]
             score = qc.get("score_global", 0)
@@ -440,7 +440,7 @@ with qc_col_center:
             )
             st.page_link(
                 "pages/1_Login.py",
-                label="Créer un compte gratuit — 30 secondes",
+                label="Créer un compte gratuit - 30 secondes",
                 use_container_width=True,
             )
 
@@ -496,7 +496,7 @@ if not persona:  # N'afficher que sur la landing générique
                             {desc}
                         </div>
                         <div style="font-size: 12px; color: #1A3D22; margin-top: 8px; font-weight: 600;">
-                            En savoir plus →
+                            En savoir plus ->
                         </div>
                     </div>
                 </a>""",
@@ -507,7 +507,7 @@ if not persona:  # N'afficher que sur la landing générique
 
 st.divider()
 
-# 3. PREUVE SOCIALE — facts produit fixes
+# 3. PREUVE SOCIALE - facts produit fixes
 st.markdown(
     """<div style="text-align: center; padding: 20px 0;">
         <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
@@ -537,7 +537,7 @@ st.markdown(
 
 st.divider()
 
-# 4. COMMENT ÇA MARCHE — 3 étapes
+# 4. COMMENT ÇA MARCHE - 3 étapes
 st.markdown(
     """<div style="text-align: center; padding: 10px 0 20px 0;">
         <h2 style="color: #111827;">Comment ça marche</h2>
@@ -555,7 +555,7 @@ _step_chart = _s('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x
 
 steps = [
     (s1, "1", _step_upload, "Uploadez votre rapport",
-     "Glissez votre rapport de durabilité (PDF, DOCX ou XLSX). DPEF, rapport RSE, bilan carbone — tout fonctionne."),
+     "Glissez votre rapport de durabilité (PDF, DOCX ou XLSX). DPEF, rapport RSE, bilan carbone - tout fonctionne."),
     (s2, "2", _step_cpu, "L'IA analyse en 3 minutes",
      "GPT-4o parcourt votre document, identifie les KPIs, évalue la couverture ESRS et calcule vos scores E/S/G."),
     (s3, "3", _step_chart, "Recevez votre diagnostic",
@@ -584,7 +584,7 @@ for col, num, icon, title, desc in steps:
 st.markdown("<br>", unsafe_allow_html=True)
 st.divider()
 
-# 5. DÉMO VISUELLE — Aperçu des résultats
+# 5. DÉMO VISUELLE - Aperçu des résultats
 st.markdown(
     """<div style="text-align: center; padding: 10px 0 20px 0;">
         <h2 style="color: #111827;">Ce que vous obtenez</h2>
@@ -640,11 +640,11 @@ with demo_r:
                 Standards à renforcer :
             </div>
             <div style="font-size: 12px; color: #6B7280; line-height: 1.8;">
-                <span style="color:#EF4444;">&#10007;</span> E1 — Changement climatique<br>
-                <span style="color:#EF4444;">&#10007;</span> S2 — Travailleurs de la chaîne de valeur<br>
-                <span style="color:#F59E0B;">&#9679;</span> G1 — Gouvernance (partiel)<br>
-                <span style="color:#1A3D22;">&#10003;</span> E3 — Eau et ressources marines<br>
-                <span style="color:#1A3D22;">&#10003;</span> S1 — Effectifs de l'entreprise
+                <span style="color:#EF4444;">&#10007;</span> E1 - Changement climatique<br>
+                <span style="color:#EF4444;">&#10007;</span> S2 - Travailleurs de la chaîne de valeur<br>
+                <span style="color:#F59E0B;">&#9679;</span> G1 - Gouvernance (partiel)<br>
+                <span style="color:#1A3D22;">&#10003;</span> E3 - Eau et ressources marines<br>
+                <span style="color:#1A3D22;">&#10003;</span> S1 - Effectifs de l'entreprise
             </div>
         </div>""",
         unsafe_allow_html=True,
@@ -674,7 +674,7 @@ for col, icon, title, desc in features_extra:
 
 st.divider()
 
-# 6. PRICING — 4 plans
+# 6. PRICING - 4 plans
 track_pricing_viewed(persona)
 
 st.markdown(
@@ -817,7 +817,7 @@ with st.expander("Quelle IA est utilisée ? Est-elle fiable ?"):
         "Nous utilisons GPT-4o d'OpenAI, le modèle le plus performant pour l'analyse de texte. "
         "Notre système prompt est calibré sur les 10 standards ESRS (E1-E5, S1-S4, G1) et produit "
         "des scores reproductibles (température 0.2). L'IA identifie les KPIs, évalue la couverture "
-        "et génère des recommandations — mais ne remplace pas un auditeur. C'est un outil d'aide "
+        "et génère des recommandations - mais ne remplace pas un auditeur. C'est un outil d'aide "
         "à la décision."
     )
 
@@ -906,7 +906,7 @@ st.markdown(
             </div>
         </div>
         <div style="text-align: center; font-size: 11px; color: #D1D5DB; margin-top: 20px;">
-            © 2026 ESG Optimizer AI — Tous droits réservés
+            © 2026 ESG Optimizer AI - Tous droits réservés
         </div>
     </div>""",
     unsafe_allow_html=True,

@@ -1,6 +1,6 @@
 """
-ESG Optimizer MVP — Service d'analyse GPT-4o.
-Orchestre : extraction texte → appel LLM → parsing JSON → sauvegarde DB.
+ESG Optimizer MVP - Service d'analyse GPT-4o.
+Orchestre : extraction texte -> appel LLM -> parsing JSON -> sauvegarde DB.
 """
 
 import json
@@ -22,7 +22,7 @@ from backend.services.analytics_service import ph
 
 logger = logging.getLogger(__name__)
 
-# Client OpenAI (synchrone — suffisant pour un background task)
+# Client OpenAI (synchrone - suffisant pour un background task)
 _client = OpenAI(api_key=settings.openai_api_key)
 
 
@@ -113,19 +113,19 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
         analysis.status = "processing"
         db.commit()
 
-        # 1. Récupérer le fichier depuis le stockage (R2 → tempfile local, ou direct si local)
-        logger.info("Pipeline [%d] — Récupération fichier : %s", analysis_id, storage_key)
+        # 1. Récupérer le fichier depuis le stockage (R2 -> tempfile local, ou direct si local)
+        logger.info("Pipeline [%d] - Récupération fichier : %s", analysis_id, storage_key)
         local_path = StorageService.download_to_tempfile(storage_key)
 
         # 2. Extraction du texte
-        logger.info("Pipeline [%d] — Extraction texte : %s", analysis_id, analysis.source_filename)
+        logger.info("Pipeline [%d] - Extraction texte : %s", analysis_id, analysis.source_filename)
         text = extract_text(local_path, analysis.source_format)
 
         if not text.strip():
             raise RuntimeError("Le document ne contient aucun texte exploitable.")
 
         # 2. Appel GPT-4o
-        logger.info("Pipeline [%d] — Appel GPT-4o (%d caractères)", analysis_id, len(text))
+        logger.info("Pipeline [%d] - Appel GPT-4o (%d caractères)", analysis_id, len(text))
         result = call_gpt4o(text, company_name, sector)
         raw_json = json.dumps(result, ensure_ascii=False)
 
@@ -136,7 +136,7 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
         db.commit()
 
         logger.info(
-            "Pipeline [%d] — Succès en %.1fs (score global: %s)",
+            "Pipeline [%d] - Succès en %.1fs (score global: %s)",
             analysis_id, analysis.processing_time_s, analysis.score_global,
         )
 
@@ -159,12 +159,12 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
         try:
             delta_result = run_delta(analysis, db)
             if delta_result:
-                logger.info("Pipeline [%d] — Delta calculé avec succès", analysis_id)
+                logger.info("Pipeline [%d] - Delta calculé avec succès", analysis_id)
         except Exception as delta_exc:
-            # Le delta est optionnel — on ne fait pas échouer l'analyse principale
-            logger.warning("Pipeline [%d] — Delta échoué (non bloquant) : %s", analysis_id, delta_exc)
+            # Le delta est optionnel - on ne fait pas échouer l'analyse principale
+            logger.warning("Pipeline [%d] - Delta échoué (non bloquant) : %s", analysis_id, delta_exc)
 
-        # 5. Email de notification (succès — si opt-in)
+        # 5. Email de notification (succès - si opt-in)
         try:
             user = db.query(User).filter(User.id == analysis.user_id).first()
             if user and user.email_notifications:
@@ -177,13 +177,13 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
                     report_year=analysis.report_year,
                 )
         except Exception as email_exc:
-            logger.warning("Pipeline [%d] — Email succès non envoyé : %s", analysis_id, email_exc)
+            logger.warning("Pipeline [%d] - Email succès non envoyé : %s", analysis_id, email_exc)
 
     except Exception as exc:
         analysis.status = "failed"
         analysis.error_message = str(exc)[:500]
         analysis.processing_time_s = round(time.time() - start, 2)
-        logger.error("Pipeline [%d] — Échec : %s", analysis_id, exc)
+        logger.error("Pipeline [%d] - Échec : %s", analysis_id, exc)
 
         # PostHog : analyse échouée (signal pour debugger les cas d'erreur)
         ph.capture(analysis.user_id, "analysis_failed", {
@@ -204,7 +204,7 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
                     error_message=str(exc)[:200],
                 )
         except Exception as email_exc:
-            logger.warning("Pipeline [%d] — Email échec non envoyé : %s", analysis_id, email_exc)
+            logger.warning("Pipeline [%d] - Email échec non envoyé : %s", analysis_id, email_exc)
 
     finally:
         db.commit()
@@ -213,7 +213,7 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
         try:
             StorageService.delete(storage_key)
         except Exception as del_exc:
-            logger.warning("Pipeline [%d] — Impossible de supprimer storage_key=%s : %s", analysis_id, storage_key, del_exc)
+            logger.warning("Pipeline [%d] - Impossible de supprimer storage_key=%s : %s", analysis_id, storage_key, del_exc)
 
         if local_path and local_path != storage_key:
             # local_path est un fichier téléchargé depuis R2 (distinct de storage_key)

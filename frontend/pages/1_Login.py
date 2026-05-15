@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Login / Register.
+ESG Optimizer MVP - Page Login / Register.
 Design split-panel : panneau gauche brand vert + formulaire droit crème.
 """
 
@@ -15,7 +15,7 @@ from frontend.utils.api_client import APIError, login, register, get_me
 from frontend.utils.session import is_logged_in, save_token, save_user, save_jwt_cookie
 from frontend.components.onboarding import render_onboarding
 
-# ── Guard : déjà connecté (AVANT le CSS split-panel pour éviter les conflits) ─
+# -- Guard : déjà connecté (AVANT le CSS split-panel pour éviter les conflits) -
 # Le CSS split-panel cible [data-testid="column"]:first-child de façon globale.
 # Si l'onboarding est rendu avec ce CSS actif, ses propres st.columns() héritent
 # du fond vert foncé. En plaçant ce guard avant l'injection CSS, le CSS
@@ -29,7 +29,7 @@ if is_logged_in():
     st.switch_page("pages/0_Accueil.py")
     st.stop()
 
-# ── CSS split-panel (injecté seulement pour le formulaire login/register) ─────
+# -- CSS split-panel (injecté seulement pour le formulaire login/register) -----
 st.markdown(
     f"""
     <style>
@@ -110,10 +110,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Layout split-panel ───────────────────────────────────────────────────────
+# -- Layout split-panel -------------------------------------------------------
 col_left, col_right = st.columns([4, 5], gap="small")
 
-# ── Panneau gauche : brand ───────────────────────────────────────────────────
+# -- Panneau gauche : brand ---------------------------------------------------
 with col_left:
     st.markdown(
         """
@@ -148,7 +148,7 @@ with col_left:
         )
 
 
-# ── Panneau droit : formulaire ───────────────────────────────────────────────
+# -- Panneau droit : formulaire -----------------------------------------------
 with col_right:
     st.markdown("<div style='height: 48px'></div>", unsafe_allow_html=True)
 
@@ -195,14 +195,14 @@ with col_right:
             )
 
         submitted = st.form_submit_button(
-            "Créer mon compte →" if is_register else "Se connecter →",
+            "Créer mon compte ->" if is_register else "Se connecter ->",
             use_container_width=True,
             type="primary",
         )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # ── Traitement ────────────────────────────────────────────────────────────
+    # -- Traitement ------------------------------------------------------------
     if submitted:
         if not email or not password:
             st.error("Veuillez remplir l'email et le mot de passe.")
@@ -248,7 +248,7 @@ with col_right:
         except Exception:
             st.error("Impossible de contacter le serveur. Vérifiez votre connexion.")
 
-    # ── Lien mot de passe oublié + inscription ───────────────────────────────
+    # -- Lien mot de passe oublié + inscription -------------------------------
     # Note : pas de backslash dans une expression f-string (Python 3.11)
     if is_register:
         _toggle_link = (

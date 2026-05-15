@@ -1,5 +1,5 @@
 """
-ESG Optimizer — Point d'entree Streamlit.
+ESG Optimizer - Point d'entree Streamlit.
 Lancer avec : cd frontend && streamlit run app.py --server.port 8501
 """
 
@@ -15,7 +15,7 @@ _root = Path(__file__).resolve().parent.parent
 _favicon = Image.open(_root / "frontend" / "static" / "brand" / "favicon.png")
 
 st.set_page_config(
-    page_title="ESG Optimizer — Analyse IA & Conformité CSRD",
+    page_title="ESG Optimizer - Analyse IA & Conformité CSRD",
     page_icon=_favicon,
     layout="wide",
     initial_sidebar_state="expanded",
@@ -33,7 +33,7 @@ from frontend.utils.session import get_token, save_token, save_user, clear_token
 # Styles brand
 inject_global_styles()
 
-# ── Cookie manager — persistence de session entre les refreshs ────────────────
+# -- Cookie manager - persistence de session entre les refreshs ----------------
 try:
     import extra_streamlit_components as stx
     _cm = stx.CookieManager(key="esg_cm")
@@ -52,12 +52,12 @@ try:
                 save_user(_user)
                 st.rerun()
             except Exception:
-                # Token expiré ou invalide — supprimer le cookie
+                # Token expiré ou invalide - supprimer le cookie
                 _cm.delete("esg_jwt")
 except Exception:
     pass  # Package non dispo en dev local sans pip install
 
-# ── Pages ─────────────────────────────────────────────────────────────────────
+# -- Pages ---------------------------------------------------------------------
 pages = [
     st.Page("pages/0_Accueil.py",    title="Accueil",            default=True),
     st.Page("pages/1_Login.py",      title="Connexion"),

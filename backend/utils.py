@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Utilitaires partagés.
+ESG Optimizer MVP - Utilitaires partagés.
 Fonctions communes utilisées dans plusieurs modules.
 """
 

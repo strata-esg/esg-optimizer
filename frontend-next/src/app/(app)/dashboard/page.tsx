@@ -20,14 +20,14 @@ export default async function DashboardPage() {
   try {
     if (token) {
       const [statsRes, histRes] = await Promise.all([
-        apiClient(token).get<typeof stats>("/stats"),
-        apiClient(token).get<{ analyses?: typeof history }>("/history?limit=5"),
+        apiClient(token).get<typeof stats>("/history/stats"),
+        apiClient(token).get<{ analyses?: typeof history }>("/history?per_page=5"),
       ]);
       stats = statsRes;
       history = histRes.analyses ?? [];
     }
   } catch {
-    // Silently fail
+    // En cas d'indisponibilité de l'API, on affiche un dashboard vide.
   }
 
   const firstName = user?.firstName ?? "vous";

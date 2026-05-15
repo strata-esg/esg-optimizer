@@ -7,7 +7,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def _truncate(plain: str) -> str:
-    """bcrypt est limité à 72 bytes — on tronque pour éviter le ValueError."""
+    """bcrypt est limité à 72 bytes - on tronque pour éviter le ValueError."""
     return plain.encode("utf-8")[:72].decode("utf-8", errors="ignore")
 
 

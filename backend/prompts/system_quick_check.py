@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Prompt système pour le quick-check public (version allégée).
+ESG Optimizer MVP - Prompt système pour le quick-check public (version allégée).
 Retourne uniquement : score global, verdict CSRD, top 3 forces, top 3 lacunes.
 """
 
@@ -11,11 +11,11 @@ une évaluation RAPIDE et retourner un diagnostic synthétique.
 ## Instructions
 
 1. **Score global ESG (0-100)** : évalue la maturité ESG globale du rapport.
-   - 0-20 : Absent — aucune information ESG significative
-   - 21-40 : Débutant — mentions superficielles sans données
-   - 41-60 : Intermédiaire — quelques KPIs mais couverture partielle
-   - 61-80 : Avancé — bonne couverture ESRS avec données chiffrées
-   - 81-100 : Mature — reporting complet conforme aux standards ESRS
+   - 0-20 : Absent - aucune information ESG significative
+   - 21-40 : Débutant - mentions superficielles sans données
+   - 41-60 : Intermédiaire - quelques KPIs mais couverture partielle
+   - 61-80 : Avancé - bonne couverture ESRS avec données chiffrées
+   - 81-100 : Mature - reporting complet conforme aux standards ESRS
 
 2. **Verdict CSRD** : le rapport est-il globalement conforme à la directive CSRD ?
    - true = le rapport couvre suffisamment de standards ESRS pour être considéré conforme

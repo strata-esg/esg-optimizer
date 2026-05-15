@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Schémas Pydantic (validation request/response).
+ESG Optimizer MVP - Schémas Pydantic (validation request/response).
 """
 
 from datetime import datetime
@@ -58,7 +58,7 @@ class CompanyResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ANALYSIS — Upload request
+# ANALYSIS - Upload request
 
 class AnalysisUploadMeta(BaseModel):
     """Métadonnées envoyées avec le fichier (form fields)."""
@@ -67,7 +67,7 @@ class AnalysisUploadMeta(BaseModel):
     sector: Optional[str] = None
 
 
-# ANALYSIS — Scores & résultats (sous-schémas)
+# ANALYSIS - Scores & résultats (sous-schémas)
 
 class ESRSCoverage(BaseModel):
     E1_climate_change: bool = False
@@ -103,11 +103,12 @@ class Recommendation(BaseModel):
     esrs_reference: Optional[str] = None
 
 
-# ANALYSIS — Réponse complète
+# ANALYSIS - Réponse complète
 
 class AnalysisResponse(BaseModel):
     id: int
     company_id: int
+    company_name: Optional[str] = None
     user_id: int
     report_year: Optional[int]
 

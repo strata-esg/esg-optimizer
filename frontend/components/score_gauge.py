@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Composant jauge circulaire de score (Plotly).
+ESG Optimizer MVP - Composant jauge circulaire de score (Plotly).
 Affiche un score 0-100 sous forme de gauge colorée.
 """
 
@@ -10,13 +10,13 @@ import streamlit as st
 def _score_color(score: float) -> str:
     """Retourne une couleur selon le niveau du score."""
     if score >= 80:
-        return "#1A3D22"   # vert — mature
+        return "#1A3D22"   # vert - mature
     elif score >= 60:
-        return "#3B82F6"   # bleu — correct
+        return "#3B82F6"   # bleu - correct
     elif score >= 40:
-        return "#F59E0B"   # orange — moyen
+        return "#F59E0B"   # orange - moyen
     else:
-        return "#EF4444"   # rouge — faible
+        return "#EF4444"   # rouge - faible
 
 
 def render_gauge(
@@ -81,7 +81,7 @@ def render_score_row(
     """
     Affiche le score global en grand + 3 sous-scores E/S/G côte à côte.
     """
-    # Score global — centré, plus grand
+    # Score global - centré, plus grand
     col_left, col_center, col_right = st.columns([1, 2, 1])
     with col_center:
         render_gauge(score_global, title="Score Global", height=280)

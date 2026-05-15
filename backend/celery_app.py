@@ -1,5 +1,5 @@
 """
-ESG Optimizer — Configuration Celery.
+ESG Optimizer - Configuration Celery.
 
 Broker + backend : Upstash Redis (TLS obligatoire avec rediss://).
 En dev sans Redis, ce module est importé mais les taches tombent

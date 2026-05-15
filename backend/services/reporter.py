@@ -1,8 +1,8 @@
 """
-ESG Optimizer MVP — Service de génération de rapports PDF.
+ESG Optimizer MVP - Service de génération de rapports PDF.
 Utilise ReportLab pour produire :
   - Rapport d'analyse ESG complet (≥ 8 pages, logo en header)
-  - Rapport Preview (3 pages, watermark PRÉVISUALISATION) — Plan Découverte
+  - Rapport Preview (3 pages, watermark PRÉVISUALISATION) - Plan Découverte
   - Rapport Delta (comparaison N vs N-1)
 """
 
@@ -37,7 +37,7 @@ from backend.utils import safe_json_loads as _safe_json_loads
 
 logger = logging.getLogger(__name__)
 
-# ─── Couleurs ESG Optimizer ──────────────────────────────────────────────────
+# --- Couleurs ESG Optimizer --------------------------------------------------
 BRAND_GREEN = colors.HexColor("#16A34A")
 BRAND_DARK = colors.HexColor("#1E293B")
 BRAND_LIGHT = colors.HexColor("#F1F5F9")
@@ -60,7 +60,7 @@ _LOGO_PATH = (
 )
 
 
-# ─── Styles ──────────────────────────────────────────────────────────────────
+# --- Styles ------------------------------------------------------------------
 
 def _get_styles() -> dict:
     """Retourne un dict de styles personnalisés."""
@@ -191,7 +191,7 @@ def _get_styles() -> dict:
     }
 
 
-# ─── Utilitaires ─────────────────────────────────────────────────────────────
+# --- Utilitaires -------------------------------------------------------------
 
 def _score_color(score: float | None) -> colors.HexColor:
     if score is None:
@@ -221,7 +221,7 @@ def _score_level(score: float | None) -> str:
 
 def _trend_symbol(delta: float | None) -> str:
     if delta is None:
-        return "–"
+        return "-"
     if delta >= 15:
         return "++ Forte hausse"
     if delta >= 5:
@@ -235,10 +235,10 @@ def _trend_symbol(delta: float | None) -> str:
 
 def _p(text: str, style) -> Paragraph:
     """Raccourci sécurisé pour créer un Paragraph (échappe None)."""
-    return Paragraph(str(text) if text is not None else "–", style)
+    return Paragraph(str(text) if text is not None else "-", style)
 
 
-# ─── Header/Footer callbacks ─────────────────────────────────────────────────
+# --- Header/Footer callbacks -------------------------------------------------
 
 def _make_footer(show_logo: bool = True):
     """Fabrique la fonction de pied de page avec logo optionnel."""
@@ -269,10 +269,10 @@ def _make_footer(show_logo: bool = True):
         # Pied de page
         canvas.setFont("Helvetica", 7)
         canvas.setFillColor(BRAND_GRAY)
-        canvas.drawString(2 * cm, 1.2 * cm, "ESG Optimizer AI — Rapport généré automatiquement — Confidentiel")
+        canvas.drawString(2 * cm, 1.2 * cm, "ESG Optimizer AI - Rapport généré automatiquement - Confidentiel")
         canvas.drawRightString(
             A4[0] - 2 * cm, 1.2 * cm,
-            f"Page {doc.page} — {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M UTC')}"
+            f"Page {doc.page} - {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M UTC')}"
         )
         # Ligne de séparation footer
         canvas.line(2 * cm, 1.8 * cm, A4[0] - 2 * cm, 1.8 * cm)
@@ -298,7 +298,7 @@ def _make_preview_footer():
     return _footer
 
 
-# ─── Construction du story complet ───────────────────────────────────────────
+# --- Construction du story complet -------------------------------------------
 
 def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> list:
     """
@@ -307,7 +307,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     """
     story = []
 
-    # ── PAGE 1 : COUVERTURE ──────────────────────────────────────────────────
+    # -- PAGE 1 : COUVERTURE --------------------------------------------------
     story.append(Spacer(1, 2.5 * cm))
     story.append(_p("ESG Optimizer AI", styles["title"]))
     story.append(_p("Rapport d'Analyse ESG", styles["subtitle"]))
@@ -331,7 +331,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
         "#EA580C" if (global_score or 0) >= 40 else "#DC2626"
     )
     story.append(_p(
-        f'<font color="{score_color_hex}"><b>{int(global_score) if global_score else "–"}</b></font>'
+        f'<font color="{score_color_hex}"><b>{int(global_score) if global_score else "-"}</b></font>'
         f'<font size="14" color="#94A3B8"> /100</font>',
         styles["score_big"],
     ))
@@ -352,7 +352,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     ))
     story.append(PageBreak())
 
-    # ── PAGE 2 : RÉSUMÉ EXÉCUTIF ─────────────────────────────────────────────
+    # -- PAGE 2 : RÉSUMÉ EXÉCUTIF ---------------------------------------------
     story.append(_p("1. Résumé exécutif", styles["h1"]))
     if analysis.executive_summary:
         story.append(_p(analysis.executive_summary, styles["body"]))
@@ -371,14 +371,14 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     story.append(Spacer(1, 0.5 * cm))
     story.append(_p(
         "<b>Méthodologie d'évaluation :</b> L'analyse est conduite par GPT-4o avec un système "
-        "prompt calibré sur les 10 standards ESRS (E1–E5, S1–S4, G1). La température de génération "
+        "prompt calibré sur les 10 standards ESRS (E1-E5, S1-S4, G1). La température de génération "
         "est fixée à 0,2 pour garantir des résultats reproductibles. Les scores reflètent la "
         "couverture des indicateurs requis, pas leur performance absolue.",
         styles["body"],
     ))
     story.append(PageBreak())
 
-    # ── PAGE 3 : SCORES ESG ──────────────────────────────────────────────────
+    # -- PAGE 3 : SCORES ESG --------------------------------------------------
     story.append(_p("2. Scores ESG détaillés", styles["h1"]))
 
     pillar_descriptions = {
@@ -446,15 +446,15 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     levels_data = [
         [_p("<b>Score</b>", styles["table_header"]), _p("<b>Niveau</b>", styles["table_header"]),
          _p("<b>Signification</b>", styles["table_header"])],
-        [_p("80–100", styles["table_cell"]), _p("Mature", styles["table_cell"]),
+        [_p("80-100", styles["table_cell"]), _p("Mature", styles["table_cell"]),
          _p("Reporting complet, indicateurs quantifiés, objectifs définis", styles["table_cell"])],
-        [_p("60–79", styles["table_cell"]), _p("Avancé", styles["table_cell"]),
+        [_p("60-79", styles["table_cell"]), _p("Avancé", styles["table_cell"]),
          _p("Bonne couverture, quelques lacunes quantitatives", styles["table_cell"])],
-        [_p("40–59", styles["table_cell"]), _p("Basique", styles["table_cell"]),
+        [_p("40-59", styles["table_cell"]), _p("Basique", styles["table_cell"]),
          _p("Indicateurs partiels, approche qualitative dominante", styles["table_cell"])],
-        [_p("20–39", styles["table_cell"]), _p("Embryonnaire", styles["table_cell"]),
+        [_p("20-39", styles["table_cell"]), _p("Embryonnaire", styles["table_cell"]),
          _p("Informations éparses, peu structurées", styles["table_cell"])],
-        [_p("0–19", styles["table_cell"]), _p("Quasi absent", styles["table_cell"]),
+        [_p("0-19", styles["table_cell"]), _p("Quasi absent", styles["table_cell"]),
          _p("Reporting ESG inexistant ou insuffisant", styles["table_cell"])],
     ]
     levels_table = Table(levels_data, colWidths=[2.5 * cm, 3 * cm, 11.5 * cm])
@@ -473,7 +473,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     story.append(levels_table)
     story.append(PageBreak())
 
-    # ── PAGE 4 : CONFORMITÉ CSRD ─────────────────────────────────────────────
+    # -- PAGE 4 : CONFORMITÉ CSRD ---------------------------------------------
     story.append(_p("3. Conformité CSRD", styles["h1"]))
     csrd_pct = analysis.csrd_coverage_pct or 0
 
@@ -488,7 +488,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
         csrd_color = "red"
 
     story.append(_p(
-        f"Statut CSRD : <font color='{csrd_color}'><b>{csrd_status}</b></font> — "
+        f"Statut CSRD : <font color='{csrd_color}'><b>{csrd_status}</b></font> - "
         f"Couverture des standards ESRS : <b>{csrd_pct:.0f}%</b>",
         styles["body"],
     ))
@@ -504,7 +504,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     if missing:
         story.append(_p("Disclosures manquantes identifiées :", styles["h2"]))
         for item in missing[:15]:
-            story.append(_p(f"→ {item}", styles["body_left"]))
+            story.append(_p(f"-> {item}", styles["body_left"]))
 
     story.append(Spacer(1, 0.5 * cm))
     story.append(_p(
@@ -515,30 +515,30 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     ))
     story.append(PageBreak())
 
-    # ── PAGE 5 : COUVERTURE ESRS ─────────────────────────────────────────────
+    # -- PAGE 5 : COUVERTURE ESRS ---------------------------------------------
     story.append(_p("4. Couverture ESRS détaillée", styles["h1"]))
     esrs = _safe_json_loads(analysis.esrs_coverage) or {}
 
     esrs_descriptions = {
-        "E1_climate_change": ("E1 — Changement climatique",
+        "E1_climate_change": ("E1 - Changement climatique",
             "Émissions GES (scope 1-2-3), objectifs climatiques, risques physiques et de transition"),
-        "E2_pollution": ("E2 — Pollution",
+        "E2_pollution": ("E2 - Pollution",
             "Pollution de l'air, de l'eau, des sols ; substances dangereuses"),
-        "E3_water_marine": ("E3 — Eau et ressources marines",
+        "E3_water_marine": ("E3 - Eau et ressources marines",
             "Consommation d'eau, gestion des effluents, biodiversité marine"),
-        "E4_biodiversity": ("E4 — Biodiversité et écosystèmes",
+        "E4_biodiversity": ("E4 - Biodiversité et écosystèmes",
             "Impacts sur la biodiversité, déforestation, utilisation des terres"),
-        "E5_circular_economy": ("E5 — Économie circulaire",
+        "E5_circular_economy": ("E5 - Économie circulaire",
             "Déchets, recyclage, gestion en fin de vie des produits"),
-        "S1_own_workforce": ("S1 — Effectifs propres",
+        "S1_own_workforce": ("S1 - Effectifs propres",
             "Conditions de travail, santé/sécurité, diversité, rémunération"),
-        "S2_value_chain_workers": ("S2 — Travailleurs de la chaîne de valeur",
+        "S2_value_chain_workers": ("S2 - Travailleurs de la chaîne de valeur",
             "Droits des travailleurs chez les fournisseurs et sous-traitants"),
-        "S3_affected_communities": ("S3 — Communautés affectées",
+        "S3_affected_communities": ("S3 - Communautés affectées",
             "Impacts sociaux locaux, droits des populations riveraines"),
-        "S4_consumers": ("S4 — Consommateurs et utilisateurs finaux",
+        "S4_consumers": ("S4 - Consommateurs et utilisateurs finaux",
             "Sécurité des produits, marketing responsable, confidentialité"),
-        "G1_business_conduct": ("G1 — Conduite des affaires",
+        "G1_business_conduct": ("G1 - Conduite des affaires",
             "Anti-corruption, conformité fiscale, protection des lanceurs d'alerte"),
     }
 
@@ -580,7 +580,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
 
     story.append(PageBreak())
 
-    # ── PAGE 6 : KPIs ────────────────────────────────────────────────────────
+    # -- PAGE 6 : KPIs --------------------------------------------------------
     kpis = _safe_json_loads(analysis.kpis_detected) or []
     story.append(_p("5. KPIs détectés dans le rapport", styles["h1"]))
 
@@ -602,11 +602,11 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
         ]
         for kpi in kpis[:15]:  # FIX #13 : plus de KPIs affichés
             kpi_data.append([
-                _p(kpi.get("name", "–"), styles["table_cell"]),
-                _p(str(kpi.get("value", "–")), styles["table_cell"]),
-                _p(kpi.get("unit", "–"), styles["table_cell"]),
-                _p(kpi.get("esrs_reference", "–"), styles["table_cell"]),
-                _p(kpi.get("pillar", "–"), styles["table_cell"]),
+                _p(kpi.get("name", "-"), styles["table_cell"]),
+                _p(str(kpi.get("value", "-")), styles["table_cell"]),
+                _p(kpi.get("unit", "-"), styles["table_cell"]),
+                _p(kpi.get("esrs_reference", "-"), styles["table_cell"]),
+                _p(kpi.get("pillar", "-"), styles["table_cell"]),
             ])
 
         # FIX #13 : colWidths adaptées pour éviter chevauchements
@@ -631,7 +631,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
 
     story.append(PageBreak())
 
-    # ── PAGE 7 : FORCES & FAIBLESSES ─────────────────────────────────────────
+    # -- PAGE 7 : FORCES & FAIBLESSES -----------------------------------------
     strengths = _safe_json_loads(analysis.strengths) or []
     weaknesses = _safe_json_loads(analysis.weaknesses) or []
 
@@ -667,7 +667,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
 
     story.append(PageBreak())
 
-    # ── PAGE 8 : RECOMMANDATIONS ─────────────────────────────────────────────
+    # -- PAGE 8 : RECOMMANDATIONS ---------------------------------------------
     recommendations = _safe_json_loads(analysis.recommendations) or []
     story.append(_p("7. Plan d'actions recommandées", styles["h1"]))
 
@@ -691,11 +691,11 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
         sorted_recs = sorted(recommendations, key=lambda r: r.get("priority", 5))
         for rec in sorted_recs[:10]:
             rec_data.append([
-                _p(str(rec.get("priority", "–")), styles["table_cell"]),
-                _p(rec.get("pillar", "–"), styles["table_cell"]),
-                _p(rec.get("action", "–"), styles["table_cell"]),
-                _p(rec.get("expected_impact", "–") or "–", styles["table_cell"]),
-                _p(rec.get("esrs_reference", "–"), styles["table_cell"]),
+                _p(str(rec.get("priority", "-")), styles["table_cell"]),
+                _p(rec.get("pillar", "-"), styles["table_cell"]),
+                _p(rec.get("action", "-"), styles["table_cell"]),
+                _p(rec.get("expected_impact", "-") or "-", styles["table_cell"]),
+                _p(rec.get("esrs_reference", "-"), styles["table_cell"]),
             ])
 
         # FIX #13 : colWidths pensées pour contenu long dans colonnes Action/Impact
@@ -719,7 +719,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
 
     story.append(PageBreak())
 
-    # ── PAGE 9 (si delta) : ÉVOLUTION vs ANNÉE PRÉCÉDENTE ───────────────────
+    # -- PAGE 9 (si delta) : ÉVOLUTION vs ANNÉE PRÉCÉDENTE -------------------
     if analysis.delta_global is not None:
         story.append(_p("8. Évolution vs année précédente (Delta Report)", styles["h1"]))
         story.append(_p(
@@ -737,16 +737,16 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
                 _p("<b>Tendance</b>", styles["table_header"]),
             ],
             ["Environnement",
-             f"{analysis.delta_env:+.0f}" if analysis.delta_env is not None else "–",
+             f"{analysis.delta_env:+.0f}" if analysis.delta_env is not None else "-",
              _trend_symbol(analysis.delta_env)],
             ["Social",
-             f"{analysis.delta_social:+.0f}" if analysis.delta_social is not None else "–",
+             f"{analysis.delta_social:+.0f}" if analysis.delta_social is not None else "-",
              _trend_symbol(analysis.delta_social)],
             ["Gouvernance",
-             f"{analysis.delta_gov:+.0f}" if analysis.delta_gov is not None else "–",
+             f"{analysis.delta_gov:+.0f}" if analysis.delta_gov is not None else "-",
              _trend_symbol(analysis.delta_gov)],
             ["GLOBAL",
-             f"{analysis.delta_global:+.0f}" if analysis.delta_global is not None else "–",
+             f"{analysis.delta_global:+.0f}" if analysis.delta_global is not None else "-",
              _trend_symbol(analysis.delta_global)],
         ]
         # Convertir les cellules texte en Paragraphs
@@ -769,7 +769,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
         story.append(delta_table)
         story.append(PageBreak())
 
-    # ── PAGE FINALE : MÉTHODOLOGIE & DISCLAIMER ──────────────────────────────
+    # -- PAGE FINALE : MÉTHODOLOGIE & DISCLAIMER ------------------------------
     sec_num = 9 if analysis.delta_global is not None else 8
     story.append(_p(f"{sec_num}. Méthodologie et avertissements", styles["h1"]))
     story.append(_p("<b>Modèle d'analyse</b>", styles["h2"]))
@@ -805,7 +805,7 @@ def _build_full_story(analysis: Analysis, company: Company, styles: dict) -> lis
     return story
 
 
-# ─── RAPPORT COMPLET ─────────────────────────────────────────────────────────
+# --- RAPPORT COMPLET ---------------------------------------------------------
 
 def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
     """
@@ -830,7 +830,7 @@ def generate_analysis_pdf(analysis: Analysis, company: Company) -> bytes:
     return buffer.getvalue()
 
 
-# ─── RAPPORT PREVIEW (FIX #12) ───────────────────────────────────────────────
+# --- RAPPORT PREVIEW (FIX #12) -----------------------------------------------
 
 def generate_preview(analysis: Analysis, company: Company) -> bytes:
     """
@@ -850,14 +850,14 @@ def generate_preview(analysis: Analysis, company: Company) -> bytes:
     styles = _get_styles()
     story = []
 
-    # ── PAGE 1 : COUVERTURE PREVIEW ──────────────────────────────────────────
+    # -- PAGE 1 : COUVERTURE PREVIEW ------------------------------------------
     story.append(_p(
-        "— APERÇU GRATUIT — Plan Découverte",
+        "- APERÇU GRATUIT - Plan Découverte",
         styles["preview_banner"],
     ))
     story.append(Spacer(1, 0.5 * cm))
     story.append(_p("ESG Optimizer AI", styles["title"]))
-    story.append(_p("Rapport d'Analyse ESG — Prévisualisation", styles["subtitle"]))
+    story.append(_p("Rapport d'Analyse ESG - Prévisualisation", styles["subtitle"]))
     story.append(Spacer(1, 0.8 * cm))
     story.append(_p(f"<b>{company.name}</b>", ParagraphStyle(
         "CoverPreview", parent=styles["title"], fontSize=20, textColor=BRAND_DARK,
@@ -870,7 +870,7 @@ def generate_preview(analysis: Analysis, company: Company) -> bytes:
 
     global_score = analysis.score_global
     story.append(_p(
-        f"<b>{int(global_score) if global_score else '–'}</b><font size='14' color='#94A3B8'>/100</font>",
+        f"<b>{int(global_score) if global_score else '-'}</b><font size='14' color='#94A3B8'>/100</font>",
         styles["score_big"],
     ))
     story.append(_p("Score ESG Global", styles["subtitle"]))
@@ -883,7 +883,7 @@ def generate_preview(analysis: Analysis, company: Company) -> bytes:
     ))
     story.append(PageBreak())
 
-    # ── PAGE 2 : RÉSUMÉ EXÉCUTIF ─────────────────────────────────────────────
+    # -- PAGE 2 : RÉSUMÉ EXÉCUTIF ---------------------------------------------
     story.append(_p("Résumé exécutif", styles["h1"]))
     if analysis.executive_summary:
         story.append(_p(analysis.executive_summary, styles["body"]))
@@ -895,19 +895,19 @@ def generate_preview(analysis: Analysis, company: Company) -> bytes:
     story.append(_p("<i>Les scores détaillés E/S/G sont disponibles sur la page suivante.</i>", styles["small"]))
     story.append(PageBreak())
 
-    # ── PAGE 3 : SCORES + CTA UPGRADE ───────────────────────────────────────
+    # -- PAGE 3 : SCORES + CTA UPGRADE ---------------------------------------
     story.append(_p("Scores ESG", styles["h1"]))
 
     scores_preview = [
         [_p("<b>Pilier</b>", styles["table_header"]), _p("<b>Score</b>", styles["table_header"])],
         [_p("Environnement", styles["table_cell"]),
-         _p(f"{int(analysis.score_env)}/100" if analysis.score_env else "–", styles["table_cell"])],
+         _p(f"{int(analysis.score_env)}/100" if analysis.score_env else "-", styles["table_cell"])],
         [_p("Social", styles["table_cell"]),
-         _p(f"{int(analysis.score_social)}/100" if analysis.score_social else "–", styles["table_cell"])],
+         _p(f"{int(analysis.score_social)}/100" if analysis.score_social else "-", styles["table_cell"])],
         [_p("Gouvernance", styles["table_cell"]),
-         _p(f"{int(analysis.score_gov)}/100" if analysis.score_gov else "–", styles["table_cell"])],
+         _p(f"{int(analysis.score_gov)}/100" if analysis.score_gov else "-", styles["table_cell"])],
         [_p("<b>GLOBAL</b>", styles["table_cell"]),
-         _p(f"<b>{int(analysis.score_global)}/100</b>" if analysis.score_global else "–", styles["table_cell"])],
+         _p(f"<b>{int(analysis.score_global)}/100</b>" if analysis.score_global else "-", styles["table_cell"])],
     ]
     t = Table(scores_preview, colWidths=[8 * cm, 4 * cm])
     t.setStyle(TableStyle([
@@ -930,8 +930,8 @@ def generate_preview(analysis: Analysis, company: Company) -> bytes:
         "Le rapport intégral contient : couverture ESRS détaillée, "
         "liste des KPIs détectés, forces &amp; lacunes, plan d'actions priorisé, "
         "et Delta Report si vous avez déjà analysé un rapport précédent.\n\n"
-        "→ Plan Essentiel : 39 € par analyse\n"
-        "→ Plan Pro : 129 € / mois · analyses illimitées\n\n"
+        "-> Plan Essentiel : 39 € par analyse\n"
+        "-> Plan Pro : 129 € / mois · analyses illimitées\n\n"
         "Rendez-vous sur esg-optimizer.fr pour passer au plan supérieur.",
         styles["body"],
     )]]
@@ -952,7 +952,7 @@ def generate_preview(analysis: Analysis, company: Company) -> bytes:
     return buffer.getvalue()
 
 
-# ─── RAPPORT DELTA PDF ───────────────────────────────────────────────────────
+# --- RAPPORT DELTA PDF -------------------------------------------------------
 
 def generate_delta_pdf(
     current: Analysis,
@@ -987,7 +987,7 @@ def generate_delta_pdf(
     )))
     year_label = ""
     if previous.report_year and current.report_year:
-        year_label = f"{previous.report_year} → {current.report_year}"
+        year_label = f"{previous.report_year} -> {current.report_year}"
     story.append(_p(f"Période couverte : {year_label}", styles["subtitle"]))
     story.append(Spacer(1, 0.5 * cm))
     story.append(_p(
@@ -1021,10 +1021,10 @@ def generate_delta_pdf(
         ("global", "GLOBAL"),
     ]:
         evo = score_evo.get(pillar_key, {})
-        prev_val = evo.get("previous", "–")
-        curr_val = evo.get("current", "–")
-        delta_val = evo.get("delta", "–")
-        trend = evo.get("trend", "–")
+        prev_val = evo.get("previous", "-")
+        curr_val = evo.get("current", "-")
+        delta_val = evo.get("delta", "-")
+        trend = evo.get("trend", "-")
         delta_str = f"{delta_val:+d}" if isinstance(delta_val, (int, float)) else str(delta_val)
         trend_label = {
             "forte_amelioration": "++ Forte hausse",
@@ -1061,10 +1061,10 @@ def generate_delta_pdf(
     esrs_evo = delta_narrative.get("esrs_evolution", {})
     if esrs_evo:
         story.append(_p("3. Évolution de la couverture ESRS", styles["h1"]))
-        cov_prev = esrs_evo.get("coverage_previous", "–")
-        cov_curr = esrs_evo.get("coverage_current", "–")
+        cov_prev = esrs_evo.get("coverage_previous", "-")
+        cov_curr = esrs_evo.get("coverage_current", "-")
         story.append(_p(
-            f"Couverture N-1 : <b>{cov_prev}%</b> → Couverture N : <b>{cov_curr}%</b>",
+            f"Couverture N-1 : <b>{cov_prev}%</b> -> Couverture N : <b>{cov_curr}%</b>",
             styles["body"],
         ))
         gained = esrs_evo.get("gained", [])
@@ -1100,10 +1100,10 @@ def generate_delta_pdf(
                 "removed": "x Supprimé",
             }.get(kpi.get("status", ""), kpi.get("status", ""))
             kpi_data.append([
-                _p(kpi.get("name", "–"), styles["table_cell"]),
-                _p(str(kpi.get("previous_value", "–") or "–"), styles["table_cell"]),
-                _p(str(kpi.get("current_value", "–") or "–"), styles["table_cell"]),
-                _p(kpi.get("evolution", "–") or "–", styles["table_cell"]),
+                _p(kpi.get("name", "-"), styles["table_cell"]),
+                _p(str(kpi.get("previous_value", "-") or "-"), styles["table_cell"]),
+                _p(str(kpi.get("current_value", "-") or "-"), styles["table_cell"]),
+                _p(kpi.get("evolution", "-") or "-", styles["table_cell"]),
                 _p(status_symbol, styles["table_cell"]),
             ])
 
@@ -1158,10 +1158,10 @@ def generate_delta_pdf(
         ]
         for act in actions[:6]:
             act_data.append([
-                _p(str(act.get("priority", "–")), styles["table_cell"]),
-                _p(act.get("pillar", "–"), styles["table_cell"]),
-                _p(act.get("action", "–"), styles["table_cell"]),
-                _p(act.get("rationale", "–") or "–", styles["table_cell"]),
+                _p(str(act.get("priority", "-")), styles["table_cell"]),
+                _p(act.get("pillar", "-"), styles["table_cell"]),
+                _p(act.get("action", "-"), styles["table_cell"]),
+                _p(act.get("rationale", "-") or "-", styles["table_cell"]),
             ])
         act_table = Table(act_data, colWidths=[1.5 * cm, 1.5 * cm, 6 * cm, 6 * cm])
         act_table.setStyle(TableStyle([

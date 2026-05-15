@@ -32,7 +32,7 @@ def inject_global_styles() -> None:
         />
 
         <style>
-        /* ── DESIGN TOKENS (colors_and_type.css) ─────────────── */
+        /* -- DESIGN TOKENS (colors_and_type.css) --------------- */
         :root {
           /* Brand Greens */
           --green-950: #0D1F0F;
@@ -183,7 +183,7 @@ def inject_global_styles() -> None:
           border: 1.5px solid rgba(212, 240, 216, 0.4) !important;
         }
 
-        /* Boutons de navigation (sans kind défini) → look "page link" */
+        /* Boutons de navigation (sans kind défini) -> look "page link" */
         [data-testid="stSidebar"] .stButton > button:not([kind]) {
           background: transparent !important;
           color: #D4F0D8 !important;
@@ -294,7 +294,7 @@ def inject_global_styles() -> None:
           border-bottom-color: #1A3D22 !important;
         }
 
-        /* File uploader — pas de bordure externe (double-encadrement supprimé)
+        /* File uploader - pas de bordure externe (double-encadrement supprimé)
            le dropzone interne porte sa propre bordure verte */
         [data-testid="stFileUploader"] {
           border: none !important;
@@ -351,7 +351,7 @@ def inject_global_styles() -> None:
         #MainMenu { visibility: hidden; }
         footer { visibility: hidden; }
 
-        /* ── FIX : masquer le "bonhomme qui court" et tout le bandeau status ── */
+        /* -- FIX : masquer le "bonhomme qui court" et tout le bandeau status -- */
         /* Streamlit affiche une icône Running animée dans le header en haut à droite,
            ainsi qu'un toast rouge "Connection error" intermittent. On masque les deux. */
         [data-testid="stStatusWidget"] { display: none !important; }
@@ -366,7 +366,7 @@ def inject_global_styles() -> None:
             display: none !important;
         }
 
-        /* ── FIX : Spinner / Loader custom — logo ESG qui pulse ── */
+        /* -- FIX : Spinner / Loader custom - logo ESG qui pulse -- */
         /* Quand Streamlit met le body en état de "running", on affiche notre propre
            indicateur dans le coin haut-droit. */
         @keyframes esgPulse {
@@ -404,7 +404,7 @@ def inject_global_styles() -> None:
             display: none !important;
         }
 
-        /* FIX : la mention "Non connecté" en sidebar — on cache */
+        /* FIX : la mention "Non connecté" en sidebar - on cache */
         [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
             display: none !important;
         }

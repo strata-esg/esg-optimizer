@@ -28,7 +28,7 @@ const PLANS = [
       "Rapport PDF 8+ pages complet",
       "Sans watermark",
       "Scores E / S / G / Global détaillés",
-      "10 ESRS couverts (E1→G1)",
+      "10 ESRS couverts (E1->G1)",
       "Delta Report N vs N-1",
       "Conservation historique 12 mois",
       "Support email",
@@ -81,8 +81,8 @@ const PLANS = [
 ];
 
 const COMPARISON = [
-  { item: "Prix", cabinet: "5 000–30 000€", esg: "39€ par analyse" },
-  { item: "Délai", cabinet: "4–6 semaines", esg: "3 minutes" },
+  { item: "Prix", cabinet: "5 000-30 000€", esg: "39€ par analyse" },
+  { item: "Délai", cabinet: "4-6 semaines", esg: "3 minutes" },
   { item: "ESRS couverts", cabinet: "10/10", esg: "10/10" },
   { item: "PDF structuré", cabinet: "✓", esg: "✓" },
   { item: "Delta Report N/N-1", cabinet: "✓", esg: "✓ (Essentiel+)" },
@@ -102,7 +102,7 @@ export default function TarifsAppPage() {
           Tarifs
         </h1>
         <p className="text-[#6B7280]">
-          Les cabinets facturent 5 000–30 000€ avec 4–6 semaines de délai.
+          Les cabinets facturent 5 000-30 000€ avec 4-6 semaines de délai.
           Nous faisons ça en 3 minutes pour 39€.
         </p>
       </div>
@@ -191,12 +191,4 @@ export default function TarifsAppPage() {
       <div className="text-center">
         <a
           href="mailto:contact@esg-optimizer.fr"
-          className="inline-flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#1A3D22]"
-        >
-          <ExternalLink className="w-4 h-4" />
-          Une question ? contact@esg-optimizer.fr
-        </a>
-      </div>
-    </div>
-  );
-}
+          className="inline-flex items-center gap-2 tex

@@ -1,5 +1,5 @@
 """
-ESG Optimizer MVP — Page Résultats.
+ESG Optimizer MVP - Page Résultats.
 Affichage complet d'une analyse ESG : scores, ESRS, KPIs, recommandations, deltas.
 """
 
@@ -47,8 +47,8 @@ with col_btn:
 #   - l'utilisateur vient de cliquer sur "Charger"
 #   - on arrive depuis l'upload (analysis_id présent et première visite)
 #   - l'analyse était déjà chargée (rerun causé par un clic de bouton sur la page)
-#   Sans la 3e condition, tout st.button (PDF, delta…) déclenche un rerun →
-#   should_load = False → st.stop() s'exécute avant le code de téléchargement.
+#   Sans la 3e condition, tout st.button (PDF, delta…) déclenche un rerun ->
+#   should_load = False -> st.stop() s'exécute avant le code de téléchargement.
 should_load = (
     load_btn
     or (analysis_id is not None and "analysis_loaded" not in st.session_state)
@@ -136,7 +136,7 @@ if csrd_pct is not None:
                 f'<div style="font-size:34px; color:#1D4ED8;">&#9651;</div>'
                 f'<div style="font-weight:700; color:#1E40AF; font-size:15px; margin-top:6px;">Conformité Avancée</div>'
                 f'<div style="font-size:11px; color:#3B82F6; margin-top:4px; text-transform:uppercase; letter-spacing:.04em;">'
-                f'Couverture {csrd_pct:.0f} % — 100 % requis</div>'
+                f'Couverture {csrd_pct:.0f} % - 100 % requis</div>'
                 f'</div>'
             )
         elif csrd_pct >= 50:
@@ -146,7 +146,7 @@ if csrd_pct is not None:
                 f'<div style="font-size:34px; color:#EA580C;">&#9680;</div>'
                 f'<div style="font-weight:700; color:#9A3412; font-size:14px; margin-top:6px;">En cours de structuration</div>'
                 f'<div style="font-size:11px; color:#C2410C; margin-top:4px; text-transform:uppercase; letter-spacing:.04em;">'
-                f'Couverture {csrd_pct:.0f} % — efforts requis</div>'
+                f'Couverture {csrd_pct:.0f} % - efforts requis</div>'
                 f'</div>'
             )
         else:
@@ -156,7 +156,7 @@ if csrd_pct is not None:
                 f'<div style="font-size:34px; color:#DC2626;">&#10007;</div>'
                 f'<div style="font-weight:700; color:#991B1B; font-size:15px; margin-top:6px;">Lacunes majeures</div>'
                 f'<div style="font-size:11px; color:#991B1B; margin-top:4px; text-transform:uppercase; letter-spacing:.04em;">'
-                f'Couverture {csrd_pct:.0f} % — restructuration nécessaire</div>'
+                f'Couverture {csrd_pct:.0f} % - restructuration nécessaire</div>'
                 f'</div>'
             )
         st.markdown(badge_html, unsafe_allow_html=True)
@@ -235,11 +235,11 @@ with col_weak:
             f"""<div style="background:{sev_bg}; border-left:4px solid {sev_border};
                 border-radius:0 8px 8px 0; padding:12px 14px; margin-top:12px;">
                 <div style="font-weight:700; color:{sev_color}; font-size:13px; margin-bottom:6px;">
-                    ⚠ Alerte Gouvernance — Sévérité {sev} (G : {int(score_gov)}/100)
+                    ⚠ Alerte Gouvernance - Sévérité {sev} (G : {int(score_gov)}/100)
                 </div>
                 <div style="font-size:12px; color:{sev_color}; line-height:1.6;">
-                    {"→ Score G < 40 : reporting de gouvernance quasi absent. Les auditeurs CSRD exigeront a minima :<br>— Politique anti-corruption documentée (ESRS G1)<br>— Déclaration sur la conformité fiscale<br>— Dispositif de protection des lanceurs d'alerte" if score_gov < 40 else
-                     "→ Score G < 60 : plusieurs indicateurs G1 manquants.<br>— Vérifier la présence d'une charte éthique publiée<br>— Documenter les procédures de due diligence fournisseurs<br>— Préciser les objectifs chiffrés de lutte contre la corruption"}
+                    {"-> Score G < 40 : reporting de gouvernance quasi absent. Les auditeurs CSRD exigeront a minima :<br>- Politique anti-corruption documentée (ESRS G1)<br>- Déclaration sur la conformité fiscale<br>- Dispositif de protection des lanceurs d'alerte" if score_gov < 40 else
+                     "-> Score G < 60 : plusieurs indicateurs G1 manquants.<br>- Vérifier la présence d'une charte éthique publiée<br>- Documenter les procédures de due diligence fournisseurs<br>- Préciser les objectifs chiffrés de lutte contre la corruption"}
                 </div>
             </div>""",
             unsafe_allow_html=True,
@@ -259,7 +259,7 @@ if recommendations:
         impact = rec.get("expected_impact", "")
         esrs_ref = rec.get("esrs_reference", "")
 
-        with st.expander(f"Priorité {prio} — [{pillar}] {action}"):
+        with st.expander(f"Priorité {prio} - [{pillar}] {action}"):
             if impact:
                 st.markdown(f"**Impact attendu** : {impact}")
             if esrs_ref:
@@ -423,9 +423,9 @@ try:
         csrd_text = "CSRD Ready ✓" if csrd else "en cours de conformité CSRD"
     linkedin_text = (
         f"Je viens d'analyser le rapport ESG {year} de {company} avec ESG Optimizer AI.\n\n"
-        f"Score : {int(score)}/100 — {csrd_text}\n\n"
+        f"Score : {int(score)}/100 - {csrd_text}\n\n"
         f"Et vous, où en êtes-vous de votre conformité CSRD ?\n\n"
-        f"Testez gratuitement → {app_url}"
+        f"Testez gratuitement -> {app_url}"
     )
 
     import urllib.parse
