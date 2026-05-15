@@ -33,17 +33,17 @@ router = APIRouter(prefix="/analysis", tags=["analysis"])
 def _dispatch_analysis(analysis_id: int, storage_key: str, background_tasks) -> None:
     """
     Dispatch le pipeline d'analyse :
-    - Si REDIS_URL configure : tache Celery (worker isole, pas de timeout HTTP).
-    - Sinon : BackgroundTasks FastAPI (fallback dev/local, risque de timeout en prod).
+    - Si ENABLE_CELERY=true ET REDIS_URL configure : tache Celery (worker isole, pas de timeout HTTP).
+    - Sinon : BackgroundTasks FastAPI (mode defaut sans Celery, adapte au plan Railway actuel).
     """
-    if settings.redis_url:
+    if settings.enable_celery and settings.redis_url:
         from backend.tasks.analysis_task import run_analysis_task
         run_analysis_task.delay(analysis_id, storage_key)
         logger.info("Analyse [%d] dispatchee vers Celery (Redis configure)", analysis_id)
     else:
         background_tasks.add_task(_run_pipeline_with_own_session, analysis_id, storage_key)
         logger.warning(
-            "Analyse [%d] via BackgroundTasks (REDIS_URL absent - mode dev/local)",
+            "Analyse [%d] via BackgroundTasks (ENABLE_CELERY=false ou REDIS_URL absent)",
             analysis_id,
         )
 

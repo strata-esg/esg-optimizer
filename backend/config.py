@@ -153,6 +153,9 @@ class Settings(BaseSettings):
     # Upstash Redis URL format: rediss://default:<password>@<host>:<port>
     # En local sans Redis: laisser vide, le backend bascule sur BackgroundTasks FastAPI
     redis_url: str = ""
+    # Activer explicitement Celery (ENABLE_CELERY=true dans l'environnement Railway).
+    # redis_url seul ne suffit pas : ce flag doit etre true pour dispatcher via Celery.
+    enable_celery: bool = False
 
     # --- Environment ---
     environment: str = "development"
