@@ -114,6 +114,15 @@ else
     STREAMLIT_PID=$!
     echo "  -> Streamlit demarre (pid=${STREAMLIT_PID})"
 
+    # Attend que Streamlit soit pret (max 30s)
+    for i in $(seq 1 30); do
+        if curl -sf "http://localhost:${STREAMLIT_PORT}/_stcore/health" >/dev/null 2>&1; then
+            echo "  -> Streamlit healthy"
+            break
+        fi
+        sleep 1
+    done
+
     # nginx : routes FastAPI et Streamlit
     cat > /etc/nginx/nginx.conf << NGINX_EOF
 events {
