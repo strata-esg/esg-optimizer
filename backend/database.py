@@ -15,12 +15,15 @@ url = settings.database_url
 
 # --- Gestion de l'URL pour PostgreSQL (Railway) ---
 # Railway peut fournir "postgres://" (sans "ql") ou "postgresql://".
-if url.startswith("postgres://"):
-    url = url.replace("postgres://", "postgresql+pg8000://", 1)
-    connect_args = {}
-elif url.startswith("postgresql://"):
-    # On passe par pg8000 pour éviter la compilation de psycopg2.
-    url = url.replace("postgresql://", "postgresql+pg8000://", 1)
+if url.startswith("postgres://") or url.startswith("postgresql://"):
+    # Normaliser le schéma
+    url = url.replace("postgres://", "postgresql://", 1)
+    # psycopg2 supporte sslmode nativement mais pas channel_binding (Neon) — on le retire
+    if "channel_binding" in url:
+        import re
+        url = re.sub(r"[?&]channel_binding=[^&]*", "", url)
+        url = re.sub(r"\?$", "", url)
+    url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
     connect_args = {}
 else:
     # --- Gestion SQLite (local) ---

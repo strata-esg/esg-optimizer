@@ -112,4 +112,49 @@ else
         --theme.secondaryBackgroundColor "#FFFFFF" \
         --theme.textColor "#1A3D22" &
     STREAMLIT_PID=$!
-    echo " 
+    echo "  -> Streamlit demarre (pid=${STREAMLIT_PID})"
+
+    # nginx : routes FastAPI et Streamlit
+    cat > /etc/nginx/nginx.conf << NGINX_EOF
+events {
+    worker_connections 1024;
+}
+
+http {
+    client_max_body_size 25m;
+
+    server {
+        listen ${NGINX_PORT};
+
+        location ~ ^/(health|auth|analysis|reports|stripe|email|cron|quick-check|users|admin|docs|openapi.json) {
+            proxy_pass         http://127.0.0.1:${PORT_API};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_read_timeout 360s;
+        }
+
+        location / {
+            proxy_pass         http://127.0.0.1:${STREAMLIT_PORT};
+            proxy_set_header   Host              \$host;
+            proxy_set_header   X-Real-IP         \$remote_addr;
+            proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_set_header   Upgrade           \$http_upgrade;
+            proxy_set_header   Connection        "upgrade";
+        }
+    }
+}
+NGINX_EOF
+
+fi
+
+# --- Lance nginx (maintient le container en vie) ----------------------
+echo "  -> nginx demarre sur port ${NGINX_PORT}"
+nginx -g "daemon off;" &
+NGINX_PID=$!
+
+# --- Surveille : exit si l'un des processus plante -------------------
+wait -n
+echo "Processus termine de facon inattendue. Arret du container."
+exit 1
