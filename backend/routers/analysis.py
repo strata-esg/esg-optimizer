@@ -37,15 +37,18 @@ def _dispatch_analysis(analysis_id: int, storage_key: str, background_tasks) -> 
     - Sinon : BackgroundTasks FastAPI (mode defaut sans Celery, adapte au plan Railway actuel).
     """
     if settings.enable_celery and settings.redis_url:
-        from backend.tasks.analysis_task import run_analysis_task
-        run_analysis_task.delay(analysis_id, storage_key)
-        logger.info("Analyse [%d] dispatchee vers Celery (Redis configure)", analysis_id)
-    else:
-        background_tasks.add_task(_run_pipeline_with_own_session, analysis_id, storage_key)
-        logger.warning(
-            "Analyse [%d] via BackgroundTasks (ENABLE_CELERY=false ou REDIS_URL absent)",
-            analysis_id,
-        )
+        try:
+            from backend.tasks.analysis_task import run_analysis_task
+            run_analysis_task.delay(analysis_id, storage_key)
+            logger.info("Analyse [%d] dispatchee vers Celery (Redis configure)", analysis_id)
+            return
+        except ImportError as exc:
+            logger.warning(
+                "Celery non installe (%s) - fallback BackgroundTasks pour analyse [%d]",
+                exc, analysis_id,
+            )
+    background_tasks.add_task(_run_pipeline_with_own_session, analysis_id, storage_key)
+    logger.info("Analyse [%d] via BackgroundTasks", analysis_id)
 
 
 def _check_quota(user: User) -> None:

@@ -123,106 +123,6 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
 
           {/* Actions admin */}
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Réassigner une analyse */}
-            <div className="card">
-              <h3 className="font-semibold text-[#1A3D22] mb-4">Réassigner une analyse</h3>
-              <p className="text-xs text-[#6B7280] mb-3">
-                Utile si une analyse appartient a l&apos;ancien compte Streamlit au lieu du compte Clerk.
-              </p>
-              <div className="space-y-3">
-                <input
-                  className="input"
-                  placeholder="ID de l'analyse (ex: 2)"
-                  value={reassignId}
-                  onChange={(e) => setReassignId(e.target.value)}
-                />
-                <input
-                  className="input"
-                  placeholder="Email du compte cible"
-                  value={reassignEmail}
-                  onChange={(e) => setReassignEmail(e.target.value)}
-                />
-                <button
-                  onClick={() =>
-                    apiAction("POST", `/admin/reassign-analysis/${reassignId}`, {
-                      target_email: reassignEmail,
-                    })
-                  }
-                  disabled={!reassignId || !reassignEmail || loading}
-                  className="btn-primary w-full justify-center"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Réassigner
-                </button>
-              </div>
-            </div>
-
-            {/* Corriger un email */}
-            <div className="card">
-              <h3 className="font-semibold text-[#1A3D22] mb-4">Corriger un email</h3>
-              <p className="text-xs text-[#6B7280] mb-3">
-                Corrige les emails de type <code className="text-xs bg-gray-100 px-1 rounded">clerk_id@clerk.local</code>.
-              </p>
-              <div className="space-y-3">
-                <input
-                  className="input"
-                  placeholder="Ancien email (ex: xyz@clerk.local)"
-                  value={fixOld}
-                  onChange={(e) => setFixOld(e.target.value)}
-                />
-                <input
-                  className="input"
-                  placeholder="Nouvel email (ex: diadamflow@gmail.com)"
-                  value={fixNew}
-                  onChange={(e) => setFixNew(e.target.value)}
-                />
-                <button
-                  onClick={() =>
-                    apiAction("PATCH", `/admin/fix-email`, {
-                      old_email: fixOld,
-                      new_email: fixNew,
-                    })
-                  }
-                  disabled={!fixOld || !fixNew || loading}
-                  className="btn-primary w-full justify-center"
-                >
-                  Corriger l&apos;email
-                </button>
-              </div>
-            </div>
-
-            {/* Changer plan */}
-            <div className="card">
-              <h3 className="font-semibold text-[#1A3D22] mb-4">Changer le plan</h3>
-              <div className="space-y-3">
-                <input
-                  className="input"
-                  placeholder="ID utilisateur"
-                  value={planUserId}
-                  onChange={(e) => setPlanUserId(e.target.value)}
-                />
-                <select
-                  className="input"
-                  value={planValue}
-                  onChange={(e) => setPlanValue(e.target.value)}
-                >
-                  <option value="discovery">Discovery (gratuit)</option>
-                  <option value="essential">Essential</option>
-                  <option value="pro">Pro</option>
-                  <option value="enterprise">Enterprise</option>
-                </select>
-                <button
-                  onClick={() =>
-                    apiAction("POST", `/admin/set-plan/${planUserId}`, { plan: planValue })
-                  }
-                  disabled={!planUserId || loading}
-                  className="btn-primary w-full justify-center"
-                >
-                  Appliquer le plan
-                </button>
-              </div>
-            </div>
-
             {/* Changer plan par email */}
             <div className="card md:col-span-2">
               <h3 className="font-semibold text-[#1A3D22] mb-1">Changer plan par email</h3>
@@ -269,6 +169,106 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
               </div>
             </div>
 
+            {/* Reassigner une analyse */}
+            <div className="card">
+              <h3 className="font-semibold text-[#1A3D22] mb-4">Reassigner une analyse</h3>
+              <p className="text-xs text-[#6B7280] mb-3">
+                Utile si une analyse appartient a l&apos;ancien compte Streamlit au lieu du compte Clerk.
+              </p>
+              <div className="space-y-3">
+                <input
+                  className="input"
+                  placeholder="ID de l'analyse (ex: 2)"
+                  value={reassignId}
+                  onChange={(e) => setReassignId(e.target.value)}
+                />
+                <input
+                  className="input"
+                  placeholder="Email du compte cible"
+                  value={reassignEmail}
+                  onChange={(e) => setReassignEmail(e.target.value)}
+                />
+                <button
+                  onClick={() =>
+                    apiAction("POST", `/admin/reassign-analysis/${reassignId}`, {
+                      target_email: reassignEmail,
+                    })
+                  }
+                  disabled={!reassignId || !reassignEmail || loading}
+                  className="btn-primary w-full justify-center"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Reassigner
+                </button>
+              </div>
+            </div>
+
+            {/* Corriger un email */}
+            <div className="card">
+              <h3 className="font-semibold text-[#1A3D22] mb-4">Corriger un email</h3>
+              <p className="text-xs text-[#6B7280] mb-3">
+                Corrige les emails de type <code className="text-xs bg-gray-100 px-1 rounded">clerk_id@clerk.local</code>.
+              </p>
+              <div className="space-y-3">
+                <input
+                  className="input"
+                  placeholder="Ancien email (ex: xyz@clerk.local)"
+                  value={fixOld}
+                  onChange={(e) => setFixOld(e.target.value)}
+                />
+                <input
+                  className="input"
+                  placeholder="Nouvel email (ex: diadamflow@gmail.com)"
+                  value={fixNew}
+                  onChange={(e) => setFixNew(e.target.value)}
+                />
+                <button
+                  onClick={() =>
+                    apiAction("PATCH", `/admin/fix-email`, {
+                      old_email: fixOld,
+                      new_email: fixNew,
+                    })
+                  }
+                  disabled={!fixOld || !fixNew || loading}
+                  className="btn-primary w-full justify-center"
+                >
+                  Corriger l&apos;email
+                </button>
+              </div>
+            </div>
+
+            {/* Changer plan par ID */}
+            <div className="card">
+              <h3 className="font-semibold text-[#1A3D22] mb-4">Changer le plan (par ID)</h3>
+              <div className="space-y-3">
+                <input
+                  className="input"
+                  placeholder="ID utilisateur"
+                  value={planUserId}
+                  onChange={(e) => setPlanUserId(e.target.value)}
+                />
+                <select
+                  className="input"
+                  value={planValue}
+                  onChange={(e) => setPlanValue(e.target.value)}
+                >
+                  <option value="discovery">Discovery (gratuit)</option>
+                  <option value="essential">Essential</option>
+                  <option value="pro">Pro</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+                <button
+                  onClick={() =>
+                    apiAction("POST", `/admin/set-plan/${planUserId}`, { plan: planValue })
+                  }
+                  disabled={!planUserId || loading}
+                  className="btn-primary w-full justify-center"
+                >
+                  Appliquer le plan
+                </button>
+              </div>
+            </div>
+
             {/* Reset quota */}
             <div className="card">
               <h3 className="font-semibold text-[#1A3D22] mb-4">Remettre quota a zero</h3>
@@ -292,7 +292,7 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
             </div>
           </div>
 
-          {/* Message résultat */}
+          {/* Message resultat */}
           {msg && (
             <div
               className={`rounded-lg px-4 py-3 text-sm flex items-start gap-2 ${
@@ -318,7 +318,7 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E5E0D8]">
-                {["ID", "Email", "Nom", "Plan", "Analyses", "Clerk ID", "Créé le"].map((h) => (
+                {["ID", "Email", "Nom", "Plan", "Analyses", "Clerk ID", "Cree le"].map((h) => (
                   <th key={h} className="text-left py-2 px-3 text-xs text-[#6B7280] font-semibold uppercase tracking-wide">
                     {h}
                   </th>
@@ -347,4 +347,56 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
               ))}
             </tbody>
           </table>
-          <p className="text-xs text-[#6B7280] mt-3">{users.length} utilisateurs
+          <p className="text-xs text-[#6B7280] mt-3">{users.length} utilisateurs affiches</p>
+        </div>
+      )}
+
+      {/* Analyses */}
+      {tab === "analyses" && (
+        <div className="card overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#E5E0D8]">
+                {["ID", "Entreprise", "Utilisateur", "Annee", "Score", "Statut", "Date"].map((h) => (
+                  <th key={h} className="text-left py-2 px-3 text-xs text-[#6B7280] font-semibold uppercase tracking-wide">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {analyses.map((a) => (
+                <tr key={a.id} className="border-b border-[#F3F4F6] hover:bg-[#F7F2E8] transition-colors">
+                  <td className="py-2.5 px-3 font-mono text-xs text-[#6B7280]">{a.id}</td>
+                  <td className="py-2.5 px-3 font-medium text-[#1C1C1C]">{a.company_name}</td>
+                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">{a.user_email}</td>
+                  <td className="py-2.5 px-3 text-center">{a.report_year ?? "-"}</td>
+                  <td className="py-2.5 px-3 text-center font-semibold">
+                    {a.score_global != null ? `${Math.round(a.score_global)}/100` : "-"}
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        a.status === "success"
+                          ? "bg-[#D4F0D8] text-[#1A3D22]"
+                          : a.status === "failed"
+                          ? "bg-[#FEE2E2] text-[#B53030]"
+                          : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      {a.status}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">
+                    {new Date(a.created_at).toLocaleDateString("fr-FR")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="text-xs text-[#6B7280] mt-3">{analyses.length} analyses affichees</p>
+        </div>
+      )}
+    </div>
+  );
+}
