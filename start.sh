@@ -62,15 +62,19 @@ if [ "${ENABLE_CELERY}" = "true" ]; then
     # Mode Next.js + Celery : le frontend tourne sur Vercel
     # Le worker Celery traite les analyses GPT-4o en arriere-plan
     echo "  -> Mode Celery active"
-    PYTHONPATH=/app python -m celery \
-        -A backend.celery_app \
-        worker \
-        --loglevel="${LOG_LEVEL:-info}" \
-        --concurrency="${CELERY_CONCURRENCY:-2}" \
-        --queues=celery \
-        -n "worker@%h" &
-    WORKER_PID=$!
-    echo "  -> Celery worker demarre (pid=${WORKER_PID})"
+    if python -c "import celery" 2>/dev/null; then
+        PYTHONPATH=/app python -m celery \
+            -A backend.celery_app \
+            worker \
+            --loglevel="${LOG_LEVEL:-info}" \
+            --concurrency="${CELERY_CONCURRENCY:-2}" \
+            --queues=celery \
+            -n "worker@%h" &
+        WORKER_PID=$!
+        echo "  -> Celery worker demarre (pid=${WORKER_PID})"
+    else
+        echo "  -> Celery non installe - analyses via BackgroundTasks (OK pour Railway)"
+    fi
 
     # nginx route tout vers FastAPI (Next.js gere le frontend)
     cat > /etc/nginx/nginx.conf << NGINX_EOF
