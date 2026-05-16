@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
-from backend.models import User
+from backend.models import Analysis, Company, User
 from backend.schemas import (
     UserRegisterRequest,
     UserLoginRequest,
@@ -142,4 +142,59 @@ def login(body: UserLoginRequest, db: Session = Depends(get_db)):
 # GET /auth/me
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
+    return UserResponse.model_validate(current_user)
+
+
+# PATCH /auth/sync-email
+# Le frontend Next.js appelle cet endpoint après connexion pour s'assurer
+# que l'email stocké dans la DB correspond à l'email Clerk réel.
+# Utile quand le token Clerk ne contient pas le champ "email" dans le payload.
+@router.patch("/sync-email")
+def sync_email(
+    email: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Met à jour l'email de l'utilisateur si c'est un email @clerk.local (généré par défaut).
+    Fusionne aussi avec un compte existant ayant cet email si nécessaire.
+    """
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="Email invalide.")
+
+    email = email.strip().lower()
+
+    # Si l'email est déjà correct, rien à faire
+    if current_user.email.lower() == email:
+        return UserResponse.model_validate(current_user)
+
+    # Chercher si un compte avec ce vrai email existe déjà (compte Streamlit historique)
+    existing = db.query(User).filter(User.email == email, User.id != current_user.id).first()
+    if existing and existing.clerk_id is None:
+        # Fusionner : transférer les analyses du compte Streamlit vers le compte Clerk
+        db.query(Analysis).filter(Analysis.user_id == existing.id).update(
+            {"user_id": current_user.id}, synchronize_session=False
+        )
+        # Transférer les companies
+        db.query(Company).filter(Company.user_id == existing.id).update(
+            {"user_id": current_user.id}, synchronize_session=False
+        )
+        db.commit()
+        # Supprimer l'ancien compte doublon (plan, quota -> copier si plus avantageux)
+        if existing.plan not in ("discovery", "free"):
+            current_user.plan = existing.plan
+        current_user.analyses_this_month = max(
+            current_user.analyses_this_month, existing.analyses_this_month
+        )
+        db.delete(existing)
+        logger.info(
+            "sync-email: fusion compte Streamlit user=%d (email=%s) -> clerk user=%d",
+            existing.id, email, current_user.id,
+        )
+
+    # Mettre à jour l'email du compte courant
+    current_user.email = email
+    db.commit()
+    db.refresh(current_user)
+    logger.info("sync-email: user=%d email mis à jour -> %s", current_user.id, email)
     return UserResponse.model_validate(current_user)

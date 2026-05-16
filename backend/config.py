@@ -157,6 +157,15 @@ class Settings(BaseSettings):
     # redis_url seul ne suffit pas : ce flag doit etre true pour dispatcher via Celery.
     enable_celery: bool = False
 
+    # --- Admin ---
+    # Emails autorisés à accéder aux endpoints admin via leur token Clerk/JWT.
+    # Séparer plusieurs emails par des virgules.
+    admin_emails: str = "diadamflow@gmail.com"
+
+    @property
+    def admin_email_list(self) -> list[str]:
+        return [e.strip().lower() for e in self.admin_emails.split(",") if e.strip()]
+
     # --- Environment ---
     environment: str = "development"
 
