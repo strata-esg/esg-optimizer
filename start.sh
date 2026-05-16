@@ -62,7 +62,7 @@ if [ "${ENABLE_CELERY}" = "true" ]; then
     # Mode Next.js + Celery : le frontend tourne sur Vercel
     # Le worker Celery traite les analyses GPT-4o en arriere-plan
     echo "  -> Mode Celery active"
-    PYTHONPATH=/app celery \
+    PYTHONPATH=/app python -m celery \
         -A backend.celery_app \
         worker \
         --loglevel="${LOG_LEVEL:-info}" \
