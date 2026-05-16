@@ -55,7 +55,10 @@ def _check_quota(user: User) -> None:
     - discovery / free : 1 analyse au total
     - essential : paiement à l'unité (vérifié via Stripe, pas de quota ici pour l'instant)
     - pro / enterprise : illimité
+    Les admins (emails dans ADMIN_EMAILS) ne sont jamais bloqués par le quota.
     """
+    if user.email.lower() in settings.admin_email_list:
+        return
     if user.plan in ("discovery", "free"):
         if user.analyses_this_month >= settings.discovery_total_limit:
             ph.capture(user.id, "quota_hit", {

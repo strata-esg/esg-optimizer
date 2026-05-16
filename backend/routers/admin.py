@@ -229,6 +229,45 @@ def admin_reset_quota(
     return {"status": "ok", "user_id": user_id, "before": old, "after": 0}
 
 
+@router.post("/set-plan-by-email")
+def admin_set_plan_by_email(
+    email: str = Query(..., description="Email de l'utilisateur"),
+    plan: str = Query(..., description="Plan: discovery | essential | pro | enterprise"),
+    reset_quota: bool = Query(False, description="Remet aussi analyses_this_month a 0"),
+    current_user: User = Depends(_require_admin_user),
+    db: Session = Depends(get_db),
+):
+    """Change le plan d'un utilisateur identifie par son email (+ reset quota optionnel)."""
+    valid_plans = {"discovery", "free", "essential", "pro", "enterprise"}
+    if plan not in valid_plans:
+        raise HTTPException(status_code=400, detail=f"Plan invalide. Valeurs: {valid_plans}")
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"Utilisateur '{email}' introuvable.")
+
+    old_plan = user.plan
+    old_quota = user.analyses_this_month
+    user.plan = plan
+    if reset_quota:
+        user.analyses_this_month = 0
+    db.commit()
+    logger.info(
+        "Admin: plan user=%d (%s) change de '%s' a '%s'%s",
+        user.id, email, old_plan, plan,
+        f" + quota reset ({old_quota}->0)" if reset_quota else "",
+    )
+    return {
+        "status": "ok",
+        "user_id": user.id,
+        "email": email,
+        "old_plan": old_plan,
+        "new_plan": plan,
+        "quota_reset": reset_quota,
+        "analyses_this_month": user.analyses_this_month,
+    }
+
+
 @router.patch("/fix-email")
 def admin_fix_email(
     old_email: str = Query(...),

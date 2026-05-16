@@ -33,9 +33,14 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
   const [fixOld, setFixOld] = useState("");
   const [fixNew, setFixNew] = useState("");
 
-  // Set plan
+  // Set plan by ID
   const [planUserId, setPlanUserId] = useState("");
   const [planValue, setPlanValue] = useState("pro");
+
+  // Set plan by email
+  const [planEmail, setPlanEmail] = useState("");
+  const [planEmailValue, setPlanEmailValue] = useState("pro");
+  const [planEmailResetQuota, setPlanEmailResetQuota] = useState(true);
 
   async function apiAction(method: string, path: string, params?: Record<string, string>) {
     setLoading(true);
@@ -218,6 +223,52 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
               </div>
             </div>
 
+            {/* Changer plan par email */}
+            <div className="card md:col-span-2">
+              <h3 className="font-semibold text-[#1A3D22] mb-1">Changer plan par email</h3>
+              <p className="text-xs text-[#6B7280] mb-3">Plus simple : pas besoin de l&apos;ID utilisateur.</p>
+              <div className="flex flex-wrap gap-3 items-end">
+                <input
+                  className="input flex-1 min-w-[200px]"
+                  placeholder="Email (ex: diadamflow@gmail.com)"
+                  value={planEmail}
+                  onChange={(e) => setPlanEmail(e.target.value)}
+                />
+                <select
+                  className="input w-40"
+                  value={planEmailValue}
+                  onChange={(e) => setPlanEmailValue(e.target.value)}
+                >
+                  <option value="discovery">Discovery</option>
+                  <option value="essential">Essential</option>
+                  <option value="pro">Pro</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+                <label className="flex items-center gap-1.5 text-sm text-[#1A3D22] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={planEmailResetQuota}
+                    onChange={(e) => setPlanEmailResetQuota(e.target.checked)}
+                    className="rounded"
+                  />
+                  Reset quota
+                </label>
+                <button
+                  onClick={() =>
+                    apiAction("POST", `/admin/set-plan-by-email`, {
+                      email: planEmail,
+                      plan: planEmailValue,
+                      reset_quota: planEmailResetQuota ? "true" : "false",
+                    })
+                  }
+                  disabled={!planEmail || loading}
+                  className="btn-primary justify-center"
+                >
+                  Appliquer
+                </button>
+              </div>
+            </div>
+
             {/* Reset quota */}
             <div className="card">
               <h3 className="font-semibold text-[#1A3D22] mb-4">Remettre quota a zero</h3>
@@ -296,56 +347,4 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
               ))}
             </tbody>
           </table>
-          <p className="text-xs text-[#6B7280] mt-3">{users.length} utilisateurs affichés</p>
-        </div>
-      )}
-
-      {/* Analyses */}
-      {tab === "analyses" && (
-        <div className="card overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#E5E0D8]">
-                {["ID", "Entreprise", "Utilisateur", "Année", "Score", "Statut", "Date"].map((h) => (
-                  <th key={h} className="text-left py-2 px-3 text-xs text-[#6B7280] font-semibold uppercase tracking-wide">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {analyses.map((a) => (
-                <tr key={a.id} className="border-b border-[#F3F4F6] hover:bg-[#F7F2E8] transition-colors">
-                  <td className="py-2.5 px-3 font-mono text-xs text-[#6B7280]">{a.id}</td>
-                  <td className="py-2.5 px-3 font-medium text-[#1C1C1C]">{a.company_name}</td>
-                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">{a.user_email}</td>
-                  <td className="py-2.5 px-3 text-center">{a.report_year ?? "-"}</td>
-                  <td className="py-2.5 px-3 text-center font-semibold">
-                    {a.score_global != null ? `${Math.round(a.score_global)}/100` : "-"}
-                  </td>
-                  <td className="py-2.5 px-3">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        a.status === "success"
-                          ? "bg-[#D4F0D8] text-[#1A3D22]"
-                          : a.status === "failed"
-                          ? "bg-[#FEE2E2] text-[#B53030]"
-                          : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
-                      {a.status}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 text-xs text-[#6B7280]">
-                    {new Date(a.created_at).toLocaleDateString("fr-FR")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="text-xs text-[#6B7280] mt-3">{analyses.length} analyses affichées</p>
-        </div>
-      )}
-    </div>
-  );
-}
+          <p className="text-xs text-[#6B7280] mt-3">{users.length} utilisateurs
