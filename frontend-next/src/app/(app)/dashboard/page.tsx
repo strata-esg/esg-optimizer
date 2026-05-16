@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { BarChart2, TrendingUp, FileText, ArrowUpRight, Upload } from "lucide-react";
-import { apiClient } from "@/lib/api";
+import { apiClient, API_BASE } from "@/lib/api";
 
 export default async function DashboardPage() {
   const { getToken } = await auth();
@@ -19,6 +19,18 @@ export default async function DashboardPage() {
 
   try {
     if (token) {
+      const clerkEmail = user?.emailAddresses?.[0]?.emailAddress;
+      if (clerkEmail) {
+        try {
+          await fetch(
+            `${API_BASE}/auth/sync-email?email=${encodeURIComponent(clerkEmail)}`,
+            { method: "PATCH", headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
+          );
+        } catch {
+          // Non bloquant
+        }
+      }
+
       const [statsRes, histRes] = await Promise.all([
         apiClient(token).get<typeof stats>("/history/stats"),
         apiClient(token).get<{ analyses?: typeof history }>("/history?per_page=5"),
@@ -27,7 +39,7 @@ export default async function DashboardPage() {
       history = histRes.analyses ?? [];
     }
   } catch {
-    // En cas d'indisponibilité de l'API, on affiche un dashboard vide.
+    // Dashboard vide si API indisponible
   }
 
   const firstName = user?.firstName ?? "vous";
@@ -41,7 +53,7 @@ export default async function DashboardPage() {
         >
           Bonjour, {firstName}
         </h1>
-        <p className="text-[#6B7280]">Vue d'ensemble de vos analyses ESG</p>
+        <p className="text-[#6B7280]">Vue d&apos;ensemble de vos analyses ESG</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
@@ -117,7 +129,7 @@ export default async function DashboardPage() {
         {history.length === 0 ? (
           <div className="text-center py-12 text-[#6B7280]">
             <BarChart2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">Aucune analyse pour l'instant</p>
+            <p className="font-medium">Aucune analyse pour l&apos;instant</p>
             <p className="text-sm mt-1">Uploadez votre premier rapport pour commencer</p>
             <Link href="/upload" className="btn-primary mt-4 inline-flex">
               Premier upload

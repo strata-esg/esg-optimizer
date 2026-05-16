@@ -14,16 +14,17 @@ import {
   Home,
   Menu,
   X,
+  Shield,
 } from "lucide-react";
 import { LogoSidebar } from "@/components/Logo";
 
 const navItems = [
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/upload", label: "Analyser un rapport", icon: Upload },
-  { href: "/resultats", label: "Résultats", icon: BarChart2 },
-  { href: "/parametres", label: "Paramètres", icon: Settings },
+  { href: "/resultats", label: "Resultats", icon: BarChart2 },
+  { href: "/parametres", label: "Parametres", icon: Settings },
   { href: "/plans", label: "Tarifs", icon: CreditCard },
-  { href: "/info", label: "Mentions & Méthodo", icon: FileText },
+  { href: "/info", label: "Mentions & Methodo", icon: FileText },
 ];
 
 export default function Sidebar() {
@@ -32,7 +33,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Bouton menu (mobile uniquement) */}
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -42,7 +42,6 @@ export default function Sidebar() {
         <Menu className="w-5 h-5" />
       </button>
 
-      {/* Voile sombre derrière la sidebar (mobile) */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -57,7 +56,6 @@ export default function Sidebar() {
         } md:translate-x-0`}
         style={{ background: "#1A3D22" }}
       >
-        {/* Logo + fermeture mobile */}
         <div className="border-b border-white/10 flex items-center justify-between pr-2">
           <Link
             href="/"
@@ -76,7 +74,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map(({ href, label, icon: Icon }) => {
             const isActive = pathname === href || pathname.startsWith(href + "/");
@@ -98,8 +95,16 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Pied de sidebar : accueil public + compte */}
-        <div className="px-3 pb-4 pt-2 border-t border-white/10 space-y-2">
+        <div className="px-3 pb-4 pt-2 border-t border-white/10 space-y-1">
+          <Link
+            href="/admin"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-4 py-2 rounded-lg text-[#7FC686]/80 hover:text-[#7FC686] hover:bg-white/10 transition-all text-sm"
+            title="Administration"
+          >
+            <Shield className="w-4 h-4" />
+            Admin
+          </Link>
           <Link
             href="/"
             onClick={() => setOpen(false)}
@@ -108,12 +113,14 @@ export default function Sidebar() {
             <Home className="w-4 h-4" />
             Accueil public
           </Link>
-          <div className="flex items-center gap-3 px-4 py-2">
-            <UserButton
-              appearance={{ elements: { avatarBox: "w-8 h-8" } }}
-              afterSignOutUrl="/"
-            />
-            <span className="text-[#D4F0D8]/60 text-xs">Mon compte</span>
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg">
+            <div className="flex-shrink-0 flex items-center">
+              <UserButton
+                appearance={{ elements: { avatarBox: "w-7 h-7" } }}
+                afterSignOutUrl="/"
+              />
+            </div>
+            <span className="text-[#D4F0D8]/70 text-sm font-medium leading-none">Mon compte</span>
           </div>
         </div>
       </aside>

@@ -137,7 +137,7 @@ export default async function ResultatsPage({ searchParams }: PageProps) {
     }
 
     return (
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         <h1
           className="text-4xl text-[#1A3D22] mb-2"
           style={{ fontFamily: "DM Serif Display, Georgia, serif" }}
@@ -206,7 +206,7 @@ export default async function ResultatsPage({ searchParams }: PageProps) {
 
   if (!analysis) {
     return (
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         <div className="card text-center py-16">
           <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-[#D97706]" />
           <p className="text-[#1C1C1C] font-medium">Analyse introuvable</p>
@@ -245,7 +245,7 @@ export default async function ResultatsPage({ searchParams }: PageProps) {
   // Analyse encore en traitement
   if (analysis.status === "pending" || analysis.status === "processing") {
     return (
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         {backLink}
         {header}
         <div className="card text-center py-16">
@@ -272,7 +272,7 @@ export default async function ResultatsPage({ searchParams }: PageProps) {
   // Analyse en échec
   if (analysis.status === "failed") {
     return (
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         {backLink}
         {header}
         <div className="card text-center py-16">
@@ -299,7 +299,7 @@ export default async function ResultatsPage({ searchParams }: PageProps) {
     .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
 
   return (
-    <div className="w-full max-w-4xl">
+    <div className="w-full">
       {backLink}
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
