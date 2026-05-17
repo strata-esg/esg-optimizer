@@ -53,15 +53,20 @@ def _get_or_create_clerk_user(db: Session, payload: dict) -> User:
     email = payload.get("email") or payload.get("email_address") or f"{clerk_id}@clerk.local"
     full_name = payload.get("name") or payload.get("full_name")
 
-    # Si un compte historique existe déjà avec cet e-mail, on le relie à Clerk
-    # plutôt que de créer un doublon.
+    # Si un compte existe déjà avec cet e-mail, on le retourne directement
+    # (qu'il ait déjà un clerk_id ou non) pour éviter les doublons.
     existing = db.query(User).filter(User.email == email).first()
-    if existing is not None and existing.clerk_id is None:
-        existing.clerk_id = clerk_id
+    if existing is not None:
+        if existing.clerk_id is None:
+            existing.clerk_id = clerk_id
         if full_name and not existing.full_name:
             existing.full_name = full_name
-        db.commit()
-        db.refresh(existing)
+        try:
+            db.commit()
+            db.refresh(existing)
+        except Exception:
+            db.rollback()
+            db.refresh(existing)
         return existing
 
     user = User(
