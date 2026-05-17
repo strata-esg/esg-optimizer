@@ -16,6 +16,7 @@ export default async function DashboardPage() {
     score_global: number;
     created_at: string;
   }> = [];
+  let historyAll: typeof history = [];
 
   try {
     if (token) {
@@ -31,18 +32,34 @@ export default async function DashboardPage() {
         }
       }
 
-      const [statsRes, histRes] = await Promise.all([
+      const [statsRes, histRes, histAllRes] = await Promise.all([
         apiClient(token).get<typeof stats>("/history/stats"),
         apiClient(token).get<{ analyses?: typeof history }>("/history?per_page=5"),
+        apiClient(token).get<{ analyses?: typeof history }>("/history?per_page=100"),
       ]);
       stats = statsRes;
       history = histRes.analyses ?? [];
+      historyAll = histAllRes.analyses ?? [];
     }
   } catch {
     // Dashboard vide si API indisponible
   }
 
   const firstName = user?.firstName ?? "vous";
+
+  // Calcul "Ce mois"
+  const now = new Date();
+  const cesMois = historyAll.filter((a) => {
+    const d = new Date(a.created_at);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }).length;
+
+  // Calcul "Ameliorations" : delta entre les 2 dernieres analyses
+  let ameliorations: string = "N/A";
+  if (historyAll.length >= 2) {
+    const delta = historyAll[0].score_global - historyAll[1].score_global;
+    ameliorations = delta >= 0 ? `+${delta.toFixed(0)}` : `${delta.toFixed(0)}`;
+  }
 
   return (
     <div className="w-full">
@@ -65,8 +82,8 @@ export default async function DashboardPage() {
             icon: BarChart2,
             suffix: stats.avg_score_global != null ? "/100" : "",
           },
-          { label: "Ce mois", value: "N/A", icon: TrendingUp, suffix: "" },
-          { label: "Ameliorations", value: "N/A", icon: ArrowUpRight, suffix: "" },
+          { label: "Ce mois", value: cesMois > 0 ? cesMois : "N/A", icon: TrendingUp, suffix: cesMois > 0 ? " analyse(s)" : "" },
+          { label: "Ameliorations", value: ameliorations, icon: ArrowUpRight, suffix: "" },
         ].map(({ label, value, icon: Icon, suffix }) => (
           <div key={label} className="card">
             <div className="flex items-center justify-between mb-3">
