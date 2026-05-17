@@ -23,7 +23,7 @@ const PLAN_COLORS: Record<string, string> = {
 export default function AdminPanel({ dash, users, analyses }: Props) {
   const { getToken } = useAuth();
   const [tab, setTab] = useState<"dash" | "users" | "analyses">("dash");
-  const [msg, setMsg] = useState("");
+  const [msg, setMsg] = useState<{ type: "ok" | "error"; title: string; detail?: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Reassign analysis
@@ -45,7 +45,7 @@ export default function AdminPanel({ dash, users, analyses }: Props) {
 
   async function apiAction(method: string, path: string, params?: Record<string, string>) {
     setLoading(true);
-    setMsg("");
+    setMsg(null);
     try {
       const token = await getToken();
       const url = new URL(`${API_BASE}${path}`);
@@ -55,10 +55,17 @@ export default function AdminPanel({ dash, users, analyses }: Props) {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail ?? JSON.stringify(data));
-      setMsg("OK : " + JSON.stringify(data));
+      if (!res.ok) {
+        const errMsg = data.detail ?? data.error ?? "Une erreur est survenue.";
+        const detail = data.code ? `Code ${data.code} · ${path}` : undefined;
+        setMsg({ type: "error", title: errMsg, detail });
+        setLoading(false);
+        return;
+      }
+      const successMsg = data.message ?? data.detail ?? "Action effectuee avec succes.";
+      setMsg({ type: "ok", title: successMsg });
     } catch (e) {
-      setMsg("Erreur : " + (e instanceof Error ? e.message : String(e)));
+      setMsg({ type: "error", title: e instanceof Error ? e.message : "Erreur inconnue." });
     }
     setLoading(false);
   }
@@ -297,18 +304,39 @@ export default function AdminPanel({ dash, users, analyses }: Props) {
           {/* Message resultat */}
           {msg && (
             <div
-              className={`rounded-lg px-4 py-3 text-sm flex items-start gap-2 ${
-                msg.startsWith("OK")
-                  ? "bg-[#D4F0D8] text-[#1A3D22]"
-                  : "bg-[#FEE2E2] text-[#B53030]"
+              className={`rounded-xl px-4 py-3.5 flex items-start gap-3 ${
+                msg.type === "ok"
+                  ? "bg-[#D4F0D8] border border-[#A8DFB0]"
+                  : "bg-[#FEF2F2] border border-[#FECACA]"
               }`}
             >
-              {msg.startsWith("OK") ? (
-                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              ) : (
-                <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              )}
-              <code className="text-xs break-all">{msg}</code>
+              <div className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                msg.type === "ok" ? "bg-[#1A3D22]" : "bg-[#B53030]"
+              }`}>
+                {msg.type === "ok" ? (
+                  <CheckCircle className="w-3 h-3 text-white" />
+                ) : (
+                  <AlertTriangle className="w-3 h-3 text-white" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-medium ${msg.type === "ok" ? "text-[#1A3D22]" : "text-[#991B1B]"}`}>
+                  {msg.title}
+                </p>
+                {msg.detail && (
+                  <p className={`text-xs mt-0.5 ${msg.type === "ok" ? "text-[#3A6B44]" : "text-[#B53030]"} opacity-70`}>
+                    {msg.detail}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setMsg(null)}
+                className={`text-xs opacity-50 hover:opacity-100 transition-opacity flex-shrink-0 ${
+                  msg.type === "ok" ? "text-[#1A3D22]" : "text-[#991B1B]"
+                }`}
+              >
+                x
+              </button>
             </div>
           )}
         </div>
