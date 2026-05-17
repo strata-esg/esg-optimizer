@@ -15,7 +15,10 @@ export function initPostHog() {
   if (typeof window === "undefined") return;
   if (posthog.__loaded) return; // déjà initialisé
 
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "", {
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  if (!key) return; // pas de clé = pas d'init, évite les 401/404 PostHog
+
+  posthog.init(key, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com",
     // On gère manuellement les pageviews (App Router = SPA partielle)
     capture_pageview: false,
