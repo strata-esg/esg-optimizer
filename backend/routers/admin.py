@@ -268,6 +268,27 @@ def admin_set_plan_by_email(
     }
 
 
+@router.post("/reset-all-analyses")
+def admin_reset_all_analyses(
+    current_user: User = Depends(_require_admin_user),
+    db: Session = Depends(get_db),
+):
+    """Supprime toutes les analyses et remet les quotas a zero (admin uniquement)."""
+    total_deleted = db.query(Analysis).delete()
+    db.query(Company).delete()
+    users = db.query(User).all()
+    for u in users:
+        u.analyses_this_month = 0
+        u.total_analyses = 0 if hasattr(u, "total_analyses") else u.analyses_this_month
+    db.commit()
+    logger.info("Admin: RESET TOTAL — %d analyses supprimees par %s", total_deleted, current_user.email)
+    return {
+        "status": "ok",
+        "analyses_deleted": total_deleted,
+        "message": f"{total_deleted} analyses supprimees, quotas remis a zero.",
+    }
+
+
 @router.patch("/fix-email")
 def admin_fix_email(
     old_email: str = Query(...),
