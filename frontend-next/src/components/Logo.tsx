@@ -113,9 +113,15 @@ export function LogoSidebar() {
             AI
           </span>
         </div>
-        <span className="text-[10px] text-[#7FC686] font-semibold tracking-widest uppercase mt-0.5">
-          Audit CSRD
-        </span>
+        <a
+          href="https://www.strata-esg.fr"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[9px] text-white/40 hover:text-white/70 font-medium tracking-widest uppercase mt-0.5 transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          A STRATA product
+        </a>
       </div>
     </div>
   );

@@ -8,9 +8,19 @@ export function LandingNavbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#F7F2E8]/95 backdrop-blur-sm border-b border-[#E5E0D8]">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" aria-label="ESG Optimizer AI - Accueil">
-          <Logo variant="light" size="md" showTagline={false} />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/" aria-label="ESG Optimizer AI - Accueil">
+            <Logo variant="light" size="md" showTagline={false} />
+          </Link>
+          <a
+            href="https://www.strata-esg.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center text-[10px] font-semibold tracking-widest uppercase text-[#1A3D22]/50 hover:text-[#1A3D22] border border-[#1A3D22]/20 hover:border-[#1A3D22]/50 rounded-full px-2.5 py-1 transition-all duration-150"
+          >
+            A STRATA product
+          </a>
+        </div>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#6B7280]">
           <a href="#comment" className="hover:text-[#1A3D22] transition-colors">Comment ca marche</a>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle, Leaf, ArrowRight, Zap, BarChart2, Upload, FileText, Award } from "lucide-react";
+import { CheckCircle, ArrowRight, Zap, BarChart2, Upload, FileText, Award, ExternalLink } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { LandingNavbar } from "@/components/LandingNavbar";
 
@@ -188,6 +188,15 @@ export default function LandingPage() {
       {/* -- Hero --------------------------------------- */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
+          <a
+            href="https://www.strata-esg.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-[#1A3D22]/50 hover:text-[#1A3D22] mb-4 transition-colors group"
+          >
+            A STRATA product
+            <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+          </a>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4F0D8] text-[#1A3D22] text-sm font-medium mb-6">
             <Zap className="w-3.5 h-3.5" />
             CSRD 2026 - Deadline imminente pour 15 000+ entreprises françaises
@@ -400,29 +409,57 @@ export default function LandingPage() {
 
       {/* -- Footer ------------------------------------- */}
       <footer className="py-12 px-6 border-t border-[#E5E0D8] bg-white">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Logo variant="light" size="sm" showTagline={false} />
-            <span className="text-xs text-[#6B7280]">· esg-optimizer.fr</span>
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* STRATA Ecosystem */}
+          <div className="rounded-xl border border-[#E5E0D8] bg-[#F7F2E8] px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <a
+                href="https://www.strata-esg.fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-[#1A3D22] hover:text-[#2A5C34] transition-colors mb-1"
+              >
+                STRATA <ExternalLink className="w-3 h-3" />
+              </a>
+              <p className="text-xs text-[#6B7280] leading-relaxed max-w-md">
+                The Operating System for Sustainable Business. ESG Optimizer est le produit flagship de STRATA, une plateforme ESG intelligence pour les PME européennes.
+              </p>
+            </div>
+            <div className="flex flex-col gap-1.5 text-xs text-[#6B7280] shrink-0">
+              <span className="font-semibold text-[#1A3D22] text-[10px] tracking-widest uppercase mb-0.5">Ecosystem STRATA</span>
+              <a href="https://www.strata-esg.fr" target="_blank" rel="noopener noreferrer" className="hover:text-[#1A3D22] transition-colors flex items-center gap-1">
+                ESG Optimizer <span className="text-[#7FC686] font-medium">Disponible</span>
+              </a>
+              <span className="text-[#6B7280]/60">STRATA Scope — Scope 3 Tracker <span className="italic">(Q3 2026)</span></span>
+              <span className="text-[#6B7280]/60">STRATA Watch — Regulatory Watch <span className="italic">(Q3 2026)</span></span>
+            </div>
           </div>
-          <div className="flex gap-6 text-sm text-[#6B7280]">
-            <Link href="/mentions" className="hover:text-[#1A3D22]">Mentions légales & Méthodo</Link>
-            <a href="#tarifs" className="hover:text-[#1A3D22]">Tarifs</a>
-            <a
-              href="https://www.linkedin.com/in/adama-diallo-rse"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#1A3D22]"
-            >
-              LinkedIn
-            </a>
-            <a href="mailto:contact@esg-optimizer.fr" className="hover:text-[#1A3D22]">
-              contact@esg-optimizer.fr
-            </a>
+
+          {/* Bottom bar */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Logo variant="light" size="sm" showTagline={false} />
+              <span className="text-xs text-[#6B7280]">· esg-optimizer.fr</span>
+            </div>
+            <div className="flex gap-6 text-sm text-[#6B7280]">
+              <Link href="/mentions" className="hover:text-[#1A3D22]">Mentions légales & Méthodo</Link>
+              <a href="#tarifs" className="hover:text-[#1A3D22]">Tarifs</a>
+              <a
+                href="https://www.linkedin.com/in/adama-diallo-rse"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#1A3D22]"
+              >
+                LinkedIn
+              </a>
+              <a href="mailto:contact@strata-esg.fr" className="hover:text-[#1A3D22]">
+                contact@strata-esg.fr
+              </a>
+            </div>
+            <p className="text-xs text-[#6B7280]">
+              &copy; 2026 STRATA - Tous droits réservés.
+            </p>
           </div>
-          <p className="text-xs text-[#6B7280]">
-            &copy; 2025 ESG Optimizer - Tous droits réservés.
-          </p>
         </div>
       </footer>
     </div>
