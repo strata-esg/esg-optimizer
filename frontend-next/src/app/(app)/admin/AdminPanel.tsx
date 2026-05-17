@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { API_BASE } from "@/lib/api";
 import { Users, BarChart2, CheckCircle, Clock, RefreshCw, AlertTriangle, Shield } from "lucide-react";
 import type { AdminUser, AdminAnalysis } from "./page";
 
 interface Props {
-  token: string;
   dash: { total_users: number; total_analyses: number; success_analyses: number; pending_analyses: number };
   users: AdminUser[];
   analyses: AdminAnalysis[];
@@ -20,7 +20,8 @@ const PLAN_COLORS: Record<string, string> = {
   enterprise: "bg-purple-100 text-purple-700",
 };
 
-export default function AdminPanel({ token, dash, users, analyses }: Props) {
+export default function AdminPanel({ dash, users, analyses }: Props) {
+  const { getToken } = useAuth();
   const [tab, setTab] = useState<"dash" | "users" | "analyses">("dash");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,7 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
     setLoading(true);
     setMsg("");
     try {
+      const token = await getToken();
       const url = new URL(`${API_BASE}${path}`);
       if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
       const res = await fetch(url.toString(), {
@@ -243,7 +245,7 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
               <div className="space-y-3">
                 <input
                   className="input"
-                  placeholder="ID utilisateur"
+                  placeholder="ID utilisateur (nombre)"
                   value={planUserId}
                   onChange={(e) => setPlanUserId(e.target.value)}
                 />
@@ -275,7 +277,7 @@ export default function AdminPanel({ token, dash, users, analyses }: Props) {
               <div className="space-y-3">
                 <input
                   className="input"
-                  placeholder="ID utilisateur"
+                  placeholder="ID utilisateur (nombre)"
                   id="quota-user-id"
                 />
                 <button

@@ -33,7 +33,6 @@ export default async function AdminPage() {
 
   return (
     <AdminPanel
-      token={token ?? ""}
       dash={dashData}
       users={usersData.users}
       analyses={analysesData.analyses}
