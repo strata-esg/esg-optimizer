@@ -244,6 +244,7 @@ def _serialize_analysis(analysis: Analysis, company_name: str | None = None) -> 
         "delta_gov": analysis.delta_gov,
         "delta_global": analysis.delta_global,
         "delta_narrative": analysis.delta_narrative,
+        "share_token": analysis.share_token,
         "processing_time_s": analysis.processing_time_s,
         "status": analysis.status,
         "error_message": analysis.error_message,

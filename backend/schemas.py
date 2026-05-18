@@ -141,6 +141,9 @@ class AnalysisResponse(BaseModel):
     delta_global: Optional[float] = None
     delta_narrative: Optional[str] = None
 
+    # Partage
+    share_token: Optional[str] = None
+
     # Méta
     processing_time_s: Optional[float]
     status: str

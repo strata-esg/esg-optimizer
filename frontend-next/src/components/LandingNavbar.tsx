@@ -23,6 +23,7 @@ export function LandingNavbar() {
         </div>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#6B7280]">
+          <Link href="/quick-check" className="hover:text-[#1A3D22] transition-colors font-semibold text-[#1A3D22]">Quick Check</Link>
           <a href="#comment" className="hover:text-[#1A3D22] transition-colors">Comment ca marche</a>
           <a href="#tarifs" className="hover:text-[#1A3D22] transition-colors">Tarifs</a>
           <Link href="/mentions" className="hover:text-[#1A3D22] transition-colors">Methodo</Link>

@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -20,7 +20,6 @@ from backend.services.auth_service import (
     decode_access_token,
 )
 from backend.services.clerk_auth import verify_clerk_token
-from backend.services.email_service import send_welcome_email
 from backend.services.analytics_service import ph
 
 logger = logging.getLogger(__name__)
@@ -108,7 +107,6 @@ def get_current_user(
 @router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
 def register(
     body: UserRegisterRequest,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     if db.query(User).filter(User.email == body.email).first():
@@ -123,8 +121,6 @@ def register(
     db.refresh(user)
     token = create_access_token(user.id, user.email)
 
-    # Email de bienvenue (en background pour ne pas bloquer la réponse)
-    background_tasks.add_task(send_welcome_email, user.email, body.company_name)
     logger.info("Inscription réussie - user=%d, email=%s", user.id, user.email)
 
     # PostHog : identifier le nouvel utilisateur

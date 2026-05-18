@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Leaf } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "Mentions légales & Méthodologie",
@@ -27,13 +27,8 @@ export default function MentionsPage() {
     <div className="min-h-screen bg-[#F7F2E8]">
       <header className="border-b border-[#E5E0D8] bg-[#F7F2E8]">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#1A3D22] rounded-lg flex items-center justify-center">
-              <Leaf className="w-4 h-4 text-[#D4F0D8]" />
-            </div>
-            <span className="text-[#1A3D22] text-xl" style={{ fontFamily: "DM Serif Display, Georgia, serif" }}>
-              ESG Optimizer
-            </span>
+          <Link href="/" aria-label="ESG Optimizer - Accueil">
+            <Logo variant="light" size="md" showTagline={false} />
           </Link>
           <Link href="/" className="text-sm text-[#6B7280] hover:text-[#1A3D22]">← Accueil</Link>
         </div>

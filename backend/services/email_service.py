@@ -155,6 +155,35 @@ def send_welcome_email(email: str, company_name: Optional[str] = None) -> bool:
 
 # EMAIL 2 : ANALYSE TERMINÉE
 
+def _csrd_stage_badge_html(csrd_ready: bool, coverage_pct: Optional[float] = None) -> str:
+    """Génère le badge CSRD avec 5 niveaux selon la couverture."""
+    pct = coverage_pct if coverage_pct is not None else (87.0 if csrd_ready else 28.0)
+    if pct >= 85:
+        return (
+            '<span style="background: #D4F0D8; color: #1A3D22; padding: 5px 14px; '
+            'border-radius: 8px; font-size: 13px; font-weight: 700;">CSRD Ready ✓</span>'
+        )
+    if pct >= 70:
+        return (
+            '<span style="background: #DCFCE7; color: #15803D; padding: 5px 14px; '
+            'border-radius: 8px; font-size: 13px; font-weight: 700;">Avancé ●</span>'
+        )
+    if pct >= 50:
+        return (
+            '<span style="background: #FEF3C7; color: #92400E; padding: 5px 14px; '
+            'border-radius: 8px; font-size: 13px; font-weight: 700;">En développement ▲</span>'
+        )
+    if pct >= 30:
+        return (
+            '<span style="background: #FED7AA; color: #9A3412; padding: 5px 14px; '
+            'border-radius: 8px; font-size: 13px; font-weight: 700;">Initié ▲</span>'
+        )
+    return (
+        '<span style="background: #FEE2E2; color: #991B1B; padding: 5px 14px; '
+        'border-radius: 8px; font-size: 13px; font-weight: 700;">Non conforme ✗</span>'
+    )
+
+
 def send_analysis_complete_email(
     email: str,
     analysis_id: int,
@@ -162,15 +191,10 @@ def send_analysis_complete_email(
     score_global: float,
     csrd_ready: bool,
     report_year: Optional[int] = None,
+    csrd_coverage_pct: Optional[float] = None,
 ) -> bool:
     """Envoie l'email de notification quand une analyse est terminée."""
-    csrd_badge = (
-        '<span style="background: #D4F0D8; color: #1A3D22; padding: 4px 12px; '
-        'border-radius: 8px; font-size: 13px; font-weight: 600;">CSRD Ready ✓</span>'
-        if csrd_ready else
-        '<span style="background: #FEE2E2; color: #DC2626; padding: 4px 12px; '
-        'border-radius: 8px; font-size: 13px; font-weight: 600;">Non conforme CSRD ✗</span>'
-    )
+    csrd_badge = _csrd_stage_badge_html(csrd_ready, csrd_coverage_pct)
 
     score_color = GREEN if score_global >= 60 else "#F59E0B" if score_global >= 40 else "#EF4444"
     year_text = f" ({report_year})" if report_year else ""

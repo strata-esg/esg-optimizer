@@ -175,6 +175,7 @@ def run_analysis_pipeline(analysis_id: int, storage_key: str, db: Session) -> No
                     score_global=analysis.score_global or 0,
                     csrd_ready=analysis.csrd_ready or False,
                     report_year=analysis.report_year,
+                    csrd_coverage_pct=analysis.csrd_coverage_pct,
                 )
         except Exception as email_exc:
             logger.warning("Pipeline [%d] - Email succès non envoyé : %s", analysis_id, email_exc)
