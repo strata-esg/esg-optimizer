@@ -523,4 +523,4 @@ def recompute_delta(
             detail="Aucune analyse précédente trouvée pour cette entreprise.",
         )
 
-    return {"status": "ok", "analysis_i
+    return {"status": "ok", "analysis_id": analysis_id, "previous_id": previous.id}
