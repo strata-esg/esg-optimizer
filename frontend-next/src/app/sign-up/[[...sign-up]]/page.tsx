@@ -44,7 +44,7 @@ export default function SignUpPage() {
               borderRadius: "0.625rem",
             },
           }}
-          fallbackRedirectUrl="/dashboard"
+          forceRedirectUrl="/dashboard"
           signInUrl="/sign-in"
         />
       </div>
