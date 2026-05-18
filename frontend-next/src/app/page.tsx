@@ -87,7 +87,7 @@ const HOW = [
   },
   {
     step: "2",
-    title: "Analyse GPT-4o en 3 min",
+    title: "Analyse IA en 3 min",
     desc: "Notre moteur d'analyse score les 10 ESRS (E1 à G1), détecte vos non-conformités et génère des recommandations concrètes.",
     icon: BarChart2,
   },

@@ -380,7 +380,7 @@ export default function UploadPage() {
                 {
                   icon: Zap,
                   title: "Analyse en 3 minutes",
-                  desc: "GPT-4o analyse votre rapport selon les standards ESRS et CSRD automatiquement.",
+                  desc: "Notre moteur IA analyse votre rapport selon les standards ESRS et CSRD automatiquement.",
                 },
                 {
                   icon: Lock,

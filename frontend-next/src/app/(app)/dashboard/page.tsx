@@ -9,8 +9,6 @@ import {
   XCircle,
   Clock,
   ArrowUpRight,
-  Leaf,
-  Users,
   Building2,
 } from "lucide-react";
 import { apiClient, API_BASE } from "@/lib/api";
@@ -179,7 +177,6 @@ export default async function DashboardPage() {
         <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-1.5 text-[#96D9A2] text-xs font-semibold bg-white/10 px-2.5 py-1 rounded-full mb-3">
-              <Leaf className="w-3 h-3" />
               Plan {planLabels[userPlan] ?? userPlan}
             </span>
             <h1

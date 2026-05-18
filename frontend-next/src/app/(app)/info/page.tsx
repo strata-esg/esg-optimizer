@@ -75,7 +75,7 @@ export default function MentionsAppPage() {
         <section className="card md:col-span-2">
           <h2 className="text-xl text-[#1A3D22] mb-4 font-semibold">Méthodologie d'analyse</h2>
           <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
-            Notre moteur IA (GPT-4o, temperature 0.2) analyse vos rapports de durabilité en s'appuyant sur les{" "}
+            Notre moteur IA analyse vos rapports de durabilité en s'appuyant sur les{" "}
             <strong className="text-[#1C1C1C]">ESRS - European Sustainability Reporting Standards</strong> définis par l'EFRAG
             dans le cadre de la directive CSRD. Nous couvrons les 10 thématiques suivantes :
           </p>

@@ -77,7 +77,7 @@ export default function MentionsPage() {
             Méthodologie d'analyse
           </h2>
           <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
-            Notre moteur IA (GPT-4o, temperature 0.2 pour des résultats reproductibles) analyse
+            Notre moteur IA analyse
             vos rapports de durabilité en s'appuyant sur les{" "}
             <strong>ESRS - European Sustainability Reporting Standards</strong> définis par l'EFRAG
             dans le cadre de la directive CSRD. Nous couvrons les 10 thématiques suivantes :
@@ -116,7 +116,7 @@ export default function MentionsPage() {
               <ul className="space-y-1 text-[#6B7280]">
                 <li>Python 3.11+ / FastAPI / Uvicorn</li>
                 <li>PostgreSQL (Railway)</li>
-                <li>OpenAI GPT-4o</li>
+                <li>Modèle de langage IA (OpenAI)</li>
                 <li>PyMuPDF · python-docx · openpyxl</li>
                 <li>Stripe (paiements)</li>
                 <li>Resend (emails transactionnels)</li>

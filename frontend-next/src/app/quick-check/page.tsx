@@ -11,8 +11,10 @@ import {
   BarChart2,
   Zap,
   RefreshCw,
+  FileDown,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import QuickCheckPdfPreview from "./QuickCheckPdfPreview";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");
 
@@ -47,6 +49,7 @@ export default function QuickCheckPage() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<QuickResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showPdf, setShowPdf] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -103,7 +106,7 @@ export default function QuickCheckPage() {
     } finally { setUploading(false); }
   }, [file, pollResult]);
 
-  const reset = () => { setFile(null); setResult(null); setError(null); stopPolling(); };
+  const reset = () => { setFile(null); setResult(null); setError(null); setShowPdf(false); stopPolling(); };
 
   const isProcessing = result?.status === "pending" || result?.status === "processing";
   const isDone = result?.status === "success";
@@ -215,6 +218,17 @@ export default function QuickCheckPage() {
           </div>
         ) : isDone ? (
           <div className="space-y-5">
+            {/* Bouton aperçu PDF */}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowPdf(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E5E0D8] bg-white text-[#1A3D22] font-semibold text-sm hover:bg-[#F7F2E8] hover:border-[#1A3D22] transition-all shadow-sm"
+              >
+                <FileDown className="w-4 h-4" />
+                Aperçu PDF — 3 pages
+              </button>
+            </div>
+
             {/* Score card */}
             <div className="bg-white rounded-2xl border border-[#E5E0D8] shadow-sm p-8">
               <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -323,6 +337,18 @@ export default function QuickCheckPage() {
           <strong>Mode Quick Check :</strong> diagnostic limité à 3 analyses / jour par IP. Scores E/S/G, recommandations détaillées et rapport PDF uniquement disponibles avec un compte.
         </div>
       </main>
+
+      {/* PDF Preview */}
+      {showPdf && result?.status === "success" && (
+        <QuickCheckPdfPreview
+          filename={file?.name ?? "rapport.pdf"}
+          scoreGlobal={result.score_global ?? 0}
+          csrdReady={result.csrd_ready ?? null}
+          strengths={result.teaser_strengths ?? []}
+          weaknesses={result.teaser_weaknesses ?? []}
+          onClose={() => setShowPdf(false)}
+        />
+      )}
     </div>
   );
 }
