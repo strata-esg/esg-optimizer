@@ -188,15 +188,6 @@ export default function LandingPage() {
       {/* -- Hero --------------------------------------- */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <a
-            href="https://www.strata-esg.fr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-[#1A3D22]/50 hover:text-[#1A3D22] mb-4 transition-colors group"
-          >
-            A STRATA product
-            <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-          </a>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4F0D8] text-[#1A3D22] text-sm font-medium mb-6">
             <Zap className="w-3.5 h-3.5" />
             CSRD 2026 - Deadline imminente pour 15 000+ entreprises françaises

@@ -428,6 +428,7 @@ def get_badge(share_token: str, db: Session = Depends(get_db)):
             csrd_ready=analysis.csrd_ready or False,
             report_year=analysis.report_year,
             analysis_date=analysis.created_at,
+            csrd_coverage_pct=analysis.csrd_coverage_pct,
         )
     except Exception as exc:
         logger.error("Erreur génération badge [%s] : %s", share_token, exc)
@@ -522,4 +523,4 @@ def recompute_delta(
             detail="Aucune analyse précédente trouvée pour cette entreprise.",
         )
 
-    return {"status": "ok", "analysis_id": analysis_id, "previous_id": previous.id}
+    return {"status": "ok", "analysis_i

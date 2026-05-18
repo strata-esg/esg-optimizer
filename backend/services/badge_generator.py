@@ -62,6 +62,20 @@ def _score_color(score: float) -> tuple:
     return RED
 
 
+def _csrd_stage(csrd_ready: bool, coverage_pct: float | None) -> tuple[str, tuple, tuple]:
+    """Retourne (label, bg_color, text_color) selon le stage CSRD."""
+    pct = coverage_pct if coverage_pct is not None else (87.0 if csrd_ready else 28.0)
+    if pct >= 85:
+        return "CSRD Ready  ✓", (209, 250, 229), (5, 150, 105)
+    if pct >= 70:
+        return "Avance  ●", (220, 252, 231), (21, 128, 61)
+    if pct >= 50:
+        return "En developpement  ▲", (254, 243, 199), (146, 64, 14)
+    if pct >= 30:
+        return "Initie  ▲", (254, 215, 170), (154, 52, 18)
+    return "Non conforme  ✗", (254, 226, 226), (220, 38, 38)
+
+
 def generate_badge(
     company_name: str,
     score_global: float,
@@ -69,6 +83,7 @@ def generate_badge(
     report_year: int | None = None,
     analysis_date: datetime | None = None,
     app_url: str = "esg-optimizer.fr",
+    csrd_coverage_pct: float | None = None,
 ) -> bytes:
     """
     Génère un badge PNG 1200x630 pour le partage social.
@@ -163,25 +178,21 @@ def generate_badge(
         font_bar = _get_font(14)
         draw.text((bar_x, y - 18), label_text, fill=BRAND_DARK, font=font_bar)
 
-    # Badge CSRD
+    # Badge CSRD multi-stages
     badge_x = 900
     badge_y = 250
-    if csrd_ready:
-        draw.rounded_rectangle(
-            [(badge_x, badge_y), (badge_x + 220, badge_y + 50)],
-            radius=12,
-            fill=(209, 250, 229),  # vert clair
-        )
-        font_badge = _get_font(18, bold=True)
-        draw.text((badge_x + 20, badge_y + 12), "CSRD Ready  ✓", fill=(5, 150, 105), font=font_badge)
-    else:
-        draw.rounded_rectangle(
-            [(badge_x, badge_y), (badge_x + 220, badge_y + 50)],
-            radius=12,
-            fill=(254, 226, 226),  # rouge clair
-        )
-        font_badge = _get_font(18, bold=True)
-        draw.text((badge_x + 15, badge_y + 12), "Non conforme  ✗", fill=RED, font=font_badge)
+    stage_label, stage_bg, stage_fg = _csrd_stage(csrd_ready, csrd_coverage_pct)
+    draw.rounded_rectangle(
+        [(badge_x, badge_y), (badge_x + 240, badge_y + 50)],
+        radius=12,
+        fill=stage_bg,
+    )
+    font_badge = _get_font(17, bold=True)
+    draw.text((badge_x + 14, badge_y + 13), stage_label, fill=stage_fg, font=font_badge)
+    # Pourcentage sous le badge
+    if csrd_coverage_pct is not None:
+        font_pct = _get_font(13)
+        draw.text((badge_x + 14, badge_y + 56), f"Couverture {int(round(csrd_coverage_pct))}%", fill=BRAND_GRAY, font=font_pct)
 
     # Date de l'analyse
     date_str = (analysis_date or datetime.now()).strftime("%d/%m/%Y")
