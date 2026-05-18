@@ -1,4 +1,5 @@
 import Sidebar from "./Sidebar";
+import OnboardingModal from "./OnboardingModal";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="md:ml-64 min-h-screen px-4 pt-16 pb-10 md:px-10 md:py-8">
         {children}
       </main>
+      <OnboardingModal />
     </div>
   );
 }

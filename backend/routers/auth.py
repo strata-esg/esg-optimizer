@@ -146,6 +146,27 @@ def me(current_user: User = Depends(get_current_user)):
     return UserResponse.model_validate(current_user)
 
 
+# PATCH /auth/profile
+@router.patch("/profile", response_model=UserResponse)
+def update_profile(
+    full_name: str | None = None,
+    company_name: str | None = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Met à jour le profil utilisateur (nom, entreprise) depuis le questionnaire d'onboarding.
+    """
+    if full_name is not None:
+        current_user.full_name = full_name.strip()
+    if company_name is not None:
+        current_user.company_name = company_name.strip()
+    db.commit()
+    db.refresh(current_user)
+    logger.info("update_profile: user=%d, full_name=%s, company_name=%s", current_user.id, full_name, company_name)
+    return UserResponse.model_validate(current_user)
+
+
 # PATCH /auth/sync-email
 # Le frontend Next.js appelle cet endpoint après connexion pour s'assurer
 # que l'email stocké dans la DB correspond à l'email Clerk réel.
